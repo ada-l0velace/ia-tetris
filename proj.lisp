@@ -74,7 +74,7 @@ tab)
 	T)
 )
 
-(defun tabuleiro-preeche! (tabuleiro linha coluna)
+(defun tabuleiro-preenche! (tabuleiro linha coluna)
 	(if (not (or (> linha *dim-linhas*) (> coluna *dim-colunas*)))
 		(setf (aref (tr-tab tabuleiro) linha coluna) T)
 	)
@@ -145,3 +145,12 @@ tab)
 (defun estado-final-p (estado)
 	(or (tabuleiro-topo-preenchido-p (er-tabuleiro estado)) (null (er-pecas-por-colocar estado)))
 )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;  Funcoes do Problema de Procura ;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun solucao (estado)
+	(and (not (tabuleiro-topo-preenchido-p (er-tabuleiro estado))) (null (er-pecas-por-colocar estado)))	
+)
+
