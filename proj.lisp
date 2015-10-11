@@ -30,10 +30,16 @@ tab)
 	(copy-seq tabuleiro)
 )
 
-(defun tabuleiro-preenchido-p (tabuleiro linha coluna):
+(defun tabuleiro-preenchido-p (tabuleiro linha coluna)
 	(aref (tr-tab tabuleiro) linha coluna)
 )
 
-(defun tabuleiro-altura-coluna (tabuleiro coluna):
-	
+(defun tabuleiro-altura-coluna (tabuleiro coluna)
+	(let ((altura 0))
+		(loop for i from 0 below (array-dimension (tr-tab tabuleiro) 0) do
+			(if (eq (tabuleiro-preenchido-p tabuleiro i coluna) T)
+				(incf altura)
+			)
+		)
+	altura)
 )
