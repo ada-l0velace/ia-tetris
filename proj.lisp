@@ -138,8 +138,8 @@ tab)
 	(cria-estado (er-pontos estado) (copy-seq (er-pecas-por-colocar estado)) (copy-seq (er-pecas-colocadas estado)) (copia-tabuleiro (er-tabuleiro estado)))
 )
 
-(defun estados-iguais-p (estado estado)
-	(equalp estado estado)
+(defun estados-iguais-p (estado estado1)
+	(equalp estado estado1)
 )
 
 (defun estado-final-p (estado)
