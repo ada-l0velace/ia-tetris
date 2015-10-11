@@ -15,7 +15,8 @@ coluna peca)
 tab)
 
 ;; Tipo Estado
-(defstruct (estado (:conc-name er-) (:constructor cria-estado (pontos pecas-por-colocar pecas-colocadas tabuleiro)))
+(defstruct (estado 
+	)
 	pontos
 	pecas-por-colocar
 	pecas-colocadas
@@ -135,7 +136,12 @@ tab)
 ;;;;;;;;;;;;;;;;;;
 
 (defun copia-estado (estado)
-	(cria-estado (er-pontos estado) (copy-seq (er-pecas-por-colocar estado)) (copy-seq (er-pecas-colocadas estado)) (copia-tabuleiro (er-tabuleiro estado)))
+	(make-estado 
+		:pontos (estado-pontos estado) 
+		:pecas-por-colocar (copy-seq (estado-pecas-por-colocar estado)) 
+		:pecas-colocadas (copy-seq (estado-pecas-colocadas estado)) 
+		:tabuleiro (copia-tabuleiro (estado-tabuleiro estado))
+	)
 )
 
 (defun estados-iguais-p (estado estado1)
@@ -143,7 +149,7 @@ tab)
 )
 
 (defun estado-final-p (estado)
-	(or (tabuleiro-topo-preenchido-p (er-tabuleiro estado)) (null (er-pecas-por-colocar estado)))
+	(or (tabuleiro-topo-preenchido-p (estado-tabuleiro estado)) (null (estado-pecas-por-colocar estado)))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -151,6 +157,6 @@ tab)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun solucao (estado)
-	(and (not (tabuleiro-topo-preenchido-p (er-tabuleiro estado))) (null (er-pecas-por-colocar estado)))	
+	(and (not (tabuleiro-topo-preenchido-p (estado-tabuleiro estado))) (null (estado-pecas-por-colocar estado)))	
 )
 
