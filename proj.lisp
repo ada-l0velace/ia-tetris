@@ -97,3 +97,27 @@ tab)
 	T	
 )
 
+(defun tabuleiro->array (tabuleiro)
+	(let (
+		(new-array (make-array (list *dim-linhas* *dim-colunas*)))
+	)
+	(loop for i from 0 below *dim-linhas* do
+		(loop for j from 0 below *dim-colunas* do
+			(setf (aref new-array i j) (aref (tr-tab tabuleiro) i j))		
+		)
+	)
+	new-array)	
+)
+
+(defun array->tabuleiro (array)
+	(let (
+		(new-tabuleiro (cria-tabuleiro))
+	)
+	(loop for i from 0 below *dim-linhas* do
+		(loop for j from 0 below *dim-colunas* do
+			(setf (aref (tr-tab new-tabuleiro) i j) (aref array i j))		
+		)
+	)
+	new-tabuleiro)
+)
+
