@@ -15,7 +15,7 @@ coluna peca)
 tab)
 
 ;; Tipo Estado
-(defstruct estado
+(defstruct (estado (:conc-name er-) (:constructor cria-estado (pontos pecas-por-colocar pecas-colocadas tabuleiro)))
 	pontos
 	pecas-por-colocar
 	pecas-colocadas
@@ -31,14 +31,16 @@ tab)
 	custo-caminho
 )
 
-;;Tipo Tabuleiro
+;;;;;;;;;;;;;;;;;;
+;;Tipo Tabuleiro;;
+;;;;;;;;;;;;;;;;;;
 (defun cria-tabuleiro ()
 	(make-tabuleiro :tab (make-array (list *dim-linhas* *dim-colunas*)))
 )
 
 ;des
 (defun copia-tabuleiro (tabuleiro)
-	(copy-seq tabuleiro)
+	(make-tabuleiro :tab (tabuleiro->array tabuleiro))
 )
 
 ;des
@@ -46,8 +48,7 @@ tab)
 	(aref (tr-tab tabuleiro) linha coluna)
 )
 
-;(incf num)
-;(decf num)
+;des
 (defun tabuleiro-altura-coluna (tabuleiro coluna)
 	(let (
 		(altura 0)
@@ -129,3 +130,18 @@ tab)
 	new-tabuleiro)
 )
 
+;;;;;;;;;;;;;;;;;;
+;;  Tipo Estado ;;
+;;;;;;;;;;;;;;;;;;
+
+(defun copia-estado (estado)
+	(cria-estado (er-pontos estado) (copy-seq (er-pecas-por-colocar estado)) (copy-seq (er-pecas-colocadas estado)) (copia-tabuleiro (er-tabuleiro estado)))
+)
+
+(defun estados-iguais-p (estado estado)
+	(equalp estado estado)
+)
+
+(defun estado-final-p (estado)
+	(or (tabuleiro-topo-preenchido-p (er-tabuleiro estado)) (null (er-pecas-por-colocar estado)))
+)

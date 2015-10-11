@@ -1,0 +1,1 @@
+http://eli.thegreenplace.net/2004/08/08/equality-in-lisp
