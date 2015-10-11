@@ -14,6 +14,14 @@ coluna peca)
 	(tabuleiro (:conc-name tr-))
 tab)
 
+;; Tipo Estado
+(defstruct estado
+	pontos
+	pecas-por-colocar
+	pecas-colocadas
+	tabuleiro
+)
+
 ;; Tipo Problema
 (defstruct problema
 	estado-inicial
