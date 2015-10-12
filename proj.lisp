@@ -113,14 +113,7 @@ tab)
 )
 
 (defun tabuleiros-iguais-p (tabuleiro tabuleiro1)
-	(loop for i from 0 below *dim-linhas* do
-		(loop for j from 0 below *dim-colunas* do
-			(if (not (eq (tabuleiro-preenchido-p tabuleiro i j) (tabuleiro-preenchido-p tabuleiro1 i j)))
-				(return-from tabuleiros-iguais-p NIL)
-			)
-		)
-	)
-	T	
+	(equalp tabuleiro tabuleiro1)
 )
 
 (defun tabuleiro->array (tabuleiro)
@@ -233,7 +226,13 @@ tab)
 		)
 		(setf new-estado (copia-estado estado))
 		(estado-accao new-estado accao (tabuleiro-altura-coluna (estado-tabuleiro new-estado) (accao-coluna accao)))	
-	
+		(if (eq (tabuleiro-topo-preenchido-p (estado-tabuleiro new-estado)) NIL)
+			(loop for linha from 0 below *dim-linhas* do
+				(if (eq (tabuleiro-linha-completa-p (estado-tabuleiro new-estado) linha) T)
+					(tabuleiro-remove-linha! (estado-tabuleiro new-estado) linha)
+				)
+			)
+		)
 	new-estado)
 )
 
