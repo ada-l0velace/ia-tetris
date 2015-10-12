@@ -24,7 +24,7 @@ Copyright (c) Sam Steingold, Bruno Haible 2001-2010
 
 Type :h and hit Enter for context help.
 
-[1]> (load (compile-file "projecto"))
+[1]> (load (compile-file "proj.lisp"))
 ;; Compiling file /home/*user*/*path*/ia-tetris/proj.lisp ...
 ;; Wrote file /home/user/path/ia-tetris/proj.fas
 0 errors, 0 warnings
