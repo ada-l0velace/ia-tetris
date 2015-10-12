@@ -137,7 +137,7 @@ tab)
 )
 
 (defun tabuleiro-preenche! (tabuleiro linha coluna)
-	(if (not (or (> linha *dim-linhas*) (> coluna *dim-colunas*)))
+	(if (not (or (> linha (1- *dim-linhas*)) (> coluna (1- *dim-colunas*))))
 		(setf (aref (tr-tab tabuleiro) linha coluna) T)
 	)
 )
@@ -239,7 +239,7 @@ tab)
 )
 
 (defun solucao (estado)
-	(and (not (tabuleiro-topo-preenchido-p (estado-tabuleiro estado))) (null (estado-pecas-por-colocar estado)))	
+	(estado-final-p estado)	
 )
 
 (defun accoes (estado)
