@@ -1,6 +1,7 @@
- (defparameter *dim-linhas* 18)
- (defparameter *dim-colunas* 10)
- (defparameter *SUPPRESS-SIMILAR-CONSTANT-REDEFINITION-WARNING* T)
+
+(defparameter *dim-linhas* 18)
+(defparameter *dim-colunas* 10)
+(defparameter *SUPPRESS-SIMILAR-CONSTANT-REDEFINITION-WARNING* T)
  
 ;; Tipo accao
 
