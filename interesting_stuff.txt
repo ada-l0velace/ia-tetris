@@ -1,3 +1,7 @@
 http://eli.thegreenplace.net/2004/08/08/equality-in-lisp
 https://books.google.pt/books?id=FYoOIWuoXUIC&pg=PA473&lpg=PA473&dq=constructor+structures+in+common+lisp&source=bl&ots=ip7elDRSS4&sig=8xI-oie9owCbiKdegnDZaZZ8lf4&hl=pt-PT&sa=X&ved=0CEQQ6AEwBWoVChMI3vfzgZe5yAIVytsaCh3vVAuH#v=onepage&q=constructor%20structures%20in%20common%20lisp&f=false
 http://psg.com/~dlamkins/sl/chapter06.html
+(load (compile-file "utils.lisp"))
+(load (compile-file "proj.lisp"))
+(executa-jogadas e1 (accoes e1))
+(accoes e1)

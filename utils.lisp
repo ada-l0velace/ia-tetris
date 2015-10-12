@@ -100,7 +100,7 @@
 	(format T "| ")
 	(dotimes (coluna 10)
 		(format T "~A " (cond ((null accao) " ")
-							  ((and (array-in-bounds-p (accao-coluna accao) linha (- coluna (accao-coluna accao)))
+							  ((and (array-in-bounds-p (accao-peca accao) linha (- coluna (accao-coluna accao)))
 									(aref (accao-peca accao) linha (- coluna (accao-coluna accao)))) "#")
 							  (T " "))))
 	(format T "|"))
