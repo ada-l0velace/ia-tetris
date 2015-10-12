@@ -146,6 +146,12 @@ tab)
 	(loop for i from 0 below *dim-colunas* do
 		(setf (aref (tr-tab tabuleiro) linha i) NIL)
 	)
+	(loop for i from linha below (1- *dim-linhas*) do
+		(loop for j from 0 below *dim-colunas* do
+			(setf (aref (tr-tab tabuleiro) i j) (aref (tr-tab tabuleiro) (1+ i) j))
+		)
+	)
+	;(setf (aref (tr-tab tabuleiro) (1-*dim-linhas*) *dim-linhas*) (make-array (list *dim-linhas* *dim-colunas*)))
 )
 
 (defun tabuleiro-topo-preenchido-p (tabuleiro)
@@ -219,6 +225,15 @@ tab)
 ;;  Funcoes do Problema de Procura ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun pontos (linhas-removidas)
+	(case linhas-removidas 
+		((1) 100)
+		((2) 200)
+		((3) 500)
+		((4) 800)
+	)
+)
+
 (defun solucao (estado)
 	(and (not (tabuleiro-topo-preenchido-p (estado-tabuleiro estado))) (null (estado-pecas-por-colocar estado)))	
 )
@@ -253,17 +268,24 @@ tab)
 (defun resultado (estado accao)
 	(let (
 		(new-estado NIL)
+		(linhas-removidas 0)
 		)
 		(setf new-estado (copia-estado estado))
 		(estado-accao new-estado accao (tabuleiro-altura-coluna (estado-tabuleiro new-estado) (accao-coluna accao)))	
 		(if (eq (tabuleiro-topo-preenchido-p (estado-tabuleiro new-estado)) NIL)
 			(loop for linha from 0 below *dim-linhas* do
-				(if (eq (tabuleiro-linha-completa-p (estado-tabuleiro new-estado) linha) T)
-					(tabuleiro-remove-linha! (estado-tabuleiro new-estado) linha)
+				(if (eq (tabuleiro-linha-completa-p (estado-tabuleiro new-estado) (- linha linhas-removidas)) T)
+					(block removidas
+						(tabuleiro-remove-linha! (estado-tabuleiro new-estado) (- linha linhas-removidas))
+						(incf linhas-removidas)
+					)
 				)
 			)
 		)
 		(setf (estado-pecas-colocadas new-estado) (cons (car (estado-pecas-por-colocar new-estado)) (estado-pecas-colocadas new-estado)))
+		(if (not (eq linhas-removidas 0))
+			(setf (estado-pontos new-estado) (pontos linhas-removidas))
+		)
 		(setf (estado-pecas-por-colocar new-estado) (cdr (estado-pecas-por-colocar new-estado)))
 		new-estado
 	)

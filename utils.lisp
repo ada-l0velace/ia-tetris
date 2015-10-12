@@ -76,7 +76,6 @@
 			(read-char)
 			(setf estado (resultado estado (first lista-accoes)))
 			(setf lista-accoes (rest lista-accoes))
-			(princ estado)
 		)
 		(desenha-estado estado)
 		(estado-pontos estado)))
