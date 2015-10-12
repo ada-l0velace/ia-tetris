@@ -303,7 +303,9 @@ tab)
 	(* -1 (estado-pontos estado))
 )
 
-
+(defun custo-oportunidade (estado)
+	(+ (+ 800 500 500 300 300 300 300) (estado-pontos estado))
+)
 
 (defun formulacao-problema (tabuleiro pecas-por-colocar)
 	(return-from formulacao-problema 
