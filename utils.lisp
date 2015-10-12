@@ -141,5 +141,5 @@
 ;	(tabuleiro-preenche! t1 0 coluna))
 ;(dotimes (coluna 9)
 ;	(tabuleiro-preenche! t1 1 coluna))
-(defvar e1 (make-estado :tabuleiro t1 :pecas-por-colocar '(l o j i t i)))
+(defvar e1 (make-estado :tabuleiro t1 :pecas-por-colocar '(i o j j t i)))
 (defvar p1 (formulacao-problema t1 '(i o j l t i)))

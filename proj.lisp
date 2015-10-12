@@ -17,7 +17,7 @@ tab)
 ;; Tipo Estado
 (defstruct (estado 
 	)
-	pontos
+	(pontos 0 :type integer)
 	pecas-por-colocar
 	pecas-colocadas
 	tabuleiro
@@ -286,7 +286,9 @@ tab)
 				)
 			)
 		)
-		(setf (estado-pecas-colocadas new-estado) (cons (car (estado-pecas-por-colocar new-estado)) (estado-pecas-colocadas new-estado)))
+		(if (not (null (estado-pecas-por-colocar estado)))
+			(setf (estado-pecas-colocadas new-estado) (cons (car (estado-pecas-por-colocar new-estado)) (estado-pecas-colocadas new-estado)))	
+		)
 		;(setf (estado-pecas-por-colocar new-estado) (cdr (estado-pecas-por-colocar new-estado)))
 		(if (not (solucao new-estado))
 			(if (not (eq linhas-removidas 0))
@@ -296,6 +298,12 @@ tab)
 		new-estado
 	)
 )
+
+(defun qualidade (estado)
+	(* -1 (estado-pontos estado))
+)
+
+
 
 (defun formulacao-problema (tabuleiro pecas-por-colocar)
 	(return-from formulacao-problema 
