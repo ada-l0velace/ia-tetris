@@ -2,7 +2,9 @@
 Projecto de IA em common-lisp tetris 
 
 # Compilar o Projecto
-'''
+
+```lisp
+
 /clisp
   i i i i i i i       ooooo    o        ooooooo   ooooo   ooooo
   I I I I I I I      8     8   8           8     8     o  8    8
@@ -31,3 +33,5 @@ Type :h and hit Enter for context help.
 ;;  Loaded file utils.lisp
 ;; Loaded file /home/*user*/*path*/ia-tetris/proj.fas
 T
+
+```
