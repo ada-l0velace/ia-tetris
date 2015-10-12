@@ -313,7 +313,7 @@ tab)
 			:solucao #' solucao
 			:accoes #' accoes
 			:resultado #' resultado
-			:custo-caminho NIL)
+			:custo-caminho #' custo-oportunidade)
 	)
 )
 
