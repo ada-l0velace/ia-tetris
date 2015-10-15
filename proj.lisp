@@ -76,7 +76,7 @@ tab)
 	)
 )
 
-(defun peca-largura (peca)
+(defun peca-dimensao-largura (peca)
 	(array-dimension peca 1)
 )
 (defun peca-dimensao-altura (peca)
@@ -85,20 +85,6 @@ tab)
 
 (defun peca-preenchido (peca linha coluna )
 	(aref peca linha coluna)
-)
-
-(defun peca-altura-coluna (peca coluna)
-	(let (
-		(dim-linhas-peca (peca-dimensao-altura peca))
-		(altura 0)
-		)
-		(loop for i from 0 below dim-linhas-peca  do
-			(if (eq (peca-preenchido i coluna) T)
-				(incf altura)
-				 (altura)
-			)
-		)
-	)
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -154,37 +140,6 @@ tab)
 	(- dim-linhas altura))
 )
 
-(defun peca-altura-coluna (peca coluna)
-	(let (
-		(altura 0)
-		(dim-linhas (peca-dimensao-altura peca))
-		)
-		(if (null (aref peca (1- dim-linhas) coluna))
-			(return-from peca-altura-coluna 0)
-		)
-		(loop for i downfrom (1- dim-linhas) downto 0 do
-			(if (eq (aref peca i coluna) NIL)
-				(incf altura)
-			)
-		)
-		altura
-	)
-)
-
-(defun subtract (tabuleiro linha coluna)
-	(let (
-		(altura 0)
-		(dim-linhas (array-dimension (tr-tab tabuleiro) 0))
-	)
-	(loop for i downfrom linha downto 0 do
-		(if (eq (tabuleiro-preenchido-p tabuleiro i coluna) NIL)
-			(incf altura)
-			 (return-from subtract altura)
-		)
-	)
-	altura)
-)
-
 (defun tabuleiro-linha-completa-p (tabuleiro linha)
 	(let (
 		(dim-colunas (array-dimension (tr-tab tabuleiro) 1))
@@ -205,7 +160,7 @@ tab)
 
 (defun tabuleiro-alturas-peca-coluna (tabuleiro peca coluna)
 	(let ((alturas NIL)
-		(dim-colunas-peca (peca-largura peca))
+		(dim-colunas-peca (peca-dimensao-largura peca))
 		)
 		;(format t "colunas: ~d ~c" dim-colunas-peca #\linefeed)
 		;(princ dim-colunas-peca) 
@@ -229,7 +184,7 @@ tab)
 (defun tabuleiro-peca-cabe? (tabuleiro peca linha coluna)
 	(let (
 		(dim-linhas-peca (peca-dimensao-altura peca))
-		(dim-colunas-peca (peca-largura peca))
+		(dim-colunas-peca (peca-dimensao-largura peca))
 		)
 
 		;(format t "linhas: ~d colunas: ~d ~c" dim-linhas-peca dim-colunas-peca #\linefeed)
@@ -419,8 +374,6 @@ tab)
 		(altura (tabuleiro-altura-coluna (estado-tabuleiro estado) (accao-coluna accao)))
 		)
 		(setf new-estado (copia-estado estado))
-		;(princ (peca-largura (accao-peca accao)))
-		;(princ (tabuleiro-maior-altura-coluna (estado-tabuleiro new-estado) accao (peca-largura (accao-peca accao))))
 		(if (>= (+ altura (peca-dimensao-altura (accao-peca accao))) *dim-linhas*)
 			 (estado-accao new-estado accao altura)
 			(estado-accao new-estado accao (tabuleiro-linha-desenho (estado-tabuleiro new-estado) (accao-peca accao) (accao-coluna accao)))
