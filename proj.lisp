@@ -69,12 +69,41 @@ tab)
 		((eq 'i simbolo) (cons peca-i0 (cons peca-i1 NIL)))
 		((eq 'l simbolo) (cons peca-l0 (cons peca-l1 (cons peca-l2 (cons peca-l3 NIL)))))
 		((eq 'j simbolo) (cons peca-j0 (cons peca-j1 (cons peca-j2 (cons peca-j3 NIL)))))
-		((eq 'o simbolo) (cons peca-i1 NIL))
+		((eq 'o simbolo) (cons peca-o0 NIL))
 		((eq 's simbolo) (cons peca-s0 (cons peca-s1 NIL)))
 		((eq 'z simbolo) (cons peca-z0 (cons peca-z1 NIL)))
 		((eq 't simbolo) (cons peca-t0 (cons peca-t1 (cons peca-t2 (cons peca-t3 NIL)))))
 	)
 )
+
+(defun peca-largura (peca)
+	(array-dimension peca 1)
+)
+(defun peca-dimensao-altura (peca)
+	(array-dimension peca 0)
+)
+
+(defun peca-preenchido (peca linha coluna )
+	(aref peca linha coluna)
+)
+
+(defun peca-altura-coluna (peca coluna)
+	(let (
+		(dim-linhas-peca (peca-dimensao-altura peca))
+		(altura 0)
+		)
+		(loop for i from 0 below dim-linhas-peca  do
+			(if (eq (peca-preenchido i coluna) T)
+				(incf altura)
+				 (altura)
+			)
+		)
+	)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;
+;;    Tipo accao    ;;
+;;;;;;;;;;;;;;;;;;;;;;
 
 (defun cria-accao(coluna peca)
 	(make-accao :coluna-peca (cons coluna peca))
@@ -125,6 +154,37 @@ tab)
 	(- dim-linhas altura))
 )
 
+(defun peca-altura-coluna (peca coluna)
+	(let (
+		(altura 0)
+		(dim-linhas (peca-dimensao-altura peca))
+		)
+		(if (null (aref peca (1- dim-linhas) coluna))
+			(return-from peca-altura-coluna 0)
+		)
+		(loop for i downfrom (1- dim-linhas) downto 0 do
+			(if (eq (aref peca i coluna) NIL)
+				(incf altura)
+			)
+		)
+		altura
+	)
+)
+
+(defun subtract (tabuleiro linha coluna)
+	(let (
+		(altura 0)
+		(dim-linhas (array-dimension (tr-tab tabuleiro) 0))
+	)
+	(loop for i downfrom linha downto 0 do
+		(if (eq (tabuleiro-preenchido-p tabuleiro i coluna) NIL)
+			(incf altura)
+			 (return-from subtract altura)
+		)
+	)
+	altura)
+)
+
 (defun tabuleiro-linha-completa-p (tabuleiro linha)
 	(let (
 		(dim-colunas (array-dimension (tr-tab tabuleiro) 1))
@@ -141,6 +201,85 @@ tab)
 	(if (not (or (> linha (1- *dim-linhas*)) (> coluna (1- *dim-colunas*))))
 		(setf (aref (tr-tab tabuleiro) linha coluna) T)
 	)
+)
+
+(defun tabuleiro-alturas-peca-coluna (tabuleiro peca coluna)
+	(let ((alturas NIL)
+		(dim-colunas-peca (peca-largura peca))
+		)
+		;(format t "colunas: ~d ~c" dim-colunas-peca #\linefeed)
+		;(princ dim-colunas-peca) 
+		;(read-char)
+		(loop for c from 0 below dim-colunas-peca do
+			;(format t "~d ~c" (tabuleiro-altura-coluna tabuleiro (+ c coluna)) #\linefeed)
+			(setf alturas (cons (tabuleiro-altura-coluna tabuleiro (+ c coluna)) alturas))
+		)
+		;(format t "colunas: ~d ~c" alturas #\linefeed)
+	(setf alturas (remove 0 alturas))
+	(if (null alturas)
+		(setf alturas (cons 0 alturas))
+	)
+	(if (< (first alturas) (car (last alturas)))
+		(reverse alturas)
+		 alturas	
+	)
+	)
+)
+
+(defun tabuleiro-peca-cabe? (tabuleiro peca linha coluna)
+	(let (
+		(dim-linhas-peca (peca-dimensao-altura peca))
+		(dim-colunas-peca (peca-largura peca))
+		)
+
+		;(format t "linhas: ~d colunas: ~d ~c" dim-linhas-peca dim-colunas-peca #\linefeed)
+		;(read-char)
+		(loop for pl downfrom (1- dim-linhas-peca) downto 0 do
+			(loop for pc from 0 below dim-colunas-peca do
+				(if (and (eq (aref peca pl pc) T) (tabuleiro-preenchido-p tabuleiro (+ linha pl) (+ coluna pc)))
+					(return-from tabuleiro-peca-cabe? NIL)
+				)
+			)
+		)
+		(return-from tabuleiro-peca-cabe? T))
+)
+
+(defun tabuleiro-linha-desenho (tabuleiro peca coluna)
+	(let (
+		(alturas (tabuleiro-alturas-peca-coluna tabuleiro peca coluna))
+		(hipoteses NIL)
+		(prev 0)
+		(linha 0)
+		(flag T)
+		)
+		
+
+		;(format t "alturas ~d ~c" alturas #\linefeed)
+		(loop for line in alturas do
+			(loop for l downfrom line downto 0 do
+				;(format t "linhas: ~d colunas: ~d ~c" l coluna #\linefeed)
+				;(read-char)
+				;(if (eq (tabuleiro-peca-cabe? tabuleiro peca l coluna) T)
+				(block debug
+					(setf hipoteses (cons (cons l (cons (tabuleiro-peca-cabe? tabuleiro peca l coluna) NIL)) hipoteses))
+				)
+				;)
+			)
+		)
+	(setf hipoteses (reverse hipoteses))
+	;(princ hipoteses)
+	(block break_loop
+		(loop for v in hipoteses do
+			(if (eq (car (cdr v)) NIL)
+				(block se
+					(setf linha prev)
+					(return-from break_loop)
+				)
+			)
+			(setf prev (car v))
+		)
+	)
+	linha)
 )
 
 (defun tabuleiro-remove-linha! (tabuleiro linha)
@@ -208,10 +347,12 @@ tab)
 )
 
 (defun estado-accao (estado accao linha)
-	(loop for i from 0 below (array-dimension (accao-peca accao) 0) do
+	(loop for i downfrom (1- (array-dimension (accao-peca accao) 0)) downto 0  do
 		(loop for j from 0 below (array-dimension (accao-peca accao) 1) do
 			(if (eq (aref (accao-peca accao) i j) T)
-				(tabuleiro-preenche! (estado-tabuleiro estado) (+ linha i) (+ j (accao-coluna accao)))
+				(block debug
+					(tabuleiro-preenche! (estado-tabuleiro estado) (+ linha i) (+ j (accao-coluna accao)))
+				)
 			)
 		)
 	)	
@@ -248,24 +389,25 @@ tab)
 		(peca_cabe 0)
 		(lista-accoes NIL)
 		)
-		(loop for i from 0 below *dim-linhas* do
-			(loop for peca in (pecas (car (estado-pecas-por-colocar estado))) do	
-				
-				(loop for j from 0 below *dim-colunas* do
-					(setf peca_cabe 0)
-					(loop for h from j below (+ j (array-dimension peca 1)) do
-						(if (null (tabuleiro-preenchido-p (estado-tabuleiro estado) i h))	
-							(incf peca_cabe)
-						)
-					)
-					(if (eq peca_cabe (array-dimension peca 1))
-						(setf lista-accoes (cons (cria-accao j peca) lista-accoes))
+		(loop for peca in (pecas (car (estado-pecas-por-colocar estado))) do	
+			(loop for j from 0 below *dim-colunas* do
+				(setf peca_cabe 0)
+				(loop for h from j below (+ j (array-dimension peca 1)) do
+					(if (null (tabuleiro-preenchido-p 
+								(estado-tabuleiro estado) 
+								(tabuleiro-altura-coluna (estado-tabuleiro estado) h)
+								h)
+						)	
+						(incf peca_cabe)
 					)
 				)
+				(if (eq peca_cabe (array-dimension peca 1))
+					(setf lista-accoes (cons (cria-accao j peca) lista-accoes))
+				)
 			)
-			(if (not (null lista-accoes))		
-				(return-from accoes (reverse lista-accoes))
-			)
+		)
+		(if (not (null lista-accoes))		
+			(return-from accoes (reverse lista-accoes))
 		)
 	)
 )
@@ -274,9 +416,18 @@ tab)
 	(let (
 		(new-estado NIL)
 		(linhas-removidas 0)
+		(altura (tabuleiro-altura-coluna (estado-tabuleiro estado) (accao-coluna accao)))
 		)
 		(setf new-estado (copia-estado estado))
-		(estado-accao new-estado accao (tabuleiro-altura-coluna (estado-tabuleiro new-estado) (accao-coluna accao)))	
+		;(princ (peca-largura (accao-peca accao)))
+		;(princ (tabuleiro-maior-altura-coluna (estado-tabuleiro new-estado) accao (peca-largura (accao-peca accao))))
+		(if (>= (+ altura (peca-dimensao-altura (accao-peca accao))) *dim-linhas*)
+			 (estado-accao new-estado accao altura)
+			(estado-accao new-estado accao (tabuleiro-linha-desenho (estado-tabuleiro new-estado) (accao-peca accao) (accao-coluna accao)))
+
+		)
+			
+		;(estado-accao new-estado accao (tabuleiro-altura-coluna (estado-tabuleiro new-estado) (accao-coluna accao)))
 		(if (eq (tabuleiro-topo-preenchido-p (estado-tabuleiro new-estado)) NIL)
 			(loop for linha from 0 below *dim-linhas* do
 				(if (eq (tabuleiro-linha-completa-p (estado-tabuleiro new-estado) (- linha linhas-removidas)) T)
@@ -290,7 +441,7 @@ tab)
 		(if (not (null (estado-pecas-por-colocar estado)))
 			(setf (estado-pecas-colocadas new-estado) (cons (car (estado-pecas-por-colocar new-estado)) (estado-pecas-colocadas new-estado)))	
 		)
-		(setf (estado-pecas-por-colocar new-estado) (cdr (estado-pecas-por-colocar new-estado)))
+		;(setf (estado-pecas-por-colocar new-estado) (cdr (estado-pecas-por-colocar new-estado)))
 		(if (not (solucao new-estado))
 			(if (not (eq linhas-removidas 0))
 				(setf (estado-pontos new-estado) (pontos linhas-removidas))
