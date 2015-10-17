@@ -22,8 +22,6 @@ tab)
 	pecas-por-colocar
 	pecas-colocadas
 	tabuleiro
-	(h 0 :type integer)
-	(g 0 :type integer)
 )
 
 ;; Tipo Problema
@@ -148,9 +146,51 @@ tab)
 		(total 0)
 		)
 		(loop for c from 0 below *dim-colunas* do
-			(setf total (+ total (tabuleiro-altura-coluna c)))
+			(setf total (+ total (tabuleiro-altura-coluna tabuleiro c)))
 		)	
-	total)
+	(* 1 total)
+	)
+)
+
+(defun tabuleiro-bumpiness (tabuleiro)
+	(let(
+		(total 0)
+		)
+		(loop for c from 0 below (1- *dim-colunas*) do
+			(setf total (abs (+ total (- (tabuleiro-altura-coluna tabuleiro c) (tabuleiro-altura-coluna tabuleiro (1+ c))))))
+		)	
+	(* 1 total))	
+)
+
+;Nao funciona tenho de rever isto
+(defun tabuleiro-buracos (tabuleiro)
+	(let((total 0)
+		(block NIL)
+		)
+		(loop for c from 0 below *dim-colunas* do
+			(setf block NIL)
+			(loop for l downfrom (1- *dim-linhas*) downto 0 do
+				(if (eq (tabuleiro-preenchido-p tabuleiro l c) T)
+					(setf block T)
+				)
+				(if (and (eq (tabuleiro-preenchido-p tabuleiro l c) NIL) (eq block T))
+					(incf total)
+				)
+			)
+		)
+	(* 1 total))
+)
+
+(defun tabuleiro-linhas-completas (tabuleiro)
+	(let(
+		(total 0)
+		)
+		(loop for l from 0 below (1- *dim-linhas*) do
+			(if (eq (tabuleiro-linha-completa-p tabuleiro l) T)
+				(incf total)
+			)
+		)	
+	(* 1 total))
 )
 
 (defun tabuleiro-linha-completa-p (tabuleiro linha)
@@ -171,83 +211,47 @@ tab)
 	)
 )
 
-(defun tabuleiro-alturas-peca-coluna (tabuleiro peca coluna)
-	(let ((alturas NIL)
-		(dim-colunas-peca (peca-dimensao-largura peca))
+
+
+(defun tabuleiro-desce-peca (tabuleiro peca coluna)
+	(let* (
+		(dim-linhas-peca (peca-dimensao-altura peca))
+		(drop (- *dim-linhas* dim-linhas-peca))
+	)
+		(loop for l downfrom drop downto 0 do
+			(if (null (tabuleiro-peca-pode-descer tabuleiro peca l coluna))
+				(return-from tabuleiro-desce-peca (+ 1 l))
+			)
 		)
-		;(format t "colunas: ~d ~c" dim-colunas-peca #\linefeed)
-		;(princ dim-colunas-peca) 
-		;(read-char)
-		(loop for c from 0 below dim-colunas-peca do
-			;(format t "~d ~c" (tabuleiro-altura-coluna tabuleiro (+ c coluna)) #\linefeed)
-			(setf alturas (cons (tabuleiro-altura-coluna tabuleiro (+ c coluna)) alturas))
-		)
-		;(format t "colunas: ~d ~c" alturas #\linefeed)
-	(setf alturas (remove 0 alturas))
-	(if (null alturas)
-		(setf alturas (cons 0 alturas))
-	)
-	(if (< (first alturas) (car (last alturas)))
-		(reverse alturas)
-		 alturas	
-	)
-	)
+	0)
+	
 )
 
-(defun tabuleiro-peca-cabe? (tabuleiro peca linha coluna)
+(defun tabuleiro-peca-pode-descer(tabuleiro peca linha coluna)
 	(let (
-		(dim-linhas-peca (peca-dimensao-altura peca))
-		(dim-colunas-peca (peca-dimensao-largura peca))
-		)
-
-		;(format t "linhas: ~d colunas: ~d ~c" dim-linhas-peca dim-colunas-peca #\linefeed)
-		;(read-char)
+	(dim-linhas-peca (peca-dimensao-altura peca))
+	(dim-colunas-peca (peca-dimensao-largura peca))
+	(_pc 0)
+	(_pl 0)
+	)
+	
+		(if (>= (+ linha dim-linhas-peca) *dim-linhas*)
+			(return-from tabuleiro-peca-pode-descer T)
+		)	
+	
 		(loop for pl downfrom (1- dim-linhas-peca) downto 0 do
 			(loop for pc from 0 below dim-colunas-peca do
-				(if (and (eq (aref peca pl pc) T) (tabuleiro-preenchido-p tabuleiro (+ linha pl) (+ coluna pc)))
-					(return-from tabuleiro-peca-cabe? NIL)
-				)
+				(setf _pl (+ linha pl 1))
+				(setf _pc (+ coluna pc))
+				(if (and (eq (aref peca pl pc) T) (>= _pl 0))
+					(if (not (and (< _pl *dim-linhas*) (null (tabuleiro-preenchido-p tabuleiro (1- _pl) _pc))))
+						(return-from tabuleiro-peca-pode-descer NIL)
+					)
+				)		
 			)
 		)
-		(return-from tabuleiro-peca-cabe? T))
-)
-
-(defun tabuleiro-linha-desenho (tabuleiro peca coluna)
-	(let (
-		(alturas (tabuleiro-alturas-peca-coluna tabuleiro peca coluna))
-		(hipoteses NIL)
-		(prev 0)
-		(linha 0)
-		(flag T)
-		)
-		
-
-		;(format t "alturas ~d ~c" alturas #\linefeed)
-		(loop for line in alturas do
-			(loop for l downfrom line downto 0 do
-				;(format t "linhas: ~d colunas: ~d ~c" l coluna #\linefeed)
-				;(read-char)
-				;(if (eq (tabuleiro-peca-cabe? tabuleiro peca l coluna) T)
-				(block debug
-					(setf hipoteses (cons (cons l (cons (tabuleiro-peca-cabe? tabuleiro peca l coluna) NIL)) hipoteses))
-				)
-				;)
-			)
-		)
-	(setf hipoteses (reverse hipoteses))
-	;(princ hipoteses)
-	(block break_loop
-		(loop for v in hipoteses do
-			(if (eq (car (cdr v)) NIL)
-				(block se
-					(setf linha prev)
-					(return-from break_loop)
-				)
-			)
-			(setf prev (car v))
-		)
+		(return-from tabuleiro-peca-pode-descer T)
 	)
-	linha)
 )
 
 (defun tabuleiro-remove-linha! (tabuleiro linha)
@@ -389,10 +393,10 @@ tab)
 		(setf new-estado (copia-estado estado))
 		(if (>= (+ altura (peca-dimensao-altura (accao-peca accao))) *dim-linhas*)
 			 (estado-accao new-estado accao altura)
-			(estado-accao new-estado accao (tabuleiro-linha-desenho (estado-tabuleiro new-estado) (accao-peca accao) (accao-coluna accao)))
+			(estado-accao new-estado accao (tabuleiro-desce-peca (estado-tabuleiro new-estado) (accao-peca accao) (accao-coluna accao)))
 
 		)
-			
+		;tabuleiro-desce-peca
 		;(estado-accao new-estado accao (tabuleiro-altura-coluna (estado-tabuleiro new-estado) (accao-coluna accao)))
 		(if (eq (tabuleiro-topo-preenchido-p (estado-tabuleiro new-estado)) NIL)
 			(loop for linha from 0 below *dim-linhas* do
@@ -408,7 +412,7 @@ tab)
 			(setf (estado-pecas-colocadas new-estado) (cons (car (estado-pecas-por-colocar new-estado)) (estado-pecas-colocadas new-estado)))	
 		)
 		(setf (estado-pecas-por-colocar new-estado) (cdr (estado-pecas-por-colocar new-estado)))
-		(if (not (solucao new-estado))
+		(if (not (tabuleiro-topo-preenchido-p (estado-tabuleiro new-estado)))
 			(if (not (eq linhas-removidas 0))
 				(setf (estado-pontos new-estado) (pontos linhas-removidas))
 			)
@@ -436,49 +440,14 @@ tab)
 	)
 )
 
-; (defun procura-best (tabuleiro pecas-por-colocar)
-	
-; 	(let* (
-; 			(estado (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar))
-; 			(accoes (accoes estado))
-; 			(score NIL)
-; 			(best-score NIL)
-; 			(e-copia NIL)
-; 			(lista_accoes NIL)
-; 			)
-; 		(loop while (not (null accoes)) do
-; 			;(princ accoes)
-		
-; 			(setf e-copia (resultado estado (car accoes)))
-; 			;(princ e-copia)
-; 			(if (not (null (cdr accoes)))
-; 				(setf score e-copia)
-; 				 (setf score (procura-best (estado-tabuleiro e-copia) (estado-pecas-por-colocar e-copia)))	 	
-; 			)
-; 			(if (eq best-score NIL)
-; 				(setf best-score score)
-; 			)
-; 			(if (not (null score))
-; 				(if (< (qualidade score) (qualidade best-score))
-; 					(block qwerty
-; 						(setf best-score score)
-; 					)
-; 				)
-; 			)
-			
-; 			(setf accoes (cdr accoes))
-; 		)
-; 		(if (not (null best-score))
-; 			(if (null (solucao best-score))
-; 				(block qw
-; 					(procura-best (estado-tabuleiro best-score) (estado-pecas-por-colocar best-score))
-; 				)
-; 				best-score
-; 			)
-; 			best-score
-; 		)
-; 	)
-; )
+(defun heuristicas(estado)
+	(+ 
+		(qualidade estado) 
+		(tabuleiro-altura-agregada (estado-tabuleiro estado))
+		(tabuleiro-bumpiness (estado-tabuleiro estado))
+		;(* -1 (tabuleiro-buracos (estado-tabuleiro estado)))
+	)
+)
 
 (defun procura-best (tabuleiro pecas-por-colocar)
 	(reverse (car (procura-best-aux (cons NIL (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar)))))
@@ -492,37 +461,36 @@ tab)
 			(e-copia NIL)
 			(lista_accoes (car estado))
 			)
-		(loop while (not (null accoes)) do
-			;(princ accoes)
-			(setf e-copia (resultado (cdr estado) (car accoes)))
-			;(princ e-copia)
-			
-			(if (not (null (cdr accoes)))
-				(setf score (cons (cons (car accoes) lista_accoes) e-copia))
-				 (setf score (procura-best-aux (cons (cons (car accoes) lista_accoes) e-copia)))	 	
-			)
+		(block fast
+			(loop while (not (null accoes)) do
+				;(princ accoes)
+				(setf e-copia (resultado (cdr estado) (car accoes)))
+				;(princ e-copia)
+				
+				(if (not (null (cdr accoes)))
+					(setf score (cons (cons (car accoes) lista_accoes) e-copia))
+					 (setf score (procura-best-aux (cons (cons (car accoes) lista_accoes) e-copia)))	 	
+				)
 
-			(if (eq best-score NIL)
-				(setf best-score score)
-			)
-			
-			(if (not (null (cdr score)))
-				(if (< (qualidade (cdr score)) (qualidade (cdr best-score)))
-					(block qwerty
-						(setf best-score score)
+				(if (eq best-score NIL)
+					(setf best-score score)
+				)
+				
+				(if (not (null (cdr score)))
+					(if (< (heuristicas (cdr score)) (heuristicas (cdr best-score)))
+						(block qwerty
+							(setf best-score score)
+							;(return-from fast)
+						)
 					)
 				)
+				
+				(setf accoes (cdr accoes))
 			)
-			(setf accoes (cdr accoes))
 		)
-
 		(if (not (null best-score))
 			(if (null (solucao (cdr best-score)))
-				(block qw
-					;(setf best-score (cons (cons (car lista_accoes) (cons (car best-score) NIL)) (cdr best-score)))
-					;(princ best-score)
-					(procura-best-aux best-score)
-				)
+				(procura-best-aux best-score)
 				best-score
 			)
 			best-score
