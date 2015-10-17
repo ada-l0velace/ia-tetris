@@ -87,7 +87,7 @@ tab)
 	(aref peca linha coluna)
 )
 
-(defun peca-pontos-maximos (peca)
+(defun peca-pontos-maximo (peca)
 	(case linhas-removidas 
 		(('i) 800)
 		(('j) 500)
@@ -99,6 +99,15 @@ tab)
 	)
 )
 
+(defun pecas-pontos-maximo (pecas)
+	(let (
+		(total 0)
+		)
+		(loop for peca in pecas do
+			(setf total (+ total peca-pontos-maximos peca))
+		)
+	total)
+)
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;    Tipo accao    ;;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -441,7 +450,7 @@ tab)
 
 (defun custo-oportunidade (estado)
 	(-  
-		(peca-pontos-maximos (car (estado-pecas-por-colocar estado)))
+		(pecas-pontos-maximo (estado-pecas-colocadas estado))
 		(estado-pontos estado)
 	)
 )
