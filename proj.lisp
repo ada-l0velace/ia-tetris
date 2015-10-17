@@ -22,6 +22,8 @@ tab)
 	pecas-por-colocar
 	pecas-colocadas
 	tabuleiro
+	(h 0 :type integer)
+	(g 0 :type integer)
 )
 
 ;; Tipo Problema
@@ -138,6 +140,17 @@ tab)
 		)
 	)
 	(- dim-linhas altura))
+)
+
+; Talvez seja util depois na parte 2 para as heuristicas...
+(defun tabuleiro-altura-agregada (tabuleiro)
+	(let(
+		(total 0)
+		)
+		(loop for c from 0 below *dim-colunas* do
+			(setf total (+ total (tabuleiro-altura-coluna c)))
+		)	
+	total)
 )
 
 (defun tabuleiro-linha-completa-p (tabuleiro linha)
@@ -335,8 +348,8 @@ tab)
 	)
 )
 
-(defun solucao (estado)
-	(estado-final-p estado)	
+(defun solucao (estado)	  
+	(estado-final-p estado)
 )
 
 (defun accoes (estado)
@@ -394,7 +407,7 @@ tab)
 		(if (not (null (estado-pecas-por-colocar estado)))
 			(setf (estado-pecas-colocadas new-estado) (cons (car (estado-pecas-por-colocar new-estado)) (estado-pecas-colocadas new-estado)))	
 		)
-		;(setf (estado-pecas-por-colocar new-estado) (cdr (estado-pecas-por-colocar new-estado)))
+		(setf (estado-pecas-por-colocar new-estado) (cdr (estado-pecas-por-colocar new-estado)))
 		(if (not (solucao new-estado))
 			(if (not (eq linhas-removidas 0))
 				(setf (estado-pontos new-estado) (pontos linhas-removidas))
@@ -414,12 +427,108 @@ tab)
 
 (defun formulacao-problema (tabuleiro pecas-por-colocar)
 	(return-from formulacao-problema 
-		(make-problema :estado-inicial (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar)
+		(make-problema 
+			:estado-inicial (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar)
 			:solucao #' solucao
 			:accoes #' accoes
 			:resultado #' resultado
 			:custo-caminho #' custo-oportunidade)
 	)
+)
+
+; (defun procura-best (tabuleiro pecas-por-colocar)
+	
+; 	(let* (
+; 			(estado (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar))
+; 			(accoes (accoes estado))
+; 			(score NIL)
+; 			(best-score NIL)
+; 			(e-copia NIL)
+; 			(lista_accoes NIL)
+; 			)
+; 		(loop while (not (null accoes)) do
+; 			;(princ accoes)
+		
+; 			(setf e-copia (resultado estado (car accoes)))
+; 			;(princ e-copia)
+; 			(if (not (null (cdr accoes)))
+; 				(setf score e-copia)
+; 				 (setf score (procura-best (estado-tabuleiro e-copia) (estado-pecas-por-colocar e-copia)))	 	
+; 			)
+; 			(if (eq best-score NIL)
+; 				(setf best-score score)
+; 			)
+; 			(if (not (null score))
+; 				(if (< (qualidade score) (qualidade best-score))
+; 					(block qwerty
+; 						(setf best-score score)
+; 					)
+; 				)
+; 			)
+			
+; 			(setf accoes (cdr accoes))
+; 		)
+; 		(if (not (null best-score))
+; 			(if (null (solucao best-score))
+; 				(block qw
+; 					(procura-best (estado-tabuleiro best-score) (estado-pecas-por-colocar best-score))
+; 				)
+; 				best-score
+; 			)
+; 			best-score
+; 		)
+; 	)
+; )
+
+(defun procura-best (tabuleiro pecas-por-colocar)
+	(reverse (car (procura-best-aux (cons NIL (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar)))))
+)
+
+(defun procura-best-aux (estado)
+	(let* (
+			(accoes (accoes (cdr estado)))
+			(score NIL)
+			(best-score NIL)
+			(e-copia NIL)
+			(lista_accoes (car estado))
+			)
+		(loop while (not (null accoes)) do
+			;(princ accoes)
+			(setf e-copia (resultado (cdr estado) (car accoes)))
+			;(princ e-copia)
+			
+			(if (not (null (cdr accoes)))
+				(setf score (cons (cons (car accoes) lista_accoes) e-copia))
+				 (setf score (procura-best-aux (cons (cons (car accoes) lista_accoes) e-copia)))	 	
+			)
+
+			(if (eq best-score NIL)
+				(setf best-score score)
+			)
+			
+			(if (not (null (cdr score)))
+				(if (< (qualidade (cdr score)) (qualidade (cdr best-score)))
+					(block qwerty
+						(setf best-score score)
+					)
+				)
+			)
+			(setf accoes (cdr accoes))
+		)
+
+		(if (not (null best-score))
+			(if (null (solucao (cdr best-score)))
+				(block qw
+					;(setf best-score (cons (cons (car lista_accoes) (cons (car best-score) NIL)) (cdr best-score)))
+					;(princ best-score)
+					(procura-best-aux best-score)
+				)
+				best-score
+			)
+			best-score
+		)
+	)
+
 )
 
 (load "utils.lisp")
