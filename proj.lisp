@@ -83,8 +83,20 @@ tab)
 	(array-dimension peca 0)
 )
 
-(defun peca-preenchido (peca linha coluna )
+(defun peca-preenchido (peca linha coluna)
 	(aref peca linha coluna)
+)
+
+(defun peca-pontos-maximos (peca)
+	(case linhas-removidas 
+		(('i) 800)
+		(('j) 500)
+		(('l) 500)
+		(('s) 300)
+		(('z) 300)
+		(('t) 300)
+		(('o) 300)
+	)
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -360,11 +372,13 @@ tab)
 	(let (
 		(peca_cabe 0)
 		(lista-accoes NIL)
+		(dim-colunas-peca 0)
 		)
 		(loop for peca in (pecas (car (estado-pecas-por-colocar estado))) do	
+			(setf dim-colunas-peca  (peca-dimensao-largura peca))
 			(loop for j from 0 below *dim-colunas* do
 				(setf peca_cabe 0)
-				(loop for h from j below (+ j (array-dimension peca 1)) do
+				(loop for h from j below (+ j dim-colunas-peca) do
 					(if (null (tabuleiro-preenchido-p 
 								(estado-tabuleiro estado) 
 								(tabuleiro-altura-coluna (estado-tabuleiro estado) h)
@@ -373,7 +387,7 @@ tab)
 						(incf peca_cabe)
 					)
 				)
-				(if (eq peca_cabe (array-dimension peca 1))
+				(if (eq peca_cabe dim-colunas-peca)
 					(setf lista-accoes (cons (cria-accao j peca) lista-accoes))
 				)
 			)
@@ -426,7 +440,10 @@ tab)
 )
 
 (defun custo-oportunidade (estado)
-	(+ (+ 800 500 500 300 300 300 300) (estado-pontos estado))
+	(-  
+		(peca-pontos-maximos (car (estado-pecas-por-colocar estado)))
+		(estado-pontos estado)
+	)
 )
 
 (defun formulacao-problema (tabuleiro pecas-por-colocar)
@@ -475,12 +492,14 @@ tab)
 				(if (eq best-score NIL)
 					(setf best-score score)
 				)
-				
 				(if (not (null (cdr score)))
-					(if (< (heuristicas (cdr score)) (heuristicas (cdr best-score)))
-						(block qwerty
-							(setf best-score score)
-							;(return-from fast)
+					(block Y
+						(format t "~d ~c" (heuristicas (cdr score)) #\linefeed)
+						(if (< (heuristicas (cdr score)) (heuristicas (cdr best-score)))
+							(block qwerty
+								(setf best-score score)
+								;(return-from fast)
+							)
 						)
 					)
 				)
