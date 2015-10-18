@@ -1,4 +1,4 @@
 (load "proj.lisp")
 (defvar t0 (cria-tabuleiro))
 (defvar p0 (formulacao-problema t0 '(i)))
-(procura-pp p0)
+(princ (procura-pp p0))

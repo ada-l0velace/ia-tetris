@@ -563,7 +563,6 @@
 	(dfs 
 		problema 
 		(problema-estado-inicial problema)
-
 	)
 )
 
@@ -571,13 +570,11 @@
 
 (defun dfs (problema estado-actual)
 	(if (eq (funcall (problema-solucao problema) estado-actual) T)
-		(block imprime
-			(desenha-estado estado-actual)
-			(format t "~c" #\linefeed)
-		)
+		(desenha-estado estado-actual)
 	)
-	(loop for accao in (funcall (problema-accoes problema) estado-actual) do 
-		(dfs problema (funcall (problema-resultado problema) estado-actual accao))
+	(loop for accao in (funcall (problema-accoes problema) estado-actual) do
+		(setf proximo-estado (funcall (problema-resultado problema) estado-actual accao))
+		(dfs problema proximo-estado) lista-estados
 	)
 )
 
