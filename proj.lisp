@@ -5,15 +5,16 @@
  
 ;; Tipo accao
 
-(defstruct
-	(accao)
-coluna-peca)
+(defstruct (accao)
+	coluna-peca
+)
 
 ;; Tipo tabuleiro
 
-(defstruct
-	(tabuleiro (:conc-name tr-))
-tab)
+(defstruct (tabuleiro (:conc-name tr-))
+	tab
+	alturas
+)
 
 ;; Tipo Estado
 (defstruct (estado 
@@ -87,7 +88,7 @@ tab)
 	(aref peca linha coluna)
 )
 
-(defun peca-pontos-maximo (peca)
+(defun ppm (peca) ; peca-pontos-maximo -- n usar em mais nenhum sitio
 	(cond 
 		((eq 'i peca) 800)
 		((eq 'l peca) 500)
@@ -104,7 +105,7 @@ tab)
 		(total 0)
 		)
 		(loop for peca in pecas do
-			(setf total (+ total (peca-pontos-maximo peca)))
+			(incf total (ppm peca))
 		)
 	total)
 )
@@ -130,12 +131,15 @@ tab)
 ;;Tipo Tabuleiro;;
 ;;;;;;;;;;;;;;;;;;
 (defun cria-tabuleiro ()
-	(make-tabuleiro :tab (make-array (list *dim-linhas* *dim-colunas*)))
+	(make-tabuleiro :tab (make-array (list *dim-linhas* *dim-colunas*))
+					:alturas (make-array (list *dim-colunas*) :initial-element 0))
 )
 
 ;des
 (defun copia-tabuleiro (tabuleiro)
-	(make-tabuleiro :tab (tabuleiro->array tabuleiro))
+	(make-tabuleiro :tab (tabuleiro->array tabuleiro)
+					:alturas (copy-seq (tr-alturas tabuleiro))
+	)
 )
 
 ;des
@@ -147,19 +151,52 @@ tab)
 )
 
 ;des
-(defun tabuleiro-altura-coluna (tabuleiro coluna)
+; (defun tabuleiro-altura-coluna (tabuleiro coluna)
+; 	(let (
+; 		(altura 0)
+; 	)
+; 	(loop for i downfrom (1- *dim-linhas*) downto 0 do
+; 		(if (eq (tabuleiro-preenchido-p tabuleiro i coluna) NIL)
+; 			(incf altura)
+; 			(return-from tabuleiro-altura-coluna (- *dim-linhas* altura))
+; 		)
+; 	)
+; 	0) ; coluna vazia
+; )
+
+(defun tabuleiro-calcula-altura (tabuleiro coluna topo)
 	(let (
 		(altura 0)
-		(dim-linhas (array-dimension (tr-tab tabuleiro) 0))
 	)
-	(loop for i downfrom (1- dim-linhas) downto 0 do
+	(loop for i downfrom topo downto 0 do
 		(if (eq (tabuleiro-preenchido-p tabuleiro i coluna) NIL)
 			(incf altura)
-			 (return-from tabuleiro-altura-coluna (- dim-linhas altura))
+			(return-from tabuleiro-calcula-altura (1+ (- topo altura)))
 		)
 	)
-	(- dim-linhas altura))
+	0) ; coluna vazia
 )
+
+(defun tabuleiro-altura-coluna (tabuleiro coluna)
+	(tabuleiro-get-altura tabuleiro coluna)
+)
+
+;retorna a altura de uma coluna no tabuleiro
+(defun tabuleiro-get-altura (tabuleiro coluna)
+	(if (or (< coluna 0) (> coluna (1- *dim-colunas*)))
+		0
+		(block debug
+			(aref (tr-alturas tabuleiro) coluna)
+		)
+	)
+)
+
+
+;define altura de uma coluna no tabuleiro
+(defun tabuleiro-altura! (tabuleiro coluna altura)
+	(setf (aref (tr-alturas tabuleiro) coluna) altura)
+)
+
 
 ; Talvez seja util depois na parte 2 para as heuristicas...
 (defun tabuleiro-altura-agregada (tabuleiro)
@@ -178,7 +215,9 @@ tab)
 		(total 0)
 		)
 		(loop for c from 0 below (1- *dim-colunas*) do
-			(setf total (abs (+ total (- (tabuleiro-altura-coluna tabuleiro c) (tabuleiro-altura-coluna tabuleiro (1+ c))))))
+			(setf total (abs (+ total (-
+										(tabuleiro-altura-coluna tabuleiro c)
+										(tabuleiro-altura-coluna tabuleiro (1+ c))))))
 		)	
 	(* 1 total))	
 )
@@ -226,9 +265,34 @@ tab)
 	T)
 )
 
-(defun tabuleiro-preenche! (tabuleiro linha coluna)
+(defun tabuleiro-preenche! (tabuleiro linha coluna) ; nao usar directamente
 	(if (not (or (> linha (1- *dim-linhas*)) (> coluna (1- *dim-colunas*))))
-		(setf (aref (tr-tab tabuleiro) linha coluna) T)
+		(block actualiza
+			(setf (aref (tr-tab tabuleiro) linha coluna) T)
+
+			(if (> (1+ linha) (tabuleiro-altura-coluna tabuleiro coluna))
+				(tabuleiro-altura! tabuleiro coluna (1+ linha))
+			)
+		)
+	)
+)
+
+(defun tabuleiro-muda-ponto! (tabuleiro linha coluna valor) ; valor T para preencher, NIL para apagar
+	(if (eq valor T)
+		(tabuleiro-preenche! tabuleiro linha coluna)
+		(tabuleiro-apaga! tabuleiro linha coluna)
+	)
+)
+
+(defun tabuleiro-apaga! (tabuleiro linha coluna) ; nao usar directamente
+	(if (not (or (> linha (1- *dim-linhas*)) (> coluna (1- *dim-colunas*))))
+		(block actualiza
+			(setf (aref (tr-tab tabuleiro) linha coluna) NIL)
+
+			(if (<= linha (tabuleiro-altura-coluna tabuleiro coluna))
+				(tabuleiro-altura! tabuleiro coluna (tabuleiro-calcula-altura tabuleiro coluna linha))
+			)
+		)
 	)
 )
 
@@ -275,17 +339,14 @@ tab)
 	)
 )
 
-(defun tabuleiro-remove-linha! (tabuleiro linha)
-	(loop for i from 0 below *dim-colunas* do
-		(setf (aref (tr-tab tabuleiro) linha i) NIL)
-	)
+(defun tabuleiro-remove-linha! (tabuleiro linha) ; pode ser optimizado, removendo varias
 	(loop for i from linha below (1- *dim-linhas*) do
 		(loop for j from 0 below *dim-colunas* do
-			(setf (aref (tr-tab tabuleiro) i j) (aref (tr-tab tabuleiro) (1+ i) j))
+			(tabuleiro-muda-ponto! tabuleiro i j (tabuleiro-preenchido-p tabuleiro (1+ i) j))
 		)
 	)
-	(loop for j from 0 below *dim-colunas* do
-		(setf (aref (tr-tab tabuleiro) (1- *dim-linhas*) j) NIL)
+	(loop for j from 0 below *dim-colunas* do ; linha mais acima
+		(tabuleiro-muda-ponto! tabuleiro (1- *dim-linhas*) j NIL)
 	)
 )
 
@@ -342,9 +403,11 @@ tab)
 (defun estado-accao (estado accao linha)
 	(loop for i downfrom (1- (array-dimension (accao-peca accao) 0)) downto 0  do
 		(loop for j from 0 below (array-dimension (accao-peca accao) 1) do
+
 			(if (eq (aref (accao-peca accao) i j) T)
 				(block debug
-					(tabuleiro-preenche! (estado-tabuleiro estado) (+ linha i) (+ j (accao-coluna accao)))
+
+					(tabuleiro-muda-ponto! (estado-tabuleiro estado) (+ linha i) (+ j (accao-coluna accao)) T)
 				)
 			)
 		)
@@ -387,13 +450,13 @@ tab)
 			(setf dim-colunas-peca  (peca-dimensao-largura peca))
 			(loop for j from 0 below *dim-colunas* do
 				(setf peca_cabe 0)
-				(loop for h from j below (+ j dim-colunas-peca) do
+				(loop for h from j below (min (+ j dim-colunas-peca) *dim-colunas*) do
 					(if (null (tabuleiro-preenchido-p 
-								(estado-tabuleiro estado) 
-								(tabuleiro-altura-coluna (estado-tabuleiro estado) h)
-								h)
-						)	
-						(incf peca_cabe)
+						(estado-tabuleiro estado) 
+						(tabuleiro-altura-coluna (estado-tabuleiro estado) h)
+						h)
+					)	
+					(incf peca_cabe)
 					)
 				)
 				(if (eq peca_cabe dim-colunas-peca)
@@ -467,6 +530,16 @@ tab)
 	)
 )
 
+(defun custo-oportunidade2 (estado) ; assume que todas as pecas teem 4 blocos
+	(-  
+		(*
+			(/ (length (estado-pecas-colocadas estado)) *dim-colunas*)
+			(pontos 4)
+		)
+		(estado-pontos estado)
+	)
+)
+
 (defun formulacao-problema (tabuleiro pecas-por-colocar)
 	(return-from formulacao-problema 
 		(make-problema 
@@ -481,7 +554,7 @@ tab)
 (defun heuristicas(estado)
 	(+ 
 		;(linhas-completas estado)
-		(* -1 (custo-oportunidade estado)) 
+		(* -1 (custo-oportunidade estado))
 		(altura-agregada estado)
 		(bumpiness estado)
 		(* -1 (qualidade estado))
@@ -496,6 +569,8 @@ tab)
 
 	)
 )
+
+(load "utils.lisp")
 
 (defun dfs (problema estado-actual)
 	(if (eq (funcall (problema-solucao problema) estado-actual) T)
@@ -537,7 +612,7 @@ tab)
 							(if (> (heuristicas (cdr score)) (heuristicas (cdr best-score)))
 								(block qwerty
 									(setf best-score score)
-									(return-from fast)
+									;(return-from fast)
 								)
 							)
 						)
@@ -558,5 +633,3 @@ tab)
 	)
 
 )
-
-(load "utils.lisp")
