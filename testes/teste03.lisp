@@ -1,3 +1,4 @@
 (load "proj.lisp")
-(defvar e2 (make-estado :tabuleiro (cria-tabuleiro-aleatorio 0.0 0.3) :pecas-por-colocar '(o)))
-(executa-jogadas e2 (accoes e2))
+(defvar t0 (cria-tabuleiro))
+(defvar p0 (formulacao-problema t0 '(o)))
+(procura-pp p0)

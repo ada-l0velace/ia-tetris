@@ -480,11 +480,32 @@ tab)
 
 (defun heuristicas(estado)
 	(+ 
-		(linhas-completas estado) 
+		;(linhas-completas estado)
+		(* -1 (custo-oportunidade estado)) 
 		(altura-agregada estado)
 		(bumpiness estado)
-		;(qualidade estado)
+		(* -1 (qualidade estado))
 		(* -1 (tabuleiro-buracos (estado-tabuleiro estado)))
+	)
+)
+
+(defun procura-pp (problema)
+	(dfs 
+		problema 
+		(problema-estado-inicial problema)
+
+	)
+)
+
+(defun dfs (problema estado-actual)
+	(if (eq (funcall (problema-solucao problema) estado-actual) T)
+		(block imprime
+			(desenha-estado estado-actual)
+			(format t "~c" #\linefeed)
+		)
+	)
+	(loop for accao in (funcall (problema-accoes problema) estado-actual) do 
+		(dfs problema (funcall (problema-resultado problema) estado-actual accao))
 	)
 )
 
