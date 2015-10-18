@@ -543,18 +543,6 @@
 	)
 )
 
-(load "utils.lisp")
-
-(defun dfs (problema estado-actual)
-	(if (eq (funcall (problema-solucao problema) estado-actual) T)
-		(desenha-estado estado-actual)
-	)
-	(loop for accao in (funcall (problema-accoes problema) estado-actual) do
-		(setf proximo-estado (funcall (problema-resultado problema) estado-actual accao))
-		(dfs problema proximo-estado) lista-estados
-	)
-)
-
 (defun procura-best (tabuleiro pecas-por-colocar)
 	(reverse (car (procura-best-aux (cons NIL (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar)))))
 )
@@ -603,4 +591,16 @@
 		)
 	)
 
+)
+
+(load "utils.lisp")
+
+(defun dfs (problema estado-actual)
+	(if (eq (funcall (problema-solucao problema) estado-actual) T)
+		(desenha-estado estado-actual)
+	)
+	(loop for accao in (funcall (problema-accoes problema) estado-actual) do
+		(setf proximo-estado (funcall (problema-resultado problema) estado-actual accao))
+		(dfs problema proximo-estado) lista-estados
+	)
 )
