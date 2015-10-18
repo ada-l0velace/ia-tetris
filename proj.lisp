@@ -177,16 +177,8 @@
 
 ; Talvez seja util depois na parte 2 para as heuristicas...
 (defun tabuleiro-altura-agregada (tabuleiro)
-
-; (let(
-;		(total 0)
-;		)
-;		(loop for c from 0 below *dim-colunas* do
-;			(incf total (tabuleiro-altura-coluna tabuleiro c))
-;		)	
-;	total
-;	)
-  (reduce #' + (tr-alturas tabuleiro)))
+	(reduce #' + (tr-alturas tabuleiro))
+)
 
 (defun tabuleiro-bumpiness (tabuleiro)
 	(let(
@@ -195,9 +187,11 @@
 		(loop for c from 0 below (1- *dim-colunas*) do
 			(setf total (abs (+ total (-
 										(tabuleiro-altura-coluna tabuleiro c)
-										(tabuleiro-altura-coluna tabuleiro (1+ c))))))
+										(tabuleiro-altura-coluna tabuleiro (1+ c))
+										))))
 		)	
-	(* 1 total))	
+	(* 1 total)
+	)	
 )
 
 ;Nao funciona tenho de rever isto
