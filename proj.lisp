@@ -150,19 +150,6 @@
 	)
 )
 
-;des
-; (defun tabuleiro-altura-coluna (tabuleiro coluna)
-; 	(let (
-; 		(altura 0)
-; 	)
-; 	(loop for i downfrom (1- *dim-linhas*) downto 0 do
-; 		(if (eq (tabuleiro-preenchido-p tabuleiro i coluna) NIL)
-; 			(incf altura)
-; 			(return-from tabuleiro-altura-coluna (- *dim-linhas* altura))
-; 		)
-; 	)
-; 	0) ; coluna vazia
-; )
 
 (defun tabuleiro-calcula-altura (tabuleiro coluna topo)
 	(let (
@@ -178,17 +165,7 @@
 )
 
 (defun tabuleiro-altura-coluna (tabuleiro coluna)
-	(tabuleiro-get-altura tabuleiro coluna)
-)
-
-;retorna a altura de uma coluna no tabuleiro
-(defun tabuleiro-get-altura (tabuleiro coluna)
-	(if (or (< coluna 0) (> coluna (1- *dim-colunas*)))
-		0
-		(block debug
-			(aref (tr-alturas tabuleiro) coluna)
-		)
-	)
+  (aref (tr-alturas tabuleiro) coluna)
 )
 
 
