@@ -229,7 +229,7 @@
 		)
 		(loop for c from 0 below *dim-colunas* do
 			(setf block NIL)
-			(loop for l downfrom (1- *dim-linhas*) downto 0 do
+			(loop for l downfrom (tabuleiro-altura-coluna tabuleiro c) downto 0 do
 				(if (eq (tabuleiro-preenchido-p tabuleiro l c) T)
 					(setf block T)
 				)
@@ -241,7 +241,7 @@
 	(* 1 total))
 )
 
-(defun tabuleiro-linhas-completas (tabuleiro)
+(defun tabuleiro-linhas-completas (tabuleiro) ; pode ser optimizado
 	(let(
 		(total 0)
 		)
@@ -253,16 +253,13 @@
 	total)
 )
 
-(defun tabuleiro-linha-completa-p (tabuleiro linha)
-	(let (
-		(dim-colunas (array-dimension (tr-tab tabuleiro) 1))
-	)
-	(loop for i from 0 below dim-colunas do
+(defun tabuleiro-linha-completa-p (tabuleiro linha) ; pode ser optimizado
+	(loop for i from 0 below *dim-colunas* do
 		(if (eq (tabuleiro-preenchido-p tabuleiro linha i) NIL)
 			(return-from tabuleiro-linha-completa-p NIL)
 		)
 	)
-	T)
+	T
 )
 
 (defun tabuleiro-preenche! (tabuleiro linha coluna) ; nao usar directamente
