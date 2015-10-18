@@ -5,10 +5,10 @@
 
 ;(princ (pA*a p1 #' qualidade))
 ;(princ (procura-best t1 '(i o j l t)))
-;(setf rdp (random-pecas 5))
+(setf rdp (random-pecas 6))
 (executa-jogadas 
-	(make-estado :tabuleiro (cria-tabuleiro-aleatorio 0 0) :pecas-por-colocar '(i o j l t i i i i)) 
- 	(procura-best t1 '(i o j l t i i i i))
+	(problema-estado-inicial p1) 
+ 	(procura-best (estado-tabuleiro (problema-estado-inicial p1)) (estado-pecas-por-colocar (problema-estado-inicial p1)))
 )
 ;(princ e1)
 ;(princ (accoes e1))

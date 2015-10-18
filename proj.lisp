@@ -167,9 +167,9 @@ tab)
 		(total 0)
 		)
 		(loop for c from 0 below *dim-colunas* do
-			(setf total (+ total (tabuleiro-altura-coluna tabuleiro c)))
+			(incf total (tabuleiro-altura-coluna tabuleiro c))
 		)	
-	(* 1 total)
+	total
 	)
 )
 
@@ -437,7 +437,7 @@ tab)
 		(setf (estado-pecas-por-colocar new-estado) (cdr (estado-pecas-por-colocar new-estado)))
 		(if (not (tabuleiro-topo-preenchido-p (estado-tabuleiro new-estado)))
 			(if (not (eq linhas-removidas 0))
-				(setf (estado-pontos new-estado) (pontos linhas-removidas))
+				(incf (estado-pontos new-estado) (pontos linhas-removidas))
 			)
 		)
 		new-estado
@@ -445,15 +445,15 @@ tab)
 )
 
 (defun linhas-completas (estado)
-	(* 1 (tabuleiro-linhas-completas (estado-tabuleiro estado)))
+	(* 0.76 (tabuleiro-linhas-completas (estado-tabuleiro estado)))
 )
 
 (defun altura-agregada (estado)
-	(* 0.51 (tabuleiro-altura-agregada (estado-tabuleiro estado)))
+	(* -0.51 (tabuleiro-altura-agregada (estado-tabuleiro estado)))
 )
 
 (defun bumpiness (estado)
-	(* 0.18 (tabuleiro-bumpiness (estado-tabuleiro estado)))
+	(* -0.18 (tabuleiro-bumpiness (estado-tabuleiro estado)))
 )
 
 (defun qualidade (estado)
@@ -483,8 +483,8 @@ tab)
 		(linhas-completas estado) 
 		(altura-agregada estado)
 		(bumpiness estado)
-		;(custo-oportunidade estado)
-		;(* -1 (tabuleiro-buracos (estado-tabuleiro estado)))
+		;(qualidade estado)
+		(* -1 (tabuleiro-buracos (estado-tabuleiro estado)))
 	)
 )
 
@@ -502,29 +502,27 @@ tab)
 			)
 		(block fast
 			(loop while (not (null accoes)) do
-				;(princ accoes)
 				(setf e-copia (resultado (cdr estado) (car accoes)))
-				;(princ e-copia)
-				
 				(if (not (null (cdr accoes)))
 					(setf score (cons (cons (car accoes) lista_accoes) e-copia))
 					 (setf score (procura-best-aux (cons (cons (car accoes) lista_accoes) e-copia)))	 	
 				)
 
 				(if (eq best-score NIL)
-					(setf best-score score)
-				)
-				(if (not (null (cdr score)))
-					(block Y
-						;(format t "~d ~c" (heuristicas (cdr score)) #\linefeed)
-						(if (< (heuristicas (cdr score)) (heuristicas (cdr best-score)))
-							(block qwerty
-								(setf best-score score)
-								(return-from fast)
+					 (setf best-score score)
+					(if (not (null (cdr score)))
+						(block Y
+							;(format t "~d ~c" (heuristicas (cdr score)) #\linefeed)
+							(if (> (heuristicas (cdr score)) (heuristicas (cdr best-score)))
+								(block qwerty
+									(setf best-score score)
+									(return-from fast)
+								)
 							)
 						)
 					)
 				)
+				
 				
 				(setf accoes (cdr accoes))
 			)
