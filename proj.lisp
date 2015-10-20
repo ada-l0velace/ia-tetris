@@ -559,7 +559,7 @@
 				:profundidade 0
 				:accao NIL
 				:peso (heuristicas estado-inicial)
-			) NIL))
+			)))
 		(lista-accoes NIL)
 		)
 		(loop while (not (null (node-accao solucao))) do
@@ -569,11 +569,11 @@
 	lista-accoes)
 )
 
-(defun procura-best-aux (node best-score)
+(defun procura-best-aux (node)
 	(let (
 			(accoes (accoes (node-estado-actual node)))
 			(score NIL)
-			;(best-score NIL)
+			(best-score NIL)
 			(n-copy NIL)
 			(e-copia NIL)
 			)
@@ -614,7 +614,7 @@
 		)
 		(if (not (null best-score))
 			(if (null (solucao (node-estado-actual best-score)))
-				(procura-best-aux best-score NIL)
+				(procura-best-aux best-score)
 				best-score
 			)
 			best-score
