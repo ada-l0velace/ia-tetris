@@ -491,7 +491,7 @@
 )
 
 (defun altura-agregada (estado)
-	(* 1 (tabuleiro-altura-agregada (estado-tabuleiro estado)))
+	(* 0.3 (tabuleiro-altura-agregada (estado-tabuleiro estado)))
 )
 
 (defun bumpiness (estado)
@@ -533,7 +533,7 @@
 (defun heuristicas(estado)
 	(+ 
 		;(linhas-completas estado)
-		;(custo-oportunidade estado)
+		(custo-oportunidade estado)
 		(altura-agregada estado)
 		(bumpiness estado)
 		(qualidade estado)
