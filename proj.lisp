@@ -25,6 +25,16 @@
 	tabuleiro
 )
 
+;; Node
+
+(defstruct node
+	estado-actual
+	pai
+	accao
+	profundidade
+	peso
+)
+
 ;; Tipo Problema
 (defstruct problema
 	estado-inicial
@@ -481,11 +491,11 @@
 )
 
 (defun altura-agregada (estado)
-	(* -0.51 (tabuleiro-altura-agregada (estado-tabuleiro estado)))
+	(* 0.51 (tabuleiro-altura-agregada (estado-tabuleiro estado)))
 )
 
 (defun bumpiness (estado)
-	(* -0.18 (tabuleiro-bumpiness (estado-tabuleiro estado)))
+	(* 0.18 (tabuleiro-bumpiness (estado-tabuleiro estado)))
 )
 
 (defun qualidade (estado)
@@ -523,48 +533,72 @@
 (defun heuristicas(estado)
 	(+ 
 		;(linhas-completas estado)
-		(* -1 (custo-oportunidade estado))
+		(custo-oportunidade estado)
 		(altura-agregada estado)
 		(bumpiness estado)
-		(* -1 (qualidade estado))
-		(* -1 (tabuleiro-buracos (estado-tabuleiro estado)))
+		(qualidade estado)
+		(tabuleiro-buracos (estado-tabuleiro estado))
 	)
 )
 
-(defun procura-pp (problema)
-	(dfs 
-		problema 
-		(problema-estado-inicial problema)
+; (defun procura-pp (problema)
+; 	(dfs 
+; 		problema 
+; 		(problema-estado-inicial problema)
 
-	)
-)
+; 	)
+; )
 
 (defun procura-best (tabuleiro pecas-por-colocar)
-	(reverse (car (procura-best-aux (cons NIL (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar)))))
+	(let* (
+		(estado-inicial (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar))
+		(solucao (procura-best-aux 
+			(make-node 
+				:estado-actual estado-inicial
+				:pai NIL
+				:profundidade 0
+				:accao NIL
+				:peso (heuristicas estado-inicial)
+			)))
+		(lista-accoes NIL)
+		)
+		(loop while (not (null (node-accao solucao))) do
+			(push (node-accao solucao) lista-accoes)
+			(setf solucao (node-pai solucao))
+		)
+	lista-accoes)
 )
 
-(defun procura-best-aux (estado)
-	(let* (
-			(accoes (accoes (cdr estado)))
+(defun procura-best-aux (node)
+	(let (
+			(accoes (accoes (node-estado-actual node)))
 			(score NIL)
 			(best-score NIL)
+			(n-copy NIL)
 			(e-copia NIL)
-			(lista_accoes (car estado))
 			)
 		(block fast
+			;(princ (node-estado-actual node))
 			(loop while (not (null accoes)) do
-				(setf e-copia (resultado (cdr estado) (car accoes)))
+				(setf e-copia (resultado (node-estado-actual node) (car accoes)))
+				(setf n-copy 
+					(make-node 
+						:estado-actual e-copia 
+						:pai node
+						:accao (car accoes)
+						:profundidade (1+ (node-profundidade node))
+						:peso (heuristicas e-copia)
+					))
 				(if (not (null (cdr accoes)))
-					(setf score (cons (cons (car accoes) lista_accoes) e-copia))
-					 (setf score (procura-best-aux (cons (cons (car accoes) lista_accoes) e-copia)))	 	
+					(setf score n-copy)
+					 (setf score (procura-best-aux n-copy))	 	
 				)
-
 				(if (eq best-score NIL)
 					 (setf best-score score)
-					(if (not (null (cdr score)))
+					(if (not (null score))
 						(block Y
 							;(format t "~d ~c" (heuristicas (cdr score)) #\linefeed)
-							(if (> (heuristicas (cdr score)) (heuristicas (cdr best-score)))
+							(if (< (node-peso score) (node-peso best-score))
 								(block qwerty
 									(setf best-score score)
 									;(return-from fast)
@@ -579,7 +613,7 @@
 			)
 		)
 		(if (not (null best-score))
-			(if (null (solucao (cdr best-score)))
+			(if (null (solucao (node-estado-actual best-score)))
 				(procura-best-aux best-score)
 				best-score
 			)
@@ -589,14 +623,36 @@
 
 )
 
+
+
 (load "utils.lisp")
 
-(defun dfs (problema estado-actual)
-	(if (eq (funcall (problema-solucao problema) estado-actual) T)
-		(desenha-estado estado-actual)
-	)
-	(loop for accao in (funcall (problema-accoes problema) estado-actual) do
-		(setf proximo-estado (funcall (problema-resultado problema) estado-actual accao))
-		(dfs problema proximo-estado) lista-estados
-	)
+; (defun dfs (problema estado-actual)
+; 	(if (eq (funcall (problema-solucao problema) estado-actual) T)
+; 		(desenha-estado estado-actual)
+; 	)
+; 	(loop for accao in (funcall (problema-accoes problema) estado-actual) do
+; 		(setf proximo-estado (funcall (problema-resultado problema) estado-actual accao))
+; 		(dfs problema proximo-estado) lista-estados
+; 	)
+; )
+
+(defun gerar-sucessores (estado profundidade)
+	(let (
+		(accoes (accoes estado))
+		(lista-sucessores NIL)
+		(state NIL))
+		(loop for accao in accoes do 
+			(setf state (resultado estado accao))
+			(push
+				(make-node 
+				:estado-actual state 
+				:pai estado
+				:profundidade profundidade
+				:peso (heuristicas state)
+				)
+				lista-sucessores
+			)
+		)
+	(reverse lista-sucessores))
 )
