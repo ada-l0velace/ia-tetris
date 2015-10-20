@@ -487,19 +487,19 @@
 )
 
 (defun linhas-completas (estado)
-	(* 0.76 (tabuleiro-linhas-completas (estado-tabuleiro estado)))
+	(* 1 (tabuleiro-linhas-completas (estado-tabuleiro estado)))
 )
 
 (defun altura-agregada (estado)
-	(* 0.51 (tabuleiro-altura-agregada (estado-tabuleiro estado)))
+	(* 1 (tabuleiro-altura-agregada (estado-tabuleiro estado)))
 )
 
 (defun bumpiness (estado)
-	(* 0.18 (tabuleiro-bumpiness (estado-tabuleiro estado)))
+	(* 1 (tabuleiro-bumpiness (estado-tabuleiro estado)))
 )
 
 (defun qualidade (estado)
-	(* -0.76 (estado-pontos estado))
+	(* -1 (estado-pontos estado))
 )
 
 (defun custo-oportunidade (estado)
@@ -533,7 +533,7 @@
 (defun heuristicas(estado)
 	(+ 
 		;(linhas-completas estado)
-		(custo-oportunidade estado)
+		;(custo-oportunidade estado)
 		(altura-agregada estado)
 		(bumpiness estado)
 		(qualidade estado)
@@ -559,7 +559,7 @@
 				:profundidade 0
 				:accao NIL
 				:peso (heuristicas estado-inicial)
-			)))
+			) NIL))
 		(lista-accoes NIL)
 		)
 		(loop while (not (null (node-accao solucao))) do
@@ -569,11 +569,11 @@
 	lista-accoes)
 )
 
-(defun procura-best-aux (node)
+(defun procura-best-aux (node best-score)
 	(let (
 			(accoes (accoes (node-estado-actual node)))
 			(score NIL)
-			(best-score NIL)
+			;(best-score NIL)
 			(n-copy NIL)
 			(e-copia NIL)
 			)
@@ -591,7 +591,7 @@
 					))
 				(if (not (null (cdr accoes)))
 					(setf score n-copy)
-					 (setf score (procura-best-aux n-copy))	 	
+					 ;(setf score (procura-best-aux n-copy best-score))	 	
 				)
 				(if (eq best-score NIL)
 					 (setf best-score score)
@@ -614,7 +614,7 @@
 		)
 		(if (not (null best-score))
 			(if (null (solucao (node-estado-actual best-score)))
-				(procura-best-aux best-score)
+				(procura-best-aux best-score NIL)
 				best-score
 			)
 			best-score
@@ -656,3 +656,7 @@
 		)
 	(reverse lista-sucessores))
 )
+
+;Possiveis heuristicas a aplicar
+;Difrenca de alturas entre a maior altura e a menor no tabuleiro
+
