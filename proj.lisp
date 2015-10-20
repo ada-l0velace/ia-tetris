@@ -575,17 +575,22 @@
 			(score NIL)
 			(best-score NIL)
 			(estado NIL)
+			(new-node NIL)
 		)
 		(loop while (not (null accoes)) do
 			(setf estado (resultado (node-estado-actual node) (car accoes)))
-			(setf score 
-				(make-node 
-					:estado-actual estado 
-					:pai node
-					:accao (car accoes)
-					:profundidade (1+ (node-profundidade node))
-					:peso (heuristicas estado)
-				))
+			(setf new-node (make-node 
+						:estado-actual estado 
+						:pai node
+						:accao (car accoes)
+						:profundidade (1+ (node-profundidade node))
+						:peso (heuristicas estado)
+					))
+			;Descomentar para o algoritmo pensar passos a frente (lento)
+			;(if (not (null (cdr accoes)))
+				(setf score new-node)
+			;	  (setf score (procura-best-aux new-node))	 	
+			;)
 			(if (eq best-score NIL)
 				 (setf best-score score)
 				(if (not (null score))
@@ -596,13 +601,14 @@
 			)	
 			(setf accoes (cdr accoes))
 		)
-		(if (null best-score)
-			(setf best-score node)
+		(if (not (null best-score))
+		 	(if (null (solucao (node-estado-actual best-score)))
+				(procura-best-aux best-score)
+				best-score
+			)
+			node	
 		)
-		(if (null (solucao (node-estado-actual best-score)))
-			(procura-best-aux best-score)
-			best-score
-		)
+		
 	)
 
 )
