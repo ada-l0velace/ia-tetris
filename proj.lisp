@@ -339,7 +339,19 @@
 )
 
 (defun tabuleiros-iguais-p (tabuleiro tabuleiro1)
-	(equalp tabuleiro tabuleiro1)
+	(let (
+		(flag NIL)
+	)
+	(loop for i from 0 below *dim-linhas* do
+		(loop for j from 0 below *dim-colunas* do
+			(if (and (eq (tabuleiro-preenchido-p tabuleiro i j) (tabuleiro-preenchido-p tabuleiro1 i j)))
+				(setf flag T)
+				(return-from tabuleiros-iguais-p NIL)
+			)
+					
+		)
+	)
+	flag)
 )
 
 (defun tabuleiro->array (tabuleiro)
@@ -394,7 +406,12 @@
 )
 
 (defun estados-iguais-p (estado estado1)
-	(equalp estado estado1)
+	(and 
+		(tabuleiros-iguais-p (estado-tabuleiro estado) (estado-tabuleiro estado1))
+		(eq (estado-pontos estado) (estado-pontos estado1))
+		(equal (estado-pecas-colocadas estado) (estado-pecas-colocadas estado1))
+		(equal (estado-pecas-por-colocar estado) (estado-pecas-por-colocar estado1))	
+	)
 )
 
 (defun estado-final-p (estado)
@@ -503,11 +520,11 @@
 )
 
 (defun custo-oportunidade (estado)
-	(-  
-		(pecas-pontos-maximo (estado-pecas-colocadas estado))
-		(estado-pontos estado)
-	)
-)
+	; (-  
+	; 	(pecas-pontos-maximo (estado-pecas-colocadas estado))
+	; 	(estado-pontos estado)
+	; )
+0)
 
 (defun custo-oportunidade2 (estado) ; assume que todas as pecas teem 4 blocos
 	(-  
@@ -520,20 +537,18 @@
 )
 
 (defun formulacao-problema (tabuleiro pecas-por-colocar)
-	(return-from formulacao-problema 
-		(make-problema 
+	(make-problema 
 			:estado-inicial (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar)
 			:solucao #' solucao
 			:accoes #' accoes
 			:resultado #' resultado
 			:custo-caminho #' custo-oportunidade)
-	)
 )
 
 (defun heuristicas(estado)
 	(+ 
 		;(linhas-completas estado)
-		(custo-oportunidade estado)
+		;(custo-oportunidade estado)
 		(altura-agregada estado)
 		(bumpiness estado)
 		(qualidade estado)
@@ -549,6 +564,63 @@
 ; 	)
 ; )
 
+
+(defun procura-A* (problema heuristica)
+	(let (
+		(solucao (a-star-search 
+			problema
+			(make-node 
+					:estado-actual (problema-estado-inicial problema)
+					:pai NIL
+					:profundidade 0
+					:accao NIL
+					:peso (funcall heuristica (problema-estado-inicial problema)))
+			heuristica
+		)))
+		(procura-get-solucao solucao))
+)
+
+(defun a-star-search (problema node heuristica)
+	(let ((open (list node))
+		(current NIL)
+		(accoes NIL)
+		(new-node NIL)
+		(solucao node)
+		(estado NIL)
+		)
+		(loop while (not (null open)) do
+
+			(setf current (select-best open))
+			(if (funcall (problema-solucao problema) (node-estado-actual current))
+				(return-from a-star-search solucao)
+			)
+			(setf accoes (funcall (problema-accoes problema) (node-estado-actual current)))
+			(setf open (cdr open))
+			(loop for accao in accoes do
+				(setf estado (resultado (node-estado-actual current) accao))
+				(setf new-node (make-node 
+						:estado-actual estado 
+						:pai current
+						:accao accao
+						:profundidade (1+ (node-profundidade current))
+						:peso (+ (funcall (problema-custo-caminho problema) estado) (funcall heuristica estado))
+					))
+
+				;(format t "~d ~d ~c" (node-peso new-node) (node-peso solucao) #\linefeed)
+				;(read-char)
+				(setf open (insert_lst new-node open))
+				(cond
+					((< (node-peso new-node) (node-peso current))
+						;(princ (node-estado-actual new-node))
+						(setf solucao new-node)
+					)	
+				)
+			)
+		)
+	node)
+)
+
+
 (defun procura-best (tabuleiro pecas-por-colocar)
 	(let* (
 		(estado-inicial (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar))
@@ -560,13 +632,9 @@
 				:accao NIL
 				:peso (heuristicas estado-inicial)
 			)))
-		(lista-accoes NIL)
 		)
-		(loop while (not (null (node-accao solucao))) do
-			(push (node-accao solucao) lista-accoes)
-			(setf solucao (node-pai solucao))
-		)
-	lista-accoes)
+		
+	(procura-get-solucao solucao))
 )
 
 (defun procura-best-aux (node)
@@ -613,7 +681,15 @@
 
 )
 
-
+(defun procura-get-solucao (solucao)
+	(let (
+		(lista-accoes NIL))
+		(loop while (not (null (node-accao solucao))) do
+			(push (node-accao solucao) lista-accoes)
+			(setf solucao (node-pai solucao))
+		)
+	lista-accoes)	
+)
 
 (load "utils.lisp")
 
@@ -627,26 +703,21 @@
 ; 	)
 ; )
 
-(defun gerar-sucessores (estado profundidade)
-	(let (
-		(accoes (accoes estado))
-		(lista-sucessores NIL)
-		(state NIL))
-		(loop for accao in accoes do 
-			(setf state (resultado estado accao))
-			(push
-				(make-node 
-				:estado-actual state 
-				:pai estado
-				:profundidade profundidade
-				:peso (heuristicas state)
-				)
-				lista-sucessores
-			)
-		)
-	(reverse lista-sucessores))
-)
-
 ;Possiveis heuristicas a aplicar
 ;Difrenca de alturas entre a maior altura e a menor no tabuleiro
 
+
+;;; SELECT-BEST chooses a node in step 3...
+(defun select-best (lst)
+	(first lst)
+)
+;;; INSERT puts NODE onto LST, which is ordered
+;;; by FVALUE.
+(defun insert_lst (node lst)
+	(cond ((null lst)(list node))
+		((< (node-peso node) (node-peso (first lst)))
+			(cons node lst))
+		(t 
+			(cons (first lst) (insert_lst node (rest lst))))
+	)
+)	
