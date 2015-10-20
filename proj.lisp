@@ -574,49 +574,33 @@
 			(accoes (accoes (node-estado-actual node)))
 			(score NIL)
 			(best-score NIL)
-			(n-copy NIL)
-			(e-copia NIL)
-			)
-		(block fast
-			;(princ (node-estado-actual node))
-			(loop while (not (null accoes)) do
-				(setf e-copia (resultado (node-estado-actual node) (car accoes)))
-				(setf n-copy 
-					(make-node 
-						:estado-actual e-copia 
-						:pai node
-						:accao (car accoes)
-						:profundidade (1+ (node-profundidade node))
-						:peso (heuristicas e-copia)
-					))
-				(if (not (null (cdr accoes)))
-					(setf score n-copy)
-					 ;(setf score (procura-best-aux n-copy best-score))	 	
-				)
-				(if (eq best-score NIL)
-					 (setf best-score score)
-					(if (not (null score))
-						(block Y
-							;(format t "~d ~c" (heuristicas (cdr score)) #\linefeed)
-							(if (< (node-peso score) (node-peso best-score))
-								(block qwerty
-									(setf best-score score)
-									;(return-from fast)
-								)
-							)
-						)
+			(estado NIL)
+		)
+		(loop while (not (null accoes)) do
+			(setf estado (resultado (node-estado-actual node) (car accoes)))
+			(setf score 
+				(make-node 
+					:estado-actual estado 
+					:pai node
+					:accao (car accoes)
+					:profundidade (1+ (node-profundidade node))
+					:peso (heuristicas estado)
+				))
+			(if (eq best-score NIL)
+				 (setf best-score score)
+				(if (not (null score))
+					(if (< (node-peso score) (node-peso best-score))
+						(setf best-score score)
 					)
 				)
-				
-				
-				(setf accoes (cdr accoes))
-			)
+			)	
+			(setf accoes (cdr accoes))
 		)
-		(if (not (null best-score))
-			(if (null (solucao (node-estado-actual best-score)))
-				(procura-best-aux best-score)
-				best-score
-			)
+		(if (null best-score)
+			(setf best-score node)
+		)
+		(if (null (solucao (node-estado-actual best-score)))
+			(procura-best-aux best-score)
 			best-score
 		)
 	)
