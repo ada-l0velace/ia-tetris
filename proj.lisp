@@ -520,7 +520,7 @@
 )
 
 (defun custo-oportunidade (estado)
-	(* 1 (-  
+	(* 0 (-  
 	 	(pecas-pontos-maximo (estado-pecas-colocadas estado))
 	 	(estado-pontos estado)
 	))
@@ -583,29 +583,36 @@
 					:profundidade 0
 					:accao NIL
 					:peso 0)
-		)))
+			NIL)))
 		(procura-get-solucao solucao))
 )
 
-(defun depth-first-search (problema node)
+(defun depth-first-search (problema node visited)
 	(let (
-		(accoes (funcall (problema-accoes problema)))
+		(accoes NIL)
 		(estado NIL)
 		(new-node NIL)
 		)
-		(if (problema-solucao (node-estado-actual node))
-			node
-		)
+		(push node visited)
+		(setf accoes (funcall (problema-accoes problema) (node-estado-actual node)))
 		(loop for accao in accoes do
+			
 			(setf estado (resultado (node-estado-actual node) accao))
 			(setf new-node (make-node 
 					:estado-actual estado 
 					:pai node
 					:accao accao
 					:profundidade (1+ (node-profundidade node))
-					:peso (+ (funcall (problema-custo-caminho problema) estado) (funcall heuristica estado))
+					:peso 0
 				))
-			(depth-first-search problema new-node)
+			; (if (null (member new-node visited :test #'equalp))
+			; 	(depth-first-search problema new-node visited)
+			; )
+		)
+
+		(if (funcall (problema-solucao problema) (node-estado-actual new-node))
+			(return-from depth-first-search new-node)
+			(depth-first-search problema new-node visited)
 		)
 	)
 )
