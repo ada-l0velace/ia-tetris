@@ -520,7 +520,7 @@
 )
 
 (defun custo-oportunidade (estado)
-	(* 0 (-  
+	(* 1 (-  
 	 	(pecas-pontos-maximo (estado-pecas-colocadas estado))
 	 	(estado-pontos estado)
 	))
@@ -548,7 +548,7 @@
 (defun heuristicas(estado)
 	(+ 
 		;(linhas-completas estado)
-		;(custo-oportunidade estado)
+		(custo-oportunidade estado)
 		(altura-agregada estado)
 		(bumpiness estado)
 		(qualidade estado)
@@ -570,6 +570,43 @@
 		(equalp (node-accao node1) (node-accao node2))
 		(eq (node-profundidade node1) (node-profundidade node2))
 		(eq (node-peso node1) (node-peso node1))
+	)
+)
+
+(defun procura-pp (problema)
+	(let (
+		(solucao (depth-first-search 
+			problema
+			(make-node 
+					:estado-actual (problema-estado-inicial problema)
+					:pai NIL
+					:profundidade 0
+					:accao NIL
+					:peso 0)
+		)))
+		(procura-get-solucao solucao))
+)
+
+(defun depth-first-search (problema node)
+	(let (
+		(accoes (funcall (problema-accoes problema)))
+		(estado NIL)
+		(new-node NIL)
+		)
+		(if (problema-solucao (node-estado-actual node))
+			node
+		)
+		(loop for accao in accoes do
+			(setf estado (resultado (node-estado-actual node) accao))
+			(setf new-node (make-node 
+					:estado-actual estado 
+					:pai node
+					:accao accao
+					:profundidade (1+ (node-profundidade node))
+					:peso (+ (funcall (problema-custo-caminho problema) estado) (funcall heuristica estado))
+				))
+			(depth-first-search problema new-node)
+		)
 	)
 )
 
@@ -595,24 +632,17 @@
 		(new-node NIL)
 		(solucao node)
 		(estado NIL)
-		(closed NIL)
 		)
 		(insert_heap open (node-peso node) node)
-		(loop while (not (null open)) do
-
+		(loop while (> (heap-size open) 0) do
 			(setf current (extract-min open))
 			(if (funcall (problema-solucao problema) (node-estado-actual current))
-				(return-from a-star-search solucao)
+				(return-from a-star-search current)
 			)
 			(setf accoes (funcall (problema-accoes problema) (node-estado-actual current)))
-			;(setf open (cdr open))
-			;(push current closed)
 			(loop for accao in accoes do
 				(block continue
 					(setf estado (resultado (node-estado-actual current) accao))
-					(if (funcall (problema-solucao problema) estado)
-						(return-from a-star-search solucao)
-					)
 
 					(setf new-node (make-node 
 							:estado-actual estado 
@@ -622,21 +652,11 @@
 							:peso (+ (funcall (problema-custo-caminho problema) estado) (funcall heuristica estado))
 						))
 					(insert_heap open (node-peso new-node) new-node)
-					;(setf open (insert_lst new-node open))
-					(cond
-						; ((not (null (member new-node closed :test #'nodes-iguais-p))) 
-						; 	(return-from continue))
-						; ((null (member new-node open :test #'nodes-iguais-p))
-						;  	(setf open (insert_lst new-node open)))
-						((<= (node-peso new-node) (node-peso current))
-							(setf solucao new-node))	
-					)
-					;(setf open (insert_lst new-node open))
-					
-				)
+				)	
 			)
 		)
-	node)
+	)
+	node
 )
 
 
@@ -716,6 +736,7 @@
 ;;;;;;;;;;;;;Priority Queues;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;;;;;;;;;;;;lista ordenada;;;;;;;;;;;;;;;;
 ;;; SELECT-BEST chooses a node in step 3...
 (defun select-best (lst)
 	(first lst)
@@ -731,11 +752,12 @@
 	)
 )	
 
+;;;;;;;;;;;;;binary min-heap;;;;;;;;;;;;;;;; 
 (deftype array-index () `(integer 0 ,(1- array-dimension-limit)))
 
 (defconstant +initial-size+ 50 "initial queue vector size")
 
-;;;; binary min-heap
+
 
 (defstruct (node_bh (:constructor %make-node_bh (key data index)))
   (key 0 )
@@ -772,6 +794,20 @@
   (let ((node (aref (bin-heap-array heap) 0)))
     (values (node_bh-data node)
             (node_bh-key node))))
+(defun peek-min-node (heap)
+  (let ((node (aref (bin-heap-array heap) 0)))
+    node))
+
+
+(defun heap-contains (heap node)
+	(if (< (node_bh-index node) (heap-size heap))
+		(equalp 
+			(aref (bin-heap-array heap) (node_bh-index node))
+			node
+		)
+		NIL
+	)
+)
 
 (defun clear-heap (heap)
   (setf (fill-pointer (bin-heap-array heap)) 0))
