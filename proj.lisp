@@ -520,11 +520,11 @@
 )
 
 (defun custo-oportunidade (estado)
-	; (-  
-	; 	(pecas-pontos-maximo (estado-pecas-colocadas estado))
-	; 	(estado-pontos estado)
-	; )
-0)
+	(* 0 (-  
+	 	(pecas-pontos-maximo (estado-pecas-colocadas estado))
+	 	(estado-pontos estado)
+	))
+)
 
 (defun custo-oportunidade2 (estado) ; assume que todas as pecas teem 4 blocos
 	(-  
@@ -564,6 +564,14 @@
 ; 	)
 ; )
 
+(defun nodes-iguais-p (node1 node2)
+	(and 
+		(estados-iguais-p (node-estado-actual node1) (node-estado-actual node2))
+		(equalp (node-accao node1) (node-accao node2))
+		(eq (node-profundidade node1) (node-profundidade node2))
+		(eq (node-peso node1) (node-peso node1))
+	)
+)
 
 (defun procura-A* (problema heuristica)
 	(let (
@@ -581,39 +589,50 @@
 )
 
 (defun a-star-search (problema node heuristica)
-	(let ((open (list node))
+	(let ((open (make-instance 'binary-heap))
 		(current NIL)
 		(accoes NIL)
 		(new-node NIL)
 		(solucao node)
 		(estado NIL)
+		(closed NIL)
 		)
+		(insert_heap open (node-peso node) node)
 		(loop while (not (null open)) do
 
-			(setf current (select-best open))
+			(setf current (extract-min open))
 			(if (funcall (problema-solucao problema) (node-estado-actual current))
 				(return-from a-star-search solucao)
 			)
 			(setf accoes (funcall (problema-accoes problema) (node-estado-actual current)))
-			(setf open (cdr open))
+			;(setf open (cdr open))
+			;(push current closed)
 			(loop for accao in accoes do
-				(setf estado (resultado (node-estado-actual current) accao))
-				(setf new-node (make-node 
-						:estado-actual estado 
-						:pai current
-						:accao accao
-						:profundidade (1+ (node-profundidade current))
-						:peso (+ (funcall (problema-custo-caminho problema) estado) (funcall heuristica estado))
-					))
+				(block continue
+					(setf estado (resultado (node-estado-actual current) accao))
+					(if (funcall (problema-solucao problema) estado)
+						(return-from a-star-search solucao)
+					)
 
-				;(format t "~d ~d ~c" (node-peso new-node) (node-peso solucao) #\linefeed)
-				;(read-char)
-				(setf open (insert_lst new-node open))
-				(cond
-					((< (node-peso new-node) (node-peso current))
-						;(princ (node-estado-actual new-node))
-						(setf solucao new-node)
-					)	
+					(setf new-node (make-node 
+							:estado-actual estado 
+							:pai current
+							:accao accao
+							:profundidade (1+ (node-profundidade current))
+							:peso (+ (funcall (problema-custo-caminho problema) estado) (funcall heuristica estado))
+						))
+					(insert_heap open (node-peso new-node) new-node)
+					;(setf open (insert_lst new-node open))
+					(cond
+						; ((not (null (member new-node closed :test #'nodes-iguais-p))) 
+						; 	(return-from continue))
+						; ((null (member new-node open :test #'nodes-iguais-p))
+						;  	(setf open (insert_lst new-node open)))
+						((<= (node-peso new-node) (node-peso current))
+							(setf solucao new-node))	
+					)
+					;(setf open (insert_lst new-node open))
+					
 				)
 			)
 		)
@@ -656,7 +675,7 @@
 					))
 			;Descomentar para o algoritmo pensar passos a frente (lento)
 			;(if (not (null (cdr accoes)))
-				(setf score new-node)
+			(setf score new-node)
 			;	  (setf score (procura-best-aux new-node))	 	
 			;)
 			(if (eq best-score NIL)
@@ -693,19 +712,9 @@
 
 (load "utils.lisp")
 
-; (defun dfs (problema estado-actual)
-; 	(if (eq (funcall (problema-solucao problema) estado-actual) T)
-; 		(desenha-estado estado-actual)
-; 	)
-; 	(loop for accao in (funcall (problema-accoes problema) estado-actual) do
-; 		(setf proximo-estado (funcall (problema-resultado problema) estado-actual accao))
-; 		(dfs problema proximo-estado) lista-estados
-; 	)
-; )
-
-;Possiveis heuristicas a aplicar
-;Difrenca de alturas entre a maior altura e a menor no tabuleiro
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;Priority Queues;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; SELECT-BEST chooses a node in step 3...
 (defun select-best (lst)
@@ -721,3 +730,108 @@
 			(cons (first lst) (insert_lst node (rest lst))))
 	)
 )	
+
+(deftype array-index () `(integer 0 ,(1- array-dimension-limit)))
+
+(defconstant +initial-size+ 50 "initial queue vector size")
+
+;;;; binary min-heap
+
+(defstruct (node_bh (:constructor %make-node_bh (key data index)))
+  (key 0 )
+  (index 0 :type array-index)
+  (data nil))
+
+(defclass binary-heap ()
+  ((array :accessor bin-heap-array
+          :type (vector (or null node))
+          :initarg :array
+          :initform (make-array +initial-size+
+                                :adjustable t 
+                                :fill-pointer 0 
+                                :element-type '(or null node)
+                                :initial-element nil))))
+
+
+
+;(declaim (inline parent left right %make-node))
+
+(defun parent (k)
+  (declare (type array-index k))
+  (floor (1- k) 2))
+
+(defun left (k)
+  (declare (type (integer 0 #.(floor array-dimension-limit 2)) k))
+  (1+ (* k 2)))
+
+(defun right (k)
+  (declare (type (integer 0 #.(floor array-dimension-limit 2)) k))
+  (* (1+ k) 2))
+
+(defun peek-min (heap)
+  (let ((node (aref (bin-heap-array heap) 0)))
+    (values (node_bh-data node)
+            (node_bh-key node))))
+
+(defun clear-heap (heap)
+  (setf (fill-pointer (bin-heap-array heap)) 0))
+
+(defun empty-p (heap)
+  (zerop (fill-pointer (bin-heap-array heap))))
+
+(defun heap-size (heap)
+  (length (bin-heap-array heap)))
+
+(defun extract-min (heap)
+  (let ((array (bin-heap-array heap))
+	(node (aref (bin-heap-array heap) 0)))
+    (assert node)
+    (setf (aref array 0) (aref array (1- (length array)))
+          (aref array (1- (length array))) nil)
+    (when (> (decf (fill-pointer array)) 1)
+      (sink array 0))
+    (values (node_bh-data node)
+            (node_bh-key node))))
+
+;(declaim (inline swap-nodes))
+(defun swap-nodes (array i j)
+  (declare (type array-index i j))
+  (setf (node_bh-index (aref array i)) j
+        (node_bh-index (aref array j)) i)
+  (rotatef (aref array i) (aref array j)))
+
+(defun sink (array index)
+  (let ((maxindex (1- (length array))))
+    (if (zerop maxindex)
+        maxindex
+        (loop for i = index then j
+              with j = 0
+              while (<= (left i) maxindex) do
+                (cond
+                  ((< maxindex (right i))
+                   (setf j (left i)))
+                  ((<= (node_bh-key (aref array (left i)))
+                       (node_bh-key (aref array (right i))))
+                   (setf j (left i)))
+                  (t
+                   (setf j (right i))))
+                (when (<= (node_bh-key (aref array i))
+                          (node_bh-key (aref array j)))
+                  (loop-finish))
+                (swap-nodes array i j)
+              finally (return array)))))
+
+(defun perlocate-up (array vindex)
+  (loop for index = vindex then parent
+        for parent = (parent index)
+        with key = (node_bh-key (aref array vindex))
+        while (and (>= parent 0)
+                   (< key (node_bh-key (aref array parent))))
+        do (swap-nodes array index parent) 
+        finally (return (aref array index))))
+
+(defun insert_heap (heap key data)
+  (let ((node (%make-node_bh key data 0))
+        (array (bin-heap-array heap)))
+    (perlocate-up array (setf (node_bh-index node) 
+                              (vector-push-extend node array)))))

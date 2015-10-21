@@ -142,4 +142,4 @@
 (dotimes (coluna 9)
 	(tabuleiro-preenche! t1 1 coluna))
 (defvar e1 (make-estado :tabuleiro t1 :pecas-por-colocar '(i o j l t)))
-(defvar p1 (formulacao-problema t1 (random-pecas 100)))
+(defvar p1 (formulacao-problema t1 (random-pecas 10)))
