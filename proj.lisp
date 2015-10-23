@@ -592,29 +592,36 @@
 		(accoes NIL)
 		(estado NIL)
 		(new-node NIL)
+		(result NIL)
 		)
-		(push node visited)
+		(if (funcall (problema-solucao problema) (node-estado-actual node))
+		 	(setf result node)
+		)
 		(setf accoes (funcall (problema-accoes problema) (node-estado-actual node)))
 		(loop for accao in accoes do
-			
-			(setf estado (resultado (node-estado-actual node) accao))
-			(setf new-node (make-node 
-					:estado-actual estado 
-					:pai node
-					:accao accao
-					:profundidade (1+ (node-profundidade node))
-					:peso 0
-				))
-			; (if (null (member new-node visited :test #'equalp))
-			; 	(depth-first-search problema new-node visited)
-			; )
+			(setf new-node (cria-node-filho problema node accao))
+		 	(setf result (depth-first-search problema new-node visited))
 		)
+	result)
+)
 
-		(if (funcall (problema-solucao problema) (node-estado-actual new-node))
-			(return-from depth-first-search new-node)
-			(depth-first-search problema new-node visited)
+(defun cria-node-filho (problema pai accao &optional (heuristica (lambda (a) (declare (ignore a)) 0)))
+	(let (
+		(estado (funcall (problema-resultado problema) 
+				(node-estado-actual pai)
+				accao))
+		)
+		(make-node
+			:estado-actual estado 
+			:pai pai
+			:accao accao
+			:profundidade (1+ (node-profundidade pai))
+			:peso (+
+				(funcall (problema-custo-caminho problema) estado)
+				(funcall heuristica estado))
 		)
 	)
+	
 )
 
 (defun procura-A* (problema heuristica)
@@ -637,8 +644,6 @@
 		(current NIL)
 		(accoes NIL)
 		(new-node NIL)
-		(solucao node)
-		(estado NIL)
 		)
 		(insert_heap open (node-peso node) node)
 		(loop while (> (heap-size open) 0) do
@@ -649,15 +654,7 @@
 			(setf accoes (funcall (problema-accoes problema) (node-estado-actual current)))
 			(loop for accao in accoes do
 				(block continue
-					(setf estado (resultado (node-estado-actual current) accao))
-
-					(setf new-node (make-node 
-							:estado-actual estado 
-							:pai current
-							:accao accao
-							:profundidade (1+ (node-profundidade current))
-							:peso (+ (funcall (problema-custo-caminho problema) estado) (funcall heuristica estado))
-						))
+					(setf new-node (cria-node-filho problema current accao heuristica))
 					(insert_heap open (node-peso new-node) new-node)
 				)	
 			)
@@ -669,8 +666,10 @@
 
 (defun procura-best (tabuleiro pecas-por-colocar)
 	(let* (
+		(problema (formulacao-problema tabuleiro pecas-por-colocar))
 		(estado-inicial (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar))
 		(solucao (procura-best-aux 
+			problema
 			(make-node 
 				:estado-actual estado-inicial
 				:pai NIL
@@ -683,23 +682,15 @@
 	(procura-get-solucao solucao))
 )
 
-(defun procura-best-aux (node)
+(defun procura-best-aux (problema node)
 	(let (
-			(accoes (accoes (node-estado-actual node)))
+			(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
 			(score NIL)
 			(best-score NIL)
-			(estado NIL)
 			(new-node NIL)
 		)
 		(loop while (not (null accoes)) do
-			(setf estado (resultado (node-estado-actual node) (car accoes)))
-			(setf new-node (make-node 
-						:estado-actual estado 
-						:pai node
-						:accao (car accoes)
-						:profundidade (1+ (node-profundidade node))
-						:peso (heuristicas estado)
-					))
+			(setf new-node (cria-node-filho problema node (car accoes) #' heuristicas))
 			;Descomentar para o algoritmo pensar passos a frente (lento)
 			;(if (not (null (cdr accoes)))
 			(setf score new-node)
@@ -717,14 +708,12 @@
 		)
 		(if (not (null best-score))
 		 	(if (null (solucao (node-estado-actual best-score)))
-				(procura-best-aux best-score)
+				(procura-best-aux problema best-score)
 				best-score
 			)
 			node	
 		)
-		
 	)
-
 )
 
 (defun procura-get-solucao (solucao)

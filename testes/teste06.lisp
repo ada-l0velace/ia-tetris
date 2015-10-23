@@ -11,7 +11,7 @@
 (format t "------Procura-pp-----~c" #\linefeed)
 (format t "---------------------~c" #\linefeed)
 (format t "---------------------~c" #\linefeed)
-(time (executa-jogadas (problema-estado-inicial p1) (procura-pp p1)))
+;(time (executa-jogadas (problema-estado-inicial p1) (procura-pp p1)))
 (format t "---------------------~c" #\linefeed)
 (format t "---------------------~c" #\linefeed)
 (format t "------Procura-A*-----~c" #\linefeed)
