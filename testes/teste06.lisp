@@ -17,7 +17,7 @@
 (format t "------Procura-A*-----~c" #\linefeed)
 (format t "---------------------~c" #\linefeed)
 (format t "---------------------~c" #\linefeed)
-(time (executa-jogadas (problema-estado-inicial p1) (procura-A* p1 #' heuristicas)))
+;(time (executa-jogadas (problema-estado-inicial p1) (procura-A* p1 #' heuristicas)))
 (format t "---------------------~c" #\linefeed)
 (format t "---------------------~c" #\linefeed)
 (format t "-----Procura-best----~c" #\linefeed)

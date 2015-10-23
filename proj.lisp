@@ -520,7 +520,7 @@
 )
 
 (defun custo-oportunidade (estado)
-	(* 0 (-  
+	(* 1 (-  
 	 	(pecas-pontos-maximo (estado-pecas-colocadas estado))
 	 	(estado-pontos estado)
 	))
@@ -676,39 +676,64 @@
 				:profundidade 0
 				:accao NIL
 				:peso (heuristicas estado-inicial)
-			)))
+			)
+			MOST-POSITIVE-FIXNUM))
 		)
 		
 	(procura-get-solucao solucao))
 )
 
-(defun procura-best-aux (problema node)
+(defun procura-best-aux (problema node f_limit)
 	(let (
 			(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
 			(score NIL)
 			(best-score NIL)
 			(new-node NIL)
+			(alternative NIL)
 		)
+		;(format t "#####################~c" #\linefeed)
 		(loop while (not (null accoes)) do
 			(setf new-node (cria-node-filho problema node (car accoes) #' heuristicas))
-			;Descomentar para o algoritmo pensar passos a frente (lento)
-			;(if (not (null (cdr accoes)))
 			(setf score new-node)
-			;	  (setf score (procura-best-aux new-node))	 	
-			;)
+			(setf (node-peso score) (max (node-peso score) (node-peso node)))
+			;(format t "~d ~d ~c" (node-peso score) f_limit #\linefeed)
 			(if (eq best-score NIL)
-				 (setf best-score score)
+				(block hum
+					(setf best-score score)
+					(setf alternative best-score)
+				)
 				(if (not (null score))
-					(if (< (node-peso score) (node-peso best-score))
-						(setf best-score score)
+					(block yolo
+						(if (< (node-peso score) (node-peso best-score))
+							(block less
+								(setf alternative best-score)
+								(setf best-score score)
+							)
+						)
+						(if alternative
+							(if (and 
+								(> (node-peso score) (node-peso best-score))
+								(< (node-peso score) (node-peso alternative)))
+								(setf alternative score)
+							)
+						)
 					)
 				)
+
 			)	
 			(setf accoes (cdr accoes))
 		)
+		;(format t "-----------------~c" #\linefeed)
+		;(format t "~d ~d ~c" (node-peso score) (node-peso alternative) #\linefeed)
 		(if (not (null best-score))
-		 	(if (null (solucao (node-estado-actual best-score)))
-				(procura-best-aux problema best-score)
+		 	(if (null (funcall (problema-solucao problema) (node-estado-actual best-score)))
+				(block not_solution
+					;(format t "~d ~d ~c" (node-peso best-score) f_limit #\linefeed)
+					; (if (> (node-peso best-score) f_limit)
+					; 	(return-from procura-best-aux best-score)
+					; )
+					(procura-best-aux problema best-score (min (node-peso alternative) f_limit))
+				)
 				best-score
 			)
 			node	
