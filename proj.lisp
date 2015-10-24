@@ -391,10 +391,8 @@
 (defun estado-accao (estado accao linha)
 	(loop for i downfrom (1- (array-dimension (accao-peca accao) 0)) downto 0  do
 		(loop for j from 0 below (array-dimension (accao-peca accao) 1) do
-
 			(if (eq (aref (accao-peca accao) i j) T)
 				(block debug
-
 					(tabuleiro-muda-ponto! (estado-tabuleiro estado) (+ linha i) (+ j (accao-coluna accao)) T)
 				)
 			)

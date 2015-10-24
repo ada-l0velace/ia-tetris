@@ -6,13 +6,13 @@ rm -f testes/*.myout
 for i in **testes/*.lisp; do 
 	if [ "$i" != "testes/teste06.lisp" ] ; then
 		eval "clisp $i >> ${i::-4}myout"
-	fi 	
+	fi
 done
 
 for i in **testes/*.out; do
 	if ! diff "$i" "${i::-3}myout" > /dev/null ; then
-	  echo "${RED}Test $i failed ${NC}\n"
+	  printf "${RED}Test $i failed ${NC}\n"
 	else
-		printf "${GREEN}Test ${i::-3}lisp passed ${NC}\n"
+		printf "${GREEN} ${i::-3}lisp passed ${NC}\n"
 	fi
 done
