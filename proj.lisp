@@ -246,7 +246,7 @@
 
 (defun tabuleiro-linha-completa-p (tabuleiro linha) ; pode ser optimizado
 	(loop for i from 0 below *dim-colunas* do
-		(if (eq (tabuleiro-preenchido-p tabuleiro linha i) NIL)
+		(if (null (tabuleiro-preenchido-p tabuleiro linha i))
 			(return-from tabuleiro-linha-completa-p NIL)
 		)
 	)
@@ -292,7 +292,7 @@
 		(drop (- *dim-linhas* dim-linhas-peca))
 	)
 		(loop for l downfrom drop downto 0 do
-			(if (null (tabuleiro-peca-pode-descer tabuleiro peca l coluna))
+			(if (null (tabuleiro-peca-pode-descer-p tabuleiro peca l coluna))
 				(return-from tabuleiro-desce-peca (+ 1 l))
 			)
 		)
@@ -300,7 +300,7 @@
 	
 )
 
-(defun tabuleiro-peca-pode-descer(tabuleiro peca linha coluna)
+(defun tabuleiro-peca-pode-descer-p (tabuleiro peca linha coluna)
 	(let (
 		(dim-linhas-peca (peca-dimensao-altura peca))
 		(dim-colunas-peca (peca-dimensao-largura peca))
@@ -309,7 +309,7 @@
 	)
 	
 		(if (>= (+ linha dim-linhas-peca) *dim-linhas*)
-			(return-from tabuleiro-peca-pode-descer T)
+			(return-from tabuleiro-peca-pode-descer-p T)
 		)	
 	
 		(loop for pl downfrom (1- dim-linhas-peca) downto 0 do
@@ -318,12 +318,12 @@
 				(setf _pc (+ coluna pc))
 				(if (and (eq (aref peca pl pc) T) (>= _pl 0))
 					(if (not (and (< _pl *dim-linhas*) (null (tabuleiro-preenchido-p tabuleiro (1- _pl) _pc))))
-						(return-from tabuleiro-peca-pode-descer NIL)
+						(return-from tabuleiro-peca-pode-descer-p NIL)
 					)
 				)		
 			)
 		)
-		(return-from tabuleiro-peca-pode-descer T)
+		(return-from tabuleiro-peca-pode-descer-p T)
 	)
 )
 
