@@ -293,10 +293,10 @@
 
 (defun tabuleiro-peca-pode-descer(tabuleiro peca linha coluna)
 	(let (
-	(dim-linhas-peca (peca-dimensao-altura peca))
-	(dim-colunas-peca (peca-dimensao-largura peca))
-	(_pc 0)
-	(_pl 0)
+		(dim-linhas-peca (peca-dimensao-altura peca))
+		(dim-colunas-peca (peca-dimensao-largura peca))
+		(_pc 0)
+		(_pl 0)
 	)
 	
 		(if (>= (+ linha dim-linhas-peca) *dim-linhas*)
@@ -339,19 +339,7 @@
 )
 
 (defun tabuleiros-iguais-p (tabuleiro tabuleiro1)
-	(let (
-		(flag NIL)
-	)
-	(loop for i from 0 below *dim-linhas* do
-		(loop for j from 0 below *dim-colunas* do
-			(if (and (eq (tabuleiro-preenchido-p tabuleiro i j) (tabuleiro-preenchido-p tabuleiro1 i j)))
-				(setf flag T)
-				(return-from tabuleiros-iguais-p NIL)
-			)
-					
-		)
-	)
-	flag)
+	(equalp tabuleiro tabuleiro1)	
 )
 
 (defun tabuleiro->array (tabuleiro)
@@ -447,12 +435,12 @@
 			(loop for j from 0 below *dim-colunas* do
 				(setf peca_cabe 0)
 				(loop for h from j below (min (+ j dim-colunas-peca) *dim-colunas*) do
-					(if (null (tabuleiro-preenchido-p 
-						(estado-tabuleiro estado) 
-						(tabuleiro-altura-coluna (estado-tabuleiro estado) h)
-						h)
-					)	
-					(incf peca_cabe)
+					(if (null 
+						(tabuleiro-preenchido-p 
+							(estado-tabuleiro estado) 
+							(tabuleiro-altura-coluna (estado-tabuleiro estado) h)
+							h))	
+						(incf peca_cabe)
 					)
 				)
 				(if (eq peca_cabe dim-colunas-peca)
