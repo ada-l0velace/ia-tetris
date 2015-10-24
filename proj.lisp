@@ -491,6 +491,42 @@
 	)
 )
 
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; Tipo Node ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defun cria-node-filho (problema pai accao &optional (heuristica (lambda (a) (declare (ignore a)) 0)))
+	(let (
+		(estado (funcall (problema-resultado problema) 
+				(node-estado-actual pai)
+				accao))
+		)
+		(make-node
+			:estado-actual estado 
+			:pai pai
+			:accao accao
+			:profundidade (1+ (node-profundidade pai))
+			:peso (+
+				(funcall (problema-custo-caminho problema) estado)
+				(funcall heuristica estado))
+		)
+	)
+	
+)
+
+(defun nodes-iguais-p (node1 node2)
+	(and 
+		(estados-iguais-p (node-estado-actual node1) (node-estado-actual node2))
+		(equalp (node-accao node1) (node-accao node2))
+		(eq (node-profundidade node1) (node-profundidade node2))
+		(eq (node-peso node1) (node-peso node1))
+	)
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;; Heuristicas ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;
+
 (defun linhas-completas (estado)
 	(* 1 (tabuleiro-linhas-completas (estado-tabuleiro estado)))
 )
@@ -524,15 +560,6 @@
 	)
 )
 
-(defun formulacao-problema (tabuleiro pecas-por-colocar)
-	(make-problema 
-			:estado-inicial (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar)
-			:solucao #' solucao
-			:accoes #' accoes
-			:resultado #' resultado
-			:custo-caminho #' custo-oportunidade)
-)
-
 (defun heuristicas(estado)
 	(+ 
 		;(linhas-completas estado)
@@ -544,22 +571,18 @@
 	)
 )
 
-; (defun procura-pp (problema)
-; 	(dfs 
-; 		problema 
-; 		(problema-estado-inicial problema)
-
-; 	)
-; )
-
-(defun nodes-iguais-p (node1 node2)
-	(and 
-		(estados-iguais-p (node-estado-actual node1) (node-estado-actual node2))
-		(equalp (node-accao node1) (node-accao node2))
-		(eq (node-profundidade node1) (node-profundidade node2))
-		(eq (node-peso node1) (node-peso node1))
-	)
+(defun formulacao-problema (tabuleiro pecas-por-colocar)
+	(make-problema 
+			:estado-inicial (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar)
+			:solucao #' solucao
+			:accoes #' accoes
+			:resultado #' resultado
+			:custo-caminho #' custo-oportunidade)
 )
+
+;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;; Procuras ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;
 
 (defun procura-pp (problema)
 	(let (
@@ -587,25 +610,6 @@
 		 	(setf result (depth-first-search problema new-node visited))
 		)
 	result)
-)
-
-(defun cria-node-filho (problema pai accao &optional (heuristica (lambda (a) (declare (ignore a)) 0)))
-	(let (
-		(estado (funcall (problema-resultado problema) 
-				(node-estado-actual pai)
-				accao))
-		)
-		(make-node
-			:estado-actual estado 
-			:pai pai
-			:accao accao
-			:profundidade (1+ (node-profundidade pai))
-			:peso (+
-				(funcall (problema-custo-caminho problema) estado)
-				(funcall heuristica estado))
-		)
-	)
-	
 )
 
 (defun procura-A* (problema heuristica)
