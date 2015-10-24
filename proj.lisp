@@ -31,8 +31,8 @@
 	estado-actual
 	pai
 	accao
-	profundidade
-	peso
+	(profundidade 0 :type integer)
+	(peso 0.0)
 )
 
 ;; Tipo Problema
@@ -480,7 +480,7 @@
 		)
 		;tabuleiro-desce-peca
 		;(estado-accao new-estado accao (tabuleiro-altura-coluna (estado-tabuleiro new-estado) (accao-coluna accao)))
-		(if (eq (tabuleiro-topo-preenchido-p (estado-tabuleiro new-estado)) NIL)
+		(if (null (tabuleiro-topo-preenchido-p (estado-tabuleiro new-estado)))
 			(loop for linha from 0 below *dim-linhas* do
 				(if (eq (tabuleiro-linha-completa-p (estado-tabuleiro new-estado) (- linha linhas-removidas)) T)
 					(block removidas
@@ -548,7 +548,7 @@
 (defun heuristicas(estado)
 	(+ 
 		;(linhas-completas estado)
-		(custo-oportunidade estado)
+		;(custo-oportunidade estado)
 		(altura-agregada estado)
 		(bumpiness estado)
 		(qualidade estado)
@@ -578,11 +578,7 @@
 		(solucao (depth-first-search 
 			problema
 			(make-node 
-					:estado-actual (problema-estado-inicial problema)
-					:pai NIL
-					:profundidade 0
-					:accao NIL
-					:peso 0)
+					:estado-actual (problema-estado-inicial problema))
 			NIL)))
 		(procura-get-solucao solucao))
 )
@@ -688,50 +684,23 @@
 			(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
 			(score NIL)
 			(best-score NIL)
-			(new-node NIL)
-			(alternative NIL)
 		)
-		;(format t "#####################~c" #\linefeed)
 		(loop while (not (null accoes)) do
-			(setf new-node (cria-node-filho problema node (car accoes) #' heuristicas))
-			(setf score new-node)
+			(setf score (cria-node-filho problema node (car accoes) #' heuristicas))
 			(setf (node-peso score) (max (node-peso score) (node-peso node)))
-			;(format t "~d ~d ~c" (node-peso score) f_limit #\linefeed)
 			(if (eq best-score NIL)
-				(block hum
-					(setf best-score score)
-					(setf alternative best-score)
-				)
+				(setf best-score score)
 				(if (not (null score))
-					(block yolo
-						(if (< (node-peso score) (node-peso best-score))
-							(block less
-								(setf alternative best-score)
-								(setf best-score score)
-							)
-						)
-						(if alternative
-							(if (and 
-								(> (node-peso score) (node-peso best-score))
-								(< (node-peso score) (node-peso alternative)))
-								(setf alternative score)
-							)
-						)
+					(if (< (node-peso score) (node-peso best-score))
+							(setf best-score score)
 					)
 				)
-
 			)	
 			(setf accoes (cdr accoes))
 		)
-		;(format t "-----------------~c" #\linefeed)
-		;(format t "~d ~d ~c" (node-peso score) (node-peso alternative) #\linefeed)
 		(if (not (null best-score))
 		 	(if (null (funcall (problema-solucao problema) (node-estado-actual best-score)))
 				(block not_solution
-					;(format t "~d ~d ~c" (node-peso best-score) f_limit #\linefeed)
-					; (if (> (node-peso best-score) f_limit)
-					; 	(return-from procura-best-aux best-score)
-					; )
 					(procura-best-aux problema best-score (min (node-peso alternative) f_limit))
 				)
 				best-score
