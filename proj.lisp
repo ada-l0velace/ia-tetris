@@ -460,7 +460,7 @@
 				)
 			)
 		)
-		(if (not (null lista-accoes))		
+		(if lista-accoes		
 			(return-from accoes (reverse lista-accoes))
 		)
 	)
