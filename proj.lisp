@@ -1,3 +1,6 @@
+; Ricardo Campos 76398
+; Daniel Leitao *****
+; Pedro Cabral *****
 
 (defparameter *dim-linhas* 18)
 (defparameter *dim-colunas* 10)
