@@ -25,8 +25,12 @@
 	tabuleiro
 )
 
-;; Node
-
+;; Tipo Node
+;; estado-actual - estado actual do node
+;; pai - corresponde ao pai do node
+;; accao - accao que foi aplicada ao estado
+;; profundidade - em que profundidade foi aplicada
+;; peso - corresponde ao peso nas procuras ex: f(n) = g(n) + h(n)
 (defstruct node
 	estado-actual
 	pai
@@ -36,7 +40,12 @@
 )
 
 ;; Tipo Problema
-(defstruct problema
+;; estado-inicial - estado inicial do problema
+;; solucao - funcao que verifica se chegou ao objectivo
+;; accoes - funcao que calcula todas as accoes possiveis de um estado
+;; resultado - funcao que aplica uma accao a um estado e devolve a copia 
+;; custo-caminho - funcao de custo de todas as accoes realizadas ate ao momento
+(defstruct problema 
 	estado-inicial
 	solucao
 	accoes
