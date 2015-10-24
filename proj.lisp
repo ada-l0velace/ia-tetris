@@ -103,7 +103,7 @@
 	(array-dimension peca 0)
 )
 
-(defun peca-preenchido (peca linha coluna)
+(defun peca-preenchido-p (peca linha coluna)
 	(aref peca linha coluna)
 )
 
@@ -237,7 +237,7 @@
 		(total 0)
 		)
 		(loop for l from 0 below (1- *dim-linhas*) do
-			(if (eq (tabuleiro-linha-completa-p tabuleiro l) T)
+			(if (tabuleiro-linha-completa-p tabuleiro l)
 				(incf total)
 			)
 		)	
