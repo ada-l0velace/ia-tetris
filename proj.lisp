@@ -1,6 +1,6 @@
 ; Ricardo Campos 76398
-; Daniel Leitao *****
-; Pedro Cabral *****
+; Daniel Leitao 77939
+; Pedro Cabral 77968
 
 (defparameter *dim-linhas* 18)
 (defparameter *dim-colunas* 10)
@@ -8,9 +8,9 @@
  
 ;; Tipo accao
 
-(defstruct (accao)
-	coluna-peca
-)
+; (defstruct (accao)
+; 	coluna-peca
+; )
 
 ;; Tipo tabuleiro
 
@@ -85,7 +85,7 @@
 (defconstant peca-t3 (make-array (list 3 2) :initial-contents '((nil T)(T T)(nil T))))
 
 ;;;;;;;;;;;;;;;;;;;;;;
-;;    Tipo peça     ;;
+;;    Tipo peca     ;;
 ;;;;;;;;;;;;;;;;;;;;;;
 (defun pecas(simbolo)
 	(cond 
@@ -136,17 +136,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;
 
 (defun cria-accao(coluna peca)
-	(make-accao :coluna-peca (cons coluna peca))
-
-)
+	(cons coluna peca))
 
 (defun accao-coluna(accao)
-	(car (accao-coluna-peca accao))
+	(car accao)
 
 )
 
 (defun accao-peca(accao)
-	(cdr (accao-coluna-peca accao))	
+	(cdr accao)	
 )
 
 ;;;;;;;;;;;;;;;;;;
@@ -424,14 +422,14 @@
 (defun pontos (linhas-removidas)
 	(case linhas-removidas 
 		((1) 100)
-		((2) 200)
+		((2) 300)
 		((3) 500)
 		((4) 800)
 	)
 )
 
-(defun solucao (estado)	  
-	(estado-final-p estado)
+(defun solucao (estado)
+	(and (null (tabuleiro-topo-preenchido-p (estado-tabuleiro estado))) (null (estado-pecas-por-colocar estado)))
 )
 
 (defun accoes (estado)
@@ -471,13 +469,14 @@
 		(altura (tabuleiro-altura-coluna (estado-tabuleiro estado) (accao-coluna accao)))
 		)
 		(setf new-estado (copia-estado estado))
-		(if (>= (+ altura (peca-dimensao-altura (accao-peca accao))) *dim-linhas*)
+		(if (>= (+ (1- altura) (peca-dimensao-altura (accao-peca accao))) *dim-linhas*)
 			 (estado-accao new-estado accao altura)
 			(estado-accao new-estado accao (tabuleiro-desce-peca (estado-tabuleiro new-estado) (accao-peca accao) (accao-coluna accao)))
 
 		)
 		;tabuleiro-desce-peca
 		;(estado-accao new-estado accao (tabuleiro-altura-coluna (estado-tabuleiro new-estado) (accao-coluna accao)))
+		
 		(if (null (tabuleiro-topo-preenchido-p (estado-tabuleiro new-estado)))
 			(loop for linha from 0 below *dim-linhas* do
 				(if (eq (tabuleiro-linha-completa-p (estado-tabuleiro new-estado) (- linha linhas-removidas)) T)
@@ -492,10 +491,8 @@
 			(setf (estado-pecas-colocadas new-estado) (cons (car (estado-pecas-por-colocar new-estado)) (estado-pecas-colocadas new-estado)))	
 		)
 		(setf (estado-pecas-por-colocar new-estado) (cdr (estado-pecas-por-colocar new-estado)))
-		(if (not (tabuleiro-topo-preenchido-p (estado-tabuleiro new-estado)))
-			(if (not (eq linhas-removidas 0))
-				(incf (estado-pontos new-estado) (pontos linhas-removidas))
-			)
+		(if (not (eq linhas-removidas 0))
+			(incf (estado-pontos new-estado) (pontos linhas-removidas))
 		)
 		new-estado
 	)
@@ -607,7 +604,6 @@
 (defun depth-first-search (problema node visited)
 	(let (
 		(accoes NIL)
-		(estado NIL)
 		(new-node NIL)
 		(result NIL)
 		)
@@ -703,7 +699,7 @@
 		(if (not (null best-score))
 		 	(if (null (funcall (problema-solucao problema) (node-estado-actual best-score)))
 				(block not_solution
-					(procura-best-aux problema best-score (min (node-peso alternative) f_limit))
+					(procura-best-aux problema best-score (min (node-peso best-score) f_limit))
 				)
 				best-score
 			)
@@ -722,7 +718,7 @@
 	lista-accoes)	
 )
 
-(load "utils.lisp")
+(load "utils.fas")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;Priority Queues;;;;;;;;;;;;;

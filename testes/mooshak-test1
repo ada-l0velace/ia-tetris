@@ -1,0 +1,131 @@
+;; Teste 1
+;;; Testes Tipo Accao
+;;deve retornar T
+(equalp (cria-accao 3 '#2A((T T nil)(nil T T))) '(3 . #2A((T T nil)(nil T T))))
+;;deve retornar T
+(equal (accao-coluna (cria-accao 3 '#2A((T T nil)(nil T T)))) 3)
+;;deve retornar T
+(equalp (accao-peca (cria-accao 3 '#2A((T T nil)(nil T T)))) '#2A((T T nil)(nil T T)))
+
+;;; Teste 2
+;;; Testes tipo tabuleiro 1
+;;deve retornar IGNORE
+(ignore-value (setf tab1 (cria-tabuleiro)))
+;;deve retornar NIL
+(tabuleiro-preenchido-p tab1 0 0)
+;;deve retornar NIL
+(tabuleiro-preenchido-p tab1 5 5)
+;;deve retornar NIL
+(tabuleiro-preenchido-p tab1 17 0)
+;;deve retornar 0
+(tabuleiro-altura-coluna tab1 9)
+;;deve retornar NIL
+(tabuleiro-linha-completa-p tab1 0)
+;;deve retornar NIL
+(tabuleiro-topo-preenchido-p tab1)
+;;deve retornar IGNORE
+(ignore-value (tabuleiro-preenche! tab1 17 0))
+;;deve retornar T
+(tabuleiro-topo-preenchido-p tab1)
+
+;;; Teste 3
+;;; Testes tipo tabuleiro 2
+;;deve retornar IGNORE
+(ignore-value (setf tab1 (cria-tabuleiro)))
+;;deve retornar IGNORE
+(ignore-value (setf tab2 (cria-tabuleiro)))
+;;deve retornar T
+(tabuleiros-iguais-p tab1 tab2)
+;;deve retornar IGNORE
+(ignore-value (setf tab3 (copia-tabuleiro tab1)))
+;;deve retornar T
+(tabuleiros-iguais-p tab1 tab3)
+;;deve retornar NIL
+(eq tab1 tab3)
+;;deve retornar IGNORE
+(ignore-value (dotimes (coluna 10) (tabuleiro-preenche! tab1 2 coluna)))
+;;deve retornar IGNORE
+(ignore-value (setf tab3 (copia-tabuleiro tab1)))
+;;deve retornar T
+(tabuleiros-iguais-p tab1 tab3)
+;;deve retornar NIL
+(tabuleiros-iguais-p tab1 tab2)
+;;deve retornar T
+(tabuleiro-linha-completa-p tab1 2)
+;;deve retornar NIL
+(tabuleiro-linha-completa-p tab1 3)
+
+;;; Teste 4
+;;; Testes tipo tabuleiro 2
+;;deve retornar IGNORE
+(ignore-value (setf tab1 (cria-tabuleiro)))
+;;deve retornar NIL
+(tabuleiro-preenchido-p tab1 5 5)
+;;deve retornar IGNORE
+(ignore-value (tabuleiro-preenche! tab1 5 5))
+;;deve retornar T
+(tabuleiro-preenchido-p tab1 5 5)
+;;deve retornar IGNORE
+(ignore-value (tabuleiro-preenche! tab1 35 5))
+;;deve retornar IGNORE
+(ignore-value (tabuleiro-preenche! tab1 5 35))
+;;deve retornar T
+(tabuleiro-preenchido-p tab1 5 5)
+;;deve retornar 6
+(tabuleiro-altura-coluna tab1 5)
+
+;;; Teste 5
+;;; Testes tipo tabuleiro 2
+;;deve retornar IGNORE
+(ignore-value (setf tab1 (cria-tabuleiro)))
+;;deve retornar IGNORE
+(ignore-value (dotimes (coluna 10) (tabuleiro-preenche! tab1 2 coluna)))
+;;deve retornar IGNORE
+(ignore-value (tabuleiro-preenche! tab1 0 0))
+;;deve retornar IGNORE
+(ignore-value (tabuleiro-preenche! tab1 3 3))
+;;deve retornar 3
+(tabuleiro-altura-coluna tab1 0)
+;;deve retornar 4
+(tabuleiro-altura-coluna tab1 3)
+;;deve retornar T
+(tabuleiro-preenchido-p tab1 0 0)
+;;deve retornar T
+(tabuleiro-preenchido-p tab1 3 3)
+;;deve retornar IGNORE
+(ignore-value (tabuleiro-remove-linha! tab1 2))
+;;deve retornar T
+(tabuleiro-preenchido-p tab1 0 0)
+;;deve retornar NIL
+(tabuleiro-preenchido-p tab1 0 1)
+;;deve retornar NIL
+(tabuleiro-preenchido-p tab1 3 3)
+;;deve retornar T
+(tabuleiro-preenchido-p tab1 2 3)
+;;deve retornar NIL
+(tabuleiro-preenchido-p tab1 2 2)
+;;deve retornar NIL
+(tabuleiro-preenchido-p tab1 1 2)
+;;deve retornar 3
+(tabuleiro-altura-coluna tab1 3)
+
+;;; Teste 15
+;;; Testes fn resultado
+;;deve retornar IGNORE
+(ignore-value (setf estado1 (make-estado :pontos 0 :pecas-por-colocar '(o o o o o j) :pecas-colocadas '() :tabuleiro (cria-tabuleiro))))
+;;deve retornar IGNORE
+(ignore-value (setf estado2 (resultado estado1 '(0 . #2A((T T)(T T))))))
+;;deve retornar IGNORE
+(ignore-value (setf estado2 (resultado estado2 '(2 . #2A((T T)(T T))))))
+;;deve retornar IGNORE
+(ignore-value (setf estado2 (resultado estado2 '(4 . #2A((T T)(T T))))))
+;;deve retornar IGNORE
+(ignore-value (setf estado2 (resultado estado2 '(6 . #2A((T T)(T T))))))
+;;deve retornar T
+(tabuleiro-preenchido-p (estado-tabuleiro estado2) 1 5)
+;;deve retornar IGNORE
+(ignore-value (setf estado2 (resultado estado2 '(8 . #2A((T T)(T T))))))
+;;deve retornar 300
+(estado-pontos estado2)
+;;deve retornar NIL
+(tabuleiro-preenchido-p (estado-tabuleiro estado2) 1 5)
