@@ -26,11 +26,6 @@
 (defconstant peca-t2 (make-array (list 2 3) :initial-contents '((nil T nil)(T T T))))
 (defconstant peca-t3 (make-array (list 3 2) :initial-contents '((nil T)(T T)(nil T))))
 
-;; acrescentei algumas funcoes auxiliares que vao dar jeito para testar automaticamente o codigo dos alunos
-(defun ignore-value (x)
-	(declare (ignore x))
-	'ignore)
-
 ;;; random-element: list --> universal
 ;;; funcao que dada uma lista, devolve um elemento aleatorio dessa lista
 ;;; se a lista recebida for vazia, e devolvido nil
@@ -76,11 +71,12 @@
 	(let ((estado estado-inicial))
 		(do () ((or (estado-final-p estado) (null lista-accoes)))
 			(desenha-estado estado)
-			(read-char)
+			;(read-char)
 			(desenha-estado estado (first lista-accoes))
-			(read-char)
+			;(read-char)
 			(setf estado (resultado estado (first lista-accoes)))
-			(setf lista-accoes (rest lista-accoes)))
+			(setf lista-accoes (rest lista-accoes))
+		)
 		(desenha-estado estado)
 		(estado-pontos estado)))
 
@@ -141,15 +137,9 @@
 			
 ;;exemplo muito simples de um tabuleiro com a primeira e segunda linha quase todas preenchidas
 (defvar t1 (cria-tabuleiro))
-(dotimes (coluna 9)
-	(tabuleiro-preenche! t1 0 coluna))
-(dotimes (coluna 9)
-	(tabuleiro-preenche! t1 1 coluna))
-(defvar e1 (make-estado :tabuleiro t1 :pecas-por-colocar '(i o j l t i)))
-
-(defvar p1
-	(make-problema :estado-inicial (make-estado :tabuleiro t1 :pecas-por-colocar '(i o j l t i))
-				   :solucao #'solucao
-				   :accoes #'accoes
-				   :resultado #'resultado
-				   :custo-caminho #'custo-oportunidade))
+(dotimes (linha 0)
+	(dotimes (coluna 9)
+		(tabuleiro-preenche! t1 linha coluna))
+)
+(defvar e1 (make-estado :tabuleiro t1 :pecas-por-colocar '(i o j l t)))
+(defvar p1 (formulacao-problema t1 '(i)))
