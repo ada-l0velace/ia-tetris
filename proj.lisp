@@ -17,6 +17,7 @@
 (defstruct (tabuleiro (:conc-name tr-))
 	tab
 	alturas
+	alturas-rel
 )
 
 ;; Tipo Estado
@@ -55,6 +56,7 @@
 	resultado
 	custo-caminho
 )
+
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;    Tipo peca     ;;
@@ -113,7 +115,8 @@
 ;;;;;;;;;;;;;;;;;;
 (defun cria-tabuleiro ()
 	(make-tabuleiro :tab (make-array (list *dim-linhas* *dim-colunas*))
-					:alturas (make-array (list *dim-colunas*) :initial-element 0))
+					:alturas (make-array (list *dim-colunas*) :initial-element 0)
+					:alturas-rel (make-array (list *dim-colunas) :initial-element 0))
 )
 
 ;des
@@ -153,6 +156,24 @@
 ;define altura de uma coluna no tabuleiro
 (defun tabuleiro-altura! (tabuleiro coluna altura)
 	(setf (aref (tr-alturas tabuleiro) coluna) altura)
+)
+
+(defun tabuleiro-altura-rel (tabuleiro coluna)
+	(aref (tr-alturas-rel tabuleiro) coluna)
+)
+
+;define altura relativa de uma coluna no tabuleiro
+(defun tabuleiro-altura-rel! (tabuleiro coluna altura)
+	(setf (aref (tr-alturas-rel tabuleiro) coluna) altura)
+)
+
+;actualiza a altura relativa da coluna 'a direita da indicada
+(defun tabuleiro-altura-rel-actualiza! (tabuleiro coluna)
+	(if (not (eq coluna *dim-colunas*)) ; se nao for a ultima coluna
+		(tabuleiro-altura-rel! tabuleiro (1+ coluna)
+			(-
+				(tabuleiro-altura-coluna tabuleiro (1+ coluna))
+				(tabuleiro-altura-coluna tabuleiro coluna))))
 )
 
 
@@ -215,17 +236,21 @@
 	T
 )
 
+
+
+
 (defun tabuleiro-preenche! (tabuleiro linha coluna) ; nao usar directamente
 	(if (not (or (> linha (1- *dim-linhas*)) (> coluna (1- *dim-colunas*))))
 		(block actualiza
 			(setf (aref (tr-tab tabuleiro) linha coluna) T)
 
 			(if (> (1+ linha) (tabuleiro-altura-coluna tabuleiro coluna))
-				(tabuleiro-altura! tabuleiro coluna (1+ linha))
-			)
-		)
-	)
+				(block altura
+					(tabuleiro-altura! tabuleiro coluna (1+ linha))
+					(tabuleiro-altura-rel-actualiza! tabuleiro coluna)))))
 )
+
+
 
 (defun tabuleiro-muda-ponto! (tabuleiro linha coluna valor) ; valor T para preencher, NIL para apagar
 	(if (eq valor T)
@@ -240,11 +265,9 @@
 			(setf (aref (tr-tab tabuleiro) linha coluna) NIL)
 
 			(if (<= linha (tabuleiro-altura-coluna tabuleiro coluna))
-				(tabuleiro-altura! tabuleiro coluna (tabuleiro-calcula-altura tabuleiro coluna linha))
-			)
-		)
-	)
-)
+				(block altura
+					(tabuleiro-altura! tabuleiro coluna (tabuleiro-calcula-altura tabuleiro coluna linha))
+					(tabuleiro-altura-rel-actualiza! tabuleiro coluna))))))
 
 
 
@@ -692,6 +715,65 @@
 		((eq 't simbolo) (cons peca-t0 (cons peca-t1 (cons peca-t2 (cons peca-t3 NIL)))))
 	)
 )
+
+(defconstant peca-i-accoes '((cons 0 peca-i0) (cons 1 peca-i0) (cons 2 peca-i0)
+							(cons 3 peca-i0) (cons 4 peca-i0) (cons 5 peca-i0) (cons 6 peca-i0)
+							(cons 0 peca-i1) (cons 1 peca-i1) (cons 2 peca-i1) (cons 3 peca-i1) (cons 4 peca-i1)
+							(cons 5 peca-i1) (cons 6 peca-i1) (cons 7 peca-i1) (cons 8 peca-i1) (cons 9 peca-i1)))
+
+(defconstant peca-l-accoes '((cons 0 peca-l0) (cons 1 peca-l0) (cons 2 peca-l0) (cons 3 peca-l0)
+							(cons 4 peca-l0) (cons 5 peca-l0) (cons 6 peca-l0) (cons 7 peca-l0)
+							(cons 0 peca-l1) (cons 1 peca-l1) (cons 2 peca-l1) (cons 3 peca-l1)
+							(cons 4 peca-l1) (cons 5 peca-l1) (cons 6 peca-l1) (cons 7 peca-l1) (cons 8 peca-l1)
+							(cons 0 peca-l2) (cons 1 peca-l2) (cons 2 peca-l2) (cons 3 peca-l2)
+							(cons 4 peca-l2) (cons 5 peca-l2) (cons 6 peca-l2) (cons 7 peca-l2)
+							(cons 0 peca-l3) (cons 1 peca-l3) (cons 2 peca-l3) (cons 3 peca-l3)
+							(cons 4 peca-l3) (cons 5 peca-l3) (cons 6 peca-l3) (cons 7 peca-l3) (cons 8 peca-l3)))
+
+(defconstant peca-j-accoes '((cons 0 peca-j0) (cons 1 peca-j0) (cons 2 peca-j0) (cons 3 peca-j0)
+							(cons 4 peca-j0) (cons 5 peca-j0) (cons 6 peca-j0) (cons 7 peca-j0)
+							(cons 0 peca-j1) (cons 1 peca-j1) (cons 2 peca-j1) (cons 3 peca-j1)
+							(cons 4 peca-j1) (cons 5 peca-j1) (cons 6 peca-j1) (cons 7 peca-j1) (cons 8 peca-j1)
+							(cons 0 peca-j2) (cons 1 peca-j2) (cons 2 peca-j2) (cons 3 peca-j2)
+							(cons 4 peca-j2) (cons 5 peca-j2) (cons 6 peca-j2) (cons 7 peca-j2)
+							(cons 0 peca-j3) (cons 1 peca-j3) (cons 2 peca-j3) (cons 3 peca-j3)
+							(cons 4 peca-j3) (cons 5 peca-j3) (cons 6 peca-j3) (cons 7 peca-j3) (cons 8 peca-j3)))
+
+(defconstant peca-o-accoes '((cons 0 peca-o0) (cons 1 peca-o0) (cons 2 peca-o0) (cons 3 peca-o0)
+							(cons 4 peca-o0) (cons 5 peca-o0) (cons 6 peca-o0) (cons 7 peca-o0) (cons 8 peca-o0)))
+
+(defconstant peca-s-accoes '((cons 0 peca-s0) (cons 1 peca-s0) (cons 2 peca-s0) (cons 3 peca-s0)
+							(cons 4 peca-s0) (cons 5 peca-s0) (cons 6 peca-s0) (cons 7 peca-s0) (cons 8 peca-s0)
+							(cons 0 peca-s1) (cons 1 peca-s1) (cons 2 peca-s1) (cons 3 peca-s1)
+							(cons 4 peca-s1) (cons 5 peca-s1) (cons 6 peca-s1) (cons 7 peca-s1)))
+
+(defconstant peca-z-accoes '((cons 0 peca-z0) (cons 1 peca-z0) (cons 2 peca-z0) (cons 3 peca-z0)
+							(cons 4 peca-z0) (cons 5 peca-z0) (cons 6 peca-z0) (cons 7 peca-z0) (cons 8 peca-z0)
+							(cons 0 peca-z1) (cons 1 peca-z1) (cons 2 peca-z1) (cons 3 peca-z1)
+							(cons 4 peca-z1) (cons 5 peca-z1) (cons 6 peca-z1) (cons 7 peca-z1)))
+
+(defconstant peca-t-accoes '((cons 0 peca-t0) (cons 1 peca-t0) (cons 2 peca-t0) (cons 3 peca-t0)
+							(cons 4 peca-t0) (cons 5 peca-t0) (cons 6 peca-t0) (cons 7 peca-t0) (cons 8 peca-t0)
+							(cons 0 peca-t1) (cons 1 peca-t1) (cons 2 peca-t1) (cons 3 peca-t1)
+							(cons 4 peca-t1) (cons 5 peca-t1) (cons 6 peca-t1) (cons 7 peca-t1)
+							(cons 0 peca-t2) (cons 1 peca-t2) (cons 2 peca-t2) (cons 3 peca-t2)
+							(cons 4 peca-t2) (cons 5 peca-t2) (cons 6 peca-t2) (cons 7 peca-t2) (cons 8 peca-t2)
+							(cons 0 peca-t3) (cons 1 peca-t3) (cons 2 peca-t3) (cons 3 peca-t3)
+							(cons 4 peca-t3) (cons 5 peca-t3) (cons 6 peca-t3) (cons 7 peca-t3)))
+
+
+(defun accoes2 (est)
+	(let (
+		(peca (car (estado-pecas-por-colocar est))))
+
+		(case (peca)
+			('i peca-i-accoes)
+			('l peca-l-accoes)
+			('j peca-j-accoes)
+			('o peca-o-accoes)
+			('s peca-s-accoes)
+			('z peca-z-accoes)
+			('t peca-t-accoes))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;Priority Queues;;;;;;;;;;;;;
