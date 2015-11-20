@@ -1,4 +1,6 @@
 (load "proj.lisp")
+;;exemplo muito simples de um tabuleiro com a primeira e segunda linha quase todas preenchidas
+
 ;(executa-jogadas (problema-estado-inicial p1) (procura-pp p1))
 
 ;(desenha-estado (procura-pp p1))
@@ -11,7 +13,7 @@
 (format t "------Procura-pp-----~c" #\linefeed)
 (format t "---------------------~c" #\linefeed)
 (format t "---------------------~c" #\linefeed)
-(time (executa-jogadas (problema-estado-inicial p1) (procura-pp p1)))
+; (time (executa-jogadas (problema-estado-inicial p1) (procura-pp p1)))
 (format t "---------------------~c" #\linefeed)
 (format t "---------------------~c" #\linefeed)
 (format t "------Procura-A*-----~c" #\linefeed)
@@ -23,7 +25,7 @@
 (format t "-----Procura-best----~c" #\linefeed)
 (format t "---------------------~c" #\linefeed)
 (format t "---------------------~c" #\linefeed)
-(time (executa-jogadas (problema-estado-inicial p1) (procura-best (estado-tabuleiro (problema-estado-inicial p1)) (estado-pecas-por-colocar (problema-estado-inicial p1)))))
+;(time (executa-jogadas (problema-estado-inicial p1) (procura-best (estado-tabuleiro (problema-estado-inicial p1)) (estado-pecas-por-colocar (problema-estado-inicial p1)))))
 
  ;(procura-best (estado-tabuleiro (problema-estado-inicial p1)) (estado-pecas-por-colocar (problema-estado-inicial p1)))
 ;(procura-best-b (estado-tabuleiro (problema-estado-inicial p1)) (estado-pecas-por-colocar (problema-estado-inicial p1)))

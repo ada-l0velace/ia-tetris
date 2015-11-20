@@ -116,7 +116,8 @@
 (defun cria-tabuleiro ()
 	(make-tabuleiro :tab (make-array (list *dim-linhas* *dim-colunas*))
 					:alturas (make-array (list *dim-colunas*) :initial-element 0)
-					:alturas-rel (make-array (list *dim-colunas) :initial-element 0))
+					:alturas-rel (make-array (list *dim-colunas*) :initial-element 0)
+					)
 )
 
 ;des
@@ -167,9 +168,9 @@
 	(setf (aref (tr-alturas-rel tabuleiro) coluna) altura)
 )
 
-;actualiza a altura relativa da coluna 'a direita da indicada
+; actualiza a altura relativa da coluna 'a direita da indicada
 (defun tabuleiro-altura-rel-actualiza! (tabuleiro coluna)
-	(if (not (eq coluna *dim-colunas*)) ; se nao for a ultima coluna
+	(if (not (eq coluna (1- *dim-colunas*))) ; se nao for a ultima coluna
 		(tabuleiro-altura-rel! tabuleiro (1+ coluna)
 			(-
 				(tabuleiro-altura-coluna tabuleiro (1+ coluna))
@@ -247,7 +248,8 @@
 			(if (> (1+ linha) (tabuleiro-altura-coluna tabuleiro coluna))
 				(block altura
 					(tabuleiro-altura! tabuleiro coluna (1+ linha))
-					(tabuleiro-altura-rel-actualiza! tabuleiro coluna)))))
+					; (tabuleiro-altura-rel-actualiza! tabuleiro coluna)
+					))))
 )
 
 
@@ -267,7 +269,8 @@
 			(if (<= linha (tabuleiro-altura-coluna tabuleiro coluna))
 				(block altura
 					(tabuleiro-altura! tabuleiro coluna (tabuleiro-calcula-altura tabuleiro coluna linha))
-					(tabuleiro-altura-rel-actualiza! tabuleiro coluna))))))
+					; (tabuleiro-altura-rel-actualiza! tabuleiro coluna)
+					)))))
 
 
 
@@ -575,31 +578,32 @@
 ;;;;;;; Procuras ;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;
 
+(load (compile-file "utils.lisp"))
+
 (defun procura-pp (problema)
 	(let (
 		(solucao (depth-first-search 
 			problema
 			(make-node 
-					:estado-actual (problema-estado-inicial problema))
-			NIL)))
+					:estado-actual (problema-estado-inicial problema)))
+		))
+		(format t "solucao ~d ~d" solucao #\linefeed)
 		(procura-get-solucao solucao))
 )
 
-(defun depth-first-search (problema node visited)
+(defun depth-first-search (problema node)
 	(let (
 		(accoes NIL)
 		(new-node NIL)
-		(result NIL)
-		)
+		(result NIL))
 		(if (funcall (problema-solucao problema) (node-estado-actual node))
-		 	(setf result node)
-		)
+		 	(setf result node))
 		(setf accoes (funcall (problema-accoes problema) (node-estado-actual node)))
 		(loop for accao in accoes do
 			(setf new-node (cria-node-filho problema node accao))
-		 	(setf result (depth-first-search problema new-node visited))
+		 	(setf result (depth-first-search problema new-node))
 		)
-	result)
+		result)
 )
 
 (defun procura-A* (problema heuristica)
@@ -702,7 +706,6 @@
 	lista-accoes)	
 )
 
-(load "utils.fas")
 
 (defun pecas(simbolo)
 	(cond 
