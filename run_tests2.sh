@@ -49,7 +49,7 @@ for d in {1..12}; do
 
 done
 
-for d in 14 16 18 19 22 23 24 26; do
+for d in 14 16 18 19 22 23 24 25 26; do
 	rm -f "testes/testes publicos/test$d/out"
 	rm -f "testes/testes publicos/test$d/myout"
 	rm -f "testes/testes publicos/test$d/myout.txt"

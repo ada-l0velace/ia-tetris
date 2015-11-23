@@ -75,13 +75,13 @@
 (defun executa-jogadas (estado-inicial lista-accoes)
 	(let ((estado estado-inicial))
 		(do () ((or (estado-final-p estado) (null lista-accoes)))
-			(desenha-estado estado)
-			(read-char)
-			(desenha-estado estado (first lista-accoes))
-			(read-char)
+			;(desenha-estado estado)
+			;(read-char)
+			;(desenha-estado estado (first lista-accoes))
+			;(read-char)
 			(setf estado (resultado estado (first lista-accoes)))
 			(setf lista-accoes (rest lista-accoes)))
-		(desenha-estado estado)
+		;(desenha-estado estado)
 		(estado-pontos estado)))
 
 ;;; desenha-estado: estado x accao (opcional) --> {}

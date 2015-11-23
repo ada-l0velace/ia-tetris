@@ -114,17 +114,19 @@
 ;;Tipo Tabuleiro;;
 ;;;;;;;;;;;;;;;;;;
 (defun cria-tabuleiro ()
-	(make-tabuleiro :tab (make-array (list *dim-linhas* *dim-colunas*))
-					:alturas (make-array (list *dim-colunas*) :initial-element 0)
-					:alturas-rel (make-array (list *dim-colunas*) :initial-element 0)
-					)
-)
+	(make-tabuleiro 
+		:tab (make-array (list *dim-linhas* *dim-colunas*))
+		:alturas (make-array (list *dim-colunas*) :initial-element 0)
+		:alturas-rel (make-array (list *dim-colunas*) :initial-element 0)
+	)
+)	
 
 ;des
 (defun copia-tabuleiro (tabuleiro)
-	(make-tabuleiro :tab (tabuleiro->array tabuleiro)
-					:alturas (copy-seq (tr-alturas tabuleiro))
-					:alturas-rel (copy-seq (tr-alturas-rel tabuleiro))
+	(make-tabuleiro 
+		:tab (tabuleiro->array tabuleiro)
+		:alturas (copy-seq (tr-alturas tabuleiro))
+		:alturas-rel (copy-seq (tr-alturas-rel tabuleiro))
 	)
 )
 
@@ -189,13 +191,18 @@ T)
 		(total 0)
 		)
 		(loop for c from 0 below (1- *dim-colunas*) do
-			(setf total (abs (+ total (-
-										(tabuleiro-altura-coluna tabuleiro c)
-										(tabuleiro-altura-coluna tabuleiro (1+ c))
-										))))
+			(setf total 
+				(abs 
+					(+ total 
+						(-
+							(tabuleiro-altura-coluna tabuleiro c)
+							(tabuleiro-altura-coluna tabuleiro (1+ c))
+						)
+					)
+				)
+			)
 		)	
-	(* 1 total)
-	)	
+		(* 1 total))	
 )
 
 ;Nao funciona tenho de rever isto
@@ -592,10 +599,11 @@ T)
 
 (defun procura-pp (problema)
 	(let (
-		(solucao (depth-first-search 
-			problema
-			(make-node 
-					:estado-actual (problema-estado-inicial problema)))
+		(solucao 
+			(depth-first-search 
+				problema
+				(make-node :estado-actual (problema-estado-inicial problema))
+			)
 		))
 		(procura-get-solucao solucao))
 )
@@ -749,7 +757,7 @@ T)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;;;;;;;;;;;;listaS ordenada;;;;;;;;;;;;;;;;
-;;; SELECT-BEST chooses a node in step 3...
+;;; SELECT-BEST chooses a node in step 3... 
 (defun select-best (lst)
 	(first lst)
 )
