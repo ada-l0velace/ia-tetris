@@ -652,6 +652,7 @@ T)
 			(loop for accao in accoes do
 				(block continue
 					(setf new-node (cria-node-filho problema current accao heuristica))
+					;(format t "~d ~c"  accao #\linefeed)
 					(insert_heap open (node-peso new-node) new-node)
 				)	
 			)
