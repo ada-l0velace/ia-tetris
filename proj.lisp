@@ -644,7 +644,9 @@ T)
 		)
 		(insert_heap open (node-peso node) node)
 		(loop while (> (heap-size open) 0) do
+			
 			(setf current (extract-min open))
+			;(format t "~d ~c"  current #\linefeed)
 			(if (funcall (problema-solucao problema) (node-estado-actual current))
 				(return-from a-star-search current)
 			)
@@ -652,10 +654,11 @@ T)
 			(loop for accao in accoes do
 				(block continue
 					(setf new-node (cria-node-filho problema current accao heuristica))
-					;(format t "~d ~c"  accao #\linefeed)
+
 					(insert_heap open (node-peso new-node) new-node)
 				)	
 			)
+			;(format t "---------------------------- ~c" #\linefeed)
 		)
 	)
 	NIL
@@ -855,12 +858,12 @@ T)
                 (cond
                   ((< maxindex (right i))
                    (setf j (left i)))
-                  ((<= (node_bh-key (aref array (left i)))
+                  ((< (node_bh-key (aref array (left i)))
                        (node_bh-key (aref array (right i))))
                    (setf j (left i)))
                   (t
                    (setf j (right i))))
-                (when (<= (node_bh-key (aref array i))
+                (when (< (node_bh-key (aref array i))
                           (node_bh-key (aref array j)))
                   (loop-finish))
                 (swap-nodes array i j)
