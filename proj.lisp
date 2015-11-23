@@ -124,6 +124,7 @@
 (defun copia-tabuleiro (tabuleiro)
 	(make-tabuleiro :tab (tabuleiro->array tabuleiro)
 					:alturas (copy-seq (tr-alturas tabuleiro))
+					:alturas-rel (copy-seq (tr-alturas-rel tabuleiro))
 	)
 )
 
@@ -248,8 +249,9 @@ T)
 			(if (> (1+ linha) (tabuleiro-altura-coluna tabuleiro coluna))
 				(block altura
 					(tabuleiro-altura! tabuleiro coluna (1+ linha))
+					;(tabuleiro-altura-rel-actualiza! tabuleiro coluna)
 				)
-				;(tabuleiro-altura-rel-actualiza! tabuleiro coluna)
+				
 			)
 		)
 	)
@@ -586,7 +588,7 @@ T)
 ;;;;;;; Procuras ;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;
 
-(load (compile-file "utils.lisp"))
+
 
 (defun procura-pp (problema)
 	(let (
