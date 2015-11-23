@@ -17,31 +17,20 @@ Copyright (c) Sam Steingold, Bruno Haible 2001-2010
 Type :h and hit Enter for context help.
 
 ;; Loading file proj.lisp ...
-;;  Loading file utils.fas ...
-;;  Loaded file utils.fas
+;; Compiling file /home/lolstorm/Programming/lisp/projecto/ia-tetris/utils.lisp ...
+;; Wrote file /home/lolstorm/Programming/lisp/projecto/ia-tetris/utils.fas
+0 errors, 0 warnings
+;;  Loading file /home/lolstorm/Programming/lisp/projecto/ia-tetris/utils.fas ...
+;;  Loaded file /home/lolstorm/Programming/lisp/projecto/ia-tetris/utils.fas
 ;; Loaded file proj.lisp
+T
+NIL
 IGNORE
 IGNORE
 IGNORE
+T
 IGNORE
 IGNORE
 IGNORE
-#2A((T T T NIL NIL NIL NIL T T NIL)
-    (NIL T NIL NIL NIL NIL T T NIL NIL)
-    (NIL T NIL NIL NIL NIL NIL NIL NIL NIL)
-    (NIL T NIL NIL NIL NIL NIL NIL NIL NIL)
-    (NIL T NIL NIL NIL NIL NIL NIL NIL NIL)
-    (NIL T NIL T NIL NIL NIL NIL NIL NIL)
-    (NIL T T T T NIL NIL NIL NIL NIL)
-    (NIL NIL NIL T T T NIL NIL NIL NIL)
-    (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)
-    (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)
-    (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)
-    (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)
-    (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)
-    (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)
-    (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)
-    (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)
-    (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)
-    (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL))
+NIL
 Bye.

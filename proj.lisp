@@ -157,7 +157,7 @@
 ;define altura de uma coluna no tabuleiro
 (defun tabuleiro-altura! (tabuleiro coluna altura)
 	(setf (aref (tr-alturas tabuleiro) coluna) altura)
-)
+T)
 
 (defun tabuleiro-altura-rel (tabuleiro coluna)
 	(aref (tr-alturas-rel tabuleiro) coluna)
@@ -248,10 +248,12 @@
 			(if (> (1+ linha) (tabuleiro-altura-coluna tabuleiro coluna))
 				(block altura
 					(tabuleiro-altura! tabuleiro coluna (1+ linha))
-					; (tabuleiro-altura-rel-actualiza! tabuleiro coluna)
-					))))
-)
-
+				)
+				;(tabuleiro-altura-rel-actualiza! tabuleiro coluna)
+			)
+		)
+	)
+T)
 
 
 (defun tabuleiro-muda-ponto! (tabuleiro linha coluna valor) ; valor T para preencher, NIL para apagar
@@ -259,18 +261,20 @@
 		(tabuleiro-preenche! tabuleiro linha coluna)
 		(tabuleiro-apaga! tabuleiro linha coluna)
 	)
-)
+T)
 
 (defun tabuleiro-apaga! (tabuleiro linha coluna) ; nao usar directamente
 	(if (not (or (> linha (1- *dim-linhas*)) (> coluna (1- *dim-colunas*))))
 		(block actualiza
 			(setf (aref (tr-tab tabuleiro) linha coluna) NIL)
-
-			(if (<= linha (tabuleiro-altura-coluna tabuleiro coluna))
+			(if (<= linha (tabuleiro-altura-coluna tabuleiro coluna))			
 				(block altura
 					(tabuleiro-altura! tabuleiro coluna (tabuleiro-calcula-altura tabuleiro coluna linha))
-					; (tabuleiro-altura-rel-actualiza! tabuleiro coluna)
-					)))))
+				)
+			)
+		)
+	)
+T)
 
 
 
@@ -324,7 +328,7 @@
 	(loop for j from 0 below *dim-colunas* do ; linha mais acima
 		(tabuleiro-muda-ponto! tabuleiro (1- *dim-linhas*) j NIL)
 	)
-)
+T)
 
 (defun tabuleiro-topo-preenchido-p (tabuleiro)
 	(loop for i from 0 below *dim-colunas* do
@@ -357,7 +361,7 @@
 	)
 	(loop for i from 0 below *dim-linhas* do
 		(loop for j from 0 below *dim-colunas* do
-			(setf (aref (tr-tab new-tabuleiro) i j) (aref array i j))		
+			(tabuleiro-muda-ponto! new-tabuleiro i j (aref array i j))		
 		)
 	)
 	new-tabuleiro)
@@ -430,11 +434,15 @@
 			(loop for j from 0 below *dim-colunas* do
 				(setf peca_cabe 0)
 				(loop for h from j below (min (+ j dim-colunas-peca) *dim-colunas*) do
-					(if (null 
-						(tabuleiro-preenchido-p 
-							(estado-tabuleiro estado) 
-							(tabuleiro-altura-coluna (estado-tabuleiro estado) h)
-							h))	
+					(if (and 
+							(null 
+								(tabuleiro-preenchido-p 
+									(estado-tabuleiro estado) 
+									(tabuleiro-altura-coluna (estado-tabuleiro estado) h)
+									h)
+							)
+							(null (tabuleiro-topo-preenchido-p (estado-tabuleiro estado)))	
+						)
 						(incf peca_cabe)
 					)
 				)
@@ -587,7 +595,6 @@
 			(make-node 
 					:estado-actual (problema-estado-inicial problema)))
 		))
-		(format t "solucao ~d ~d" solucao #\linefeed)
 		(procura-get-solucao solucao))
 )
 
@@ -597,11 +604,17 @@
 		(new-node NIL)
 		(result NIL))
 		(if (funcall (problema-solucao problema) (node-estado-actual node))
-		 	(setf result node))
-		(setf accoes (funcall (problema-accoes problema) (node-estado-actual node)))
+		 	(return-from depth-first-search node)
+		)
+		(setf accoes (reverse (funcall (problema-accoes problema) (node-estado-actual node))))
 		(loop for accao in accoes do
 			(setf new-node (cria-node-filho problema node accao))
-		 	(setf result (depth-first-search problema new-node))
+		 	(setf result (depth-first-search problema new-node))	
+			(if result
+			 	(if (funcall (problema-solucao problema) (node-estado-actual result))
+			 		(return-from depth-first-search result)		
+				)		
+			)
 		)
 		result)
 )
@@ -642,15 +655,16 @@
 			)
 		)
 	)
-	node
+	NIL
 )
 
 
-(defun procura-best (tabuleiro pecas-por-colocar)
+(defun procura-best (array pecas-por-colocar)
 	(let* (
+		(tabuleiro (array->tabuleiro array))
 		(problema (formulacao-problema tabuleiro pecas-por-colocar))
 		(estado-inicial (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar))
-		(solucao (procura-best-aux 
+		(solucao (a-star-search 
 			problema
 			(make-node 
 				:estado-actual estado-inicial
@@ -659,7 +673,7 @@
 				:accao NIL
 				:peso (heuristicas estado-inicial)
 			)
-			MOST-POSITIVE-FIXNUM))
+			#'heuristicas))
 		)
 		
 	(procura-get-solucao solucao))
@@ -699,6 +713,9 @@
 (defun procura-get-solucao (solucao)
 	(let (
 		(lista-accoes NIL))
+		(if (null solucao)
+			(return-from procura-get-solucao solucao)
+		)
 		(loop while (not (null (node-accao solucao))) do
 			(push (node-accao solucao) lista-accoes)
 			(setf solucao (node-pai solucao))
@@ -706,83 +723,26 @@
 	lista-accoes)	
 )
 
+(load (compile-file "utils.lisp")) 
+;(load "utils.fas")
 
 (defun pecas(simbolo)
 	(cond 
-		((eq 'i simbolo) (cons peca-i0 (cons peca-i1 NIL)))
-		((eq 'l simbolo) (cons peca-l0 (cons peca-l1 (cons peca-l2 (cons peca-l3 NIL)))))
-		((eq 'j simbolo) (cons peca-j0 (cons peca-j1 (cons peca-j2 (cons peca-j3 NIL)))))
-		((eq 'o simbolo) (cons peca-o0 NIL))
-		((eq 's simbolo) (cons peca-s0 (cons peca-s1 NIL)))
-		((eq 'z simbolo) (cons peca-z0 (cons peca-z1 NIL)))
-		((eq 't simbolo) (cons peca-t0 (cons peca-t1 (cons peca-t2 (cons peca-t3 NIL)))))
+		((eq 'i simbolo) (list peca-i0 peca-i1)) 
+		((eq 'l simbolo) (list peca-l0 peca-l1 peca-l2 peca-l3))
+		((eq 'j simbolo) (list peca-j0 peca-j1 peca-j2 peca-j3))
+		((eq 'o simbolo) (list peca-o0))
+		((eq 's simbolo) (list peca-s0 peca-s1))
+		((eq 'z simbolo) (list peca-z0 peca-z1))
+		((eq 't simbolo) (list peca-t0 peca-t1 peca-t2 peca-t3))
 	)
 )
-
-(defconstant peca-i-accoes '((cons 0 peca-i0) (cons 1 peca-i0) (cons 2 peca-i0)
-							(cons 3 peca-i0) (cons 4 peca-i0) (cons 5 peca-i0) (cons 6 peca-i0)
-							(cons 0 peca-i1) (cons 1 peca-i1) (cons 2 peca-i1) (cons 3 peca-i1) (cons 4 peca-i1)
-							(cons 5 peca-i1) (cons 6 peca-i1) (cons 7 peca-i1) (cons 8 peca-i1) (cons 9 peca-i1)))
-
-(defconstant peca-l-accoes '((cons 0 peca-l0) (cons 1 peca-l0) (cons 2 peca-l0) (cons 3 peca-l0)
-							(cons 4 peca-l0) (cons 5 peca-l0) (cons 6 peca-l0) (cons 7 peca-l0)
-							(cons 0 peca-l1) (cons 1 peca-l1) (cons 2 peca-l1) (cons 3 peca-l1)
-							(cons 4 peca-l1) (cons 5 peca-l1) (cons 6 peca-l1) (cons 7 peca-l1) (cons 8 peca-l1)
-							(cons 0 peca-l2) (cons 1 peca-l2) (cons 2 peca-l2) (cons 3 peca-l2)
-							(cons 4 peca-l2) (cons 5 peca-l2) (cons 6 peca-l2) (cons 7 peca-l2)
-							(cons 0 peca-l3) (cons 1 peca-l3) (cons 2 peca-l3) (cons 3 peca-l3)
-							(cons 4 peca-l3) (cons 5 peca-l3) (cons 6 peca-l3) (cons 7 peca-l3) (cons 8 peca-l3)))
-
-(defconstant peca-j-accoes '((cons 0 peca-j0) (cons 1 peca-j0) (cons 2 peca-j0) (cons 3 peca-j0)
-							(cons 4 peca-j0) (cons 5 peca-j0) (cons 6 peca-j0) (cons 7 peca-j0)
-							(cons 0 peca-j1) (cons 1 peca-j1) (cons 2 peca-j1) (cons 3 peca-j1)
-							(cons 4 peca-j1) (cons 5 peca-j1) (cons 6 peca-j1) (cons 7 peca-j1) (cons 8 peca-j1)
-							(cons 0 peca-j2) (cons 1 peca-j2) (cons 2 peca-j2) (cons 3 peca-j2)
-							(cons 4 peca-j2) (cons 5 peca-j2) (cons 6 peca-j2) (cons 7 peca-j2)
-							(cons 0 peca-j3) (cons 1 peca-j3) (cons 2 peca-j3) (cons 3 peca-j3)
-							(cons 4 peca-j3) (cons 5 peca-j3) (cons 6 peca-j3) (cons 7 peca-j3) (cons 8 peca-j3)))
-
-(defconstant peca-o-accoes '((cons 0 peca-o0) (cons 1 peca-o0) (cons 2 peca-o0) (cons 3 peca-o0)
-							(cons 4 peca-o0) (cons 5 peca-o0) (cons 6 peca-o0) (cons 7 peca-o0) (cons 8 peca-o0)))
-
-(defconstant peca-s-accoes '((cons 0 peca-s0) (cons 1 peca-s0) (cons 2 peca-s0) (cons 3 peca-s0)
-							(cons 4 peca-s0) (cons 5 peca-s0) (cons 6 peca-s0) (cons 7 peca-s0) (cons 8 peca-s0)
-							(cons 0 peca-s1) (cons 1 peca-s1) (cons 2 peca-s1) (cons 3 peca-s1)
-							(cons 4 peca-s1) (cons 5 peca-s1) (cons 6 peca-s1) (cons 7 peca-s1)))
-
-(defconstant peca-z-accoes '((cons 0 peca-z0) (cons 1 peca-z0) (cons 2 peca-z0) (cons 3 peca-z0)
-							(cons 4 peca-z0) (cons 5 peca-z0) (cons 6 peca-z0) (cons 7 peca-z0) (cons 8 peca-z0)
-							(cons 0 peca-z1) (cons 1 peca-z1) (cons 2 peca-z1) (cons 3 peca-z1)
-							(cons 4 peca-z1) (cons 5 peca-z1) (cons 6 peca-z1) (cons 7 peca-z1)))
-
-(defconstant peca-t-accoes '((cons 0 peca-t0) (cons 1 peca-t0) (cons 2 peca-t0) (cons 3 peca-t0)
-							(cons 4 peca-t0) (cons 5 peca-t0) (cons 6 peca-t0) (cons 7 peca-t0) (cons 8 peca-t0)
-							(cons 0 peca-t1) (cons 1 peca-t1) (cons 2 peca-t1) (cons 3 peca-t1)
-							(cons 4 peca-t1) (cons 5 peca-t1) (cons 6 peca-t1) (cons 7 peca-t1)
-							(cons 0 peca-t2) (cons 1 peca-t2) (cons 2 peca-t2) (cons 3 peca-t2)
-							(cons 4 peca-t2) (cons 5 peca-t2) (cons 6 peca-t2) (cons 7 peca-t2) (cons 8 peca-t2)
-							(cons 0 peca-t3) (cons 1 peca-t3) (cons 2 peca-t3) (cons 3 peca-t3)
-							(cons 4 peca-t3) (cons 5 peca-t3) (cons 6 peca-t3) (cons 7 peca-t3)))
-
-
-(defun accoes2 (est)
-	(let (
-		(peca (car (estado-pecas-por-colocar est))))
-
-		(case (peca)
-			('i peca-i-accoes)
-			('l peca-l-accoes)
-			('j peca-j-accoes)
-			('o peca-o-accoes)
-			('s peca-s-accoes)
-			('z peca-z-accoes)
-			('t peca-t-accoes))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;Priority Queues;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;lista ordenada;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;listaS ordenada;;;;;;;;;;;;;;;;
 ;;; SELECT-BEST chooses a node in step 3...
 (defun select-best (lst)
 	(first lst)
@@ -908,7 +868,7 @@
         for parent = (parent index)
         with key = (node_bh-key (aref array vindex))
         while (and (>= parent 0)
-                   (< key (node_bh-key (aref array parent))))
+                   (<= key (node_bh-key (aref array parent))))
         do (swap-nodes array index parent) 
         finally (return (aref array index))))
 

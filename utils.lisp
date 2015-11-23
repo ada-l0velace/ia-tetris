@@ -139,17 +139,17 @@
 	(format T "|"))			
 
 			
-;;exemplo muito simples de um tabuleiro com a primeira e segunda linha quase todas preenchidas
+;exemplo muito simples de um tabuleiro com a primeira e segunda linha quase todas preenchidas
 (defvar t1 (cria-tabuleiro))
 (dotimes (coluna 9)
 	(tabuleiro-preenche! t1 0 coluna))
 (dotimes (coluna 9)
 	(tabuleiro-preenche! t1 1 coluna))
 (defvar e1 (make-estado :tabuleiro t1 :pecas-por-colocar '(i o j l t i)))
-
+(dotimes (linha 18)(tabuleiro-preenche! t1 linha 0))
 (defvar p1
-	(make-problema :estado-inicial (make-estado :tabuleiro t1 :pecas-por-colocar '(o o))
+	(make-problema :estado-inicial (make-estado :tabuleiro t1 :pecas-por-colocar '(l j))
 				   :solucao #'solucao
 				   :accoes #'accoes
 				   :resultado #'resultado
-				   :custo-caminho #'custo-oportunidade))
+				   :custo-caminho #'qualidade))
