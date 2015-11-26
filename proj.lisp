@@ -908,36 +908,6 @@ T)
 	)
 )
 
-
-(defun qwer ()
-	(let 
-		((hash-accoes (make-hash-table))
-		(t1 NIL))
-		
-		;;deve retornar IGNORE
-		(format T "~d ~c" (ignore-value (setf t1 (cria-tabuleiro))) #\linefeed)
-		(loop for peca in (list 'i 'l 'j 'o 's 'z 't) do
-			(setf (gethash peca hash-accoes) (accoes (make-estado :pontos 0 :pecas-por-colocar (list peca) :pecas-colocadas '() :tabuleiro t1)))
-		)
-		;;deve retornar NIL
-		(format T "~d ~c" (get-hash-accoes hash-accoes (make-estado :pontos 0 :pecas-por-colocar '() :pecas-colocadas '() :tabuleiro t1)) #\linefeed)
-		;;deve retornar uma lista de accoes para a peca l (ver ficheiro output)
-		(format T "~d ~c" (get-hash-accoes hash-accoes (make-estado :pontos 0 :pecas-por-colocar '(l i j) :pecas-colocadas '() :tabuleiro t1)) #\linefeed)
-		;;deve retornar IGNORE
-		(format T "~d ~c" (ignore-value (dotimes (linha 18)(tabuleiro-preenche! t1 linha 0))) #\linefeed)
-		;;deve retornar NIL
-		(if (tabuleiro-topo-preenchido-p t1)
-			(format T "~d ~c" NIL #\linefeed)
-			(format T "~d ~c" (get-hash-accoes hash-accoes (make-estado :pontos 0 :pecas-por-colocar '(o t j) :pecas-colocadas '(i i i i) :tabuleiro t1)) #\linefeed)
-		)
-		;;deve retornar NIL
-		(if (tabuleiro-topo-preenchido-p t1)
-			(format T "~d ~c" NIL #\linefeed)
-			(format T "~d ~c" (get-hash-accoes hash-accoes (make-estado :pontos 0 :pecas-por-colocar '(t l t) :pecas-colocadas '(i i i i) :tabuleiro t1)) #\linefeed)
-		)
-	T)
-)
-
 ;; greedy-search: problema x node x heuristica --> node
 (defun greedy-search (problema node heuristica)
 	(let (
@@ -977,13 +947,13 @@ T)
 ;; recursive-best-first-search: problema x node x heuristica x bound --> node
 (defun recursive-best-first-search (problema node heuristica hash-accoes bound)
 	(let (
-		; (accoes 
-		; 	(if (estado-final-p (node-estado-actual node))
-		; 		NIL
-		; 		(get-hash-accoes hash-accoes (node-estado-actual node))
-		; 	)
-		; )
-		(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
+		(accoes 
+			(if (estado-final-p (node-estado-actual node))
+				NIL
+				(get-hash-accoes hash-accoes (node-estado-actual node))
+			)
+		)
+		;(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
 		(new-node NIL)
 		(open (make-instance 'binary-heap))
 		(n1 NIL)
