@@ -891,14 +891,14 @@ T)
 		(hash-accoes (make-hash-table))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #' (lambda (x) (declare (ignore x))0)))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'qualidade))
-		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade3))
+		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade))
 		(solucao NIL))
 		(loop for peca in (list 'i 'l 'j 'o 's 'z 't) do
 			(setf (gethash peca hash-accoes) (accoes (make-estado :pontos 0 :pecas-por-colocar (list peca) :pecas-colocadas '() :tabuleiro tabuleiro)))
 		)
 		(cond 
-			((> (length pecas-por-colocar) 10)
-				(setf solucao (executa-procura #'a-star-search problema #'heuristicas)))
+			((< (length pecas-por-colocar) 10)
+				(setf solucao (executa-procura #'best-first-search problema #'heuristicas hash-accoes)))
 			((> (length pecas-por-colocar) 10) 
 				(setf solucao (executa-procura #'greedy-search problema #'heuristicas)))
 			(t 
@@ -942,6 +942,34 @@ T)
 			node	
 		)
 	)
+)
+
+;; best-first-search: problema x node x heuristica x hash-table -> node
+;; funcao auxiliar da procura-pp procura o node goal e constroi a solucao para depois
+;; fazer backtrace da solucao na funcao procura-pp
+(defun best-first-search (problema node heuristica hash-accoes)
+	(let ((open (make-instance 'binary-heap))
+		(current NIL)
+		(accoes NIL)
+		(new-node NIL)
+		)
+		(insert_heap open (node-peso node) node)
+		(loop while (> (heap-size open) 0) do
+			(setf current (extract-min open))
+			(if (funcall (problema-solucao problema) (node-estado-actual current))
+				(return-from best-first-search current)
+			)
+			(setf accoes (get-hash-accoes hash-accoes (node-estado-actual current)))
+			;(setf accoes (funcall (problema-accoes problema) (node-estado-actual current)))
+			(loop for accao in accoes do
+				(block continue
+					(setf new-node (cria-node-filho problema current accao heuristica))
+					(insert_heap open (node-peso new-node) new-node)
+				)	
+			)
+		)
+	)
+	NIL
 )
 
 ;; recursive-best-first-search: problema x node x heuristica x bound --> node
