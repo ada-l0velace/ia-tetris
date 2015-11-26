@@ -62,18 +62,26 @@
 ;;    Tipo peca     ;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
+;; peca-dimensao-largura: peca --> inteiro
+;; funcao que recebe uma peca e retorna a largura dela
 (defun peca-dimensao-largura (peca)
 	(array-dimension peca 1)
 )
+
+;; peca-dimensao-altura: peca --> inteiro
+;; funcao que recebe uma peca e retorna a altura dela
 (defun peca-dimensao-altura (peca)
 	(array-dimension peca 0)
 )
 
+;; peca-dimensao-altura: peca --> inteiro
 (defun peca-preenchido-p (peca linha coluna)
 	(aref peca linha coluna)
 )
 
-(defun ppm (peca) ; peca-pontos-maximo -- n usar em mais nenhum sitio
+;; peca-pontos-maximo: peca --> inteiro
+;; funcao que recebe uma peca e retorna o valor maximo que se pode obter com esta peca em uma jogada
+(defun peca-pontos-maximo (peca) 
 	(cond 
 		((eq 'i peca) 800)
 		((eq 'l peca) 500)
@@ -85,16 +93,22 @@
 	)
 )
 
+;; peca-pontos-maximo: lista x pecas --> inteiro
+;; funcao que recebe uma lista de pecas e retorna um inteiro correspondente ao valor total de pontos
+;; das pecas ja jogadas no tabuleiro
 (defun pecas-pontos-maximo (pecas)
 	(let (
 		(total 0)
 		)
 		(loop for peca in pecas do
-			(incf total (ppm peca))
+			(incf total (peca-pontos-maximo peca))
 		)
 	total)
 )
 
+;; peca-pontos-maximo: lista x pecas --> inteiro
+;; funcao que recebe uma lista de pecas e retorna um inteiro correspondente ao valor total de pontos
+;; da ultima peca jogada no tabuleiro
 (defun pecas-pontos-maximo2 (pecas)
 	(let (
 		(total 0)
@@ -115,14 +129,23 @@
 ;;    Tipo accao    ;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
+;; cria-accao: inteiro x array --> accao
+;; este constructor recebe um inteiro correspondente a posicao da coluna mais a esquerda a partir
+;; da qual a peca vai ser colocada e um array com a configuracao da peca a colocar e devolve uma
+;; nova accao
 (defun cria-accao(coluna peca)
 	(cons coluna peca))
 
+;; accao-coluna: accao x inteiro --> inteiro
+;; este selector devolve um inteiro correspondente a coluna mais a esquerda a partir da qual a
+;; peca vai ser colocada
 (defun accao-coluna(accao)
 	(car accao)
 
 )
 
+;; accao-peca: accao --> array
+;; este selector devolve o array com a configuracao geometrica exacta com que vai ser colocada
 (defun accao-peca(accao)
 	(cdr accao)	
 )
@@ -130,6 +153,9 @@
 ;;;;;;;;;;;;;;;;;;
 ;;Tipo Tabuleiro;;
 ;;;;;;;;;;;;;;;;;;
+
+;; cria-tabuleiro: {} --> tabuleiro
+;; este construtor nao recebe qualquer argumento e devolve um novo tabuleiro vazio
 (defun cria-tabuleiro ()
 	(make-tabuleiro 
 		:tab (make-array (list *dim-linhas* *dim-colunas*))
@@ -138,7 +164,9 @@
 	)
 )	
 
-;des
+;; copia-tabuleiro: tabuleiro -> tabuleiro
+;; este construtor recebe um tabuleiro e devolve um novo tabuleiro com o mesmo conteudo do tabuleiro
+;; recebido
 (defun copia-tabuleiro (tabuleiro)
 	(make-tabuleiro 
 		:tab (tabuleiro->array tabuleiro)
@@ -147,7 +175,10 @@
 	)
 )
 
-;des
+;; tabuleiro-preenchido-p: tabuleiro x inteiro x inteiro --> logico
+;; este selector recebe um tabuleiro um inteiro correspondente ao numero de linha e um inteiro
+;; correspondente ao numero da coluna e devolve o valor logico verdade se a posicao estiver preenchida
+;; e falso caso contrario
 (defun tabuleiro-preenchido-p (tabuleiro linha coluna)
 	(if (not (or (>= linha *dim-linhas*) (>= coluna *dim-colunas*)))
 		(aref (tr-tab tabuleiro) linha coluna)
@@ -155,7 +186,9 @@
 	)
 )
 
-
+;; tabuleiro-calcula-altura: tabuleiro x coluna x topo --> inteiro
+;; esta funcao calcula a altura correspondente a coluna recebida
+;; apartir de um topo recebido tambem por parametro
 (defun tabuleiro-calcula-altura (tabuleiro coluna topo)
 	(let (
 		(altura 0)
@@ -169,12 +202,17 @@
 	0) ; coluna vazia
 )
 
+;; tabuleiro-altura-coluna: tabuleiro x coluna --> inteiro
+;; este selector recebe um tabuleiro e um inteiro correspondente ao numero de uma coluna e
+;; devolve a altura de uma coluna ou seja a posicao mais alta que esteja preenchida dessa coluna  
 (defun tabuleiro-altura-coluna (tabuleiro coluna)
   (aref (tr-alturas tabuleiro) coluna)
 )
 
 
-;define altura de uma coluna no tabuleiro
+;; tabuleiro-altura! tabuleiro x inteiro x inteiro --> tabuleiro
+;; este modificador recebe um tabuleiro um inteiro correspondente ao numero da coluna e um inteiro
+;; correspondente a altura e altera a altura no array alturas na coluna correspondente
 (defun tabuleiro-altura! (tabuleiro coluna altura)
 	(setf (aref (tr-alturas tabuleiro) coluna) altura)
 T)
@@ -198,11 +236,15 @@ T)
 )
 
 
-; Talvez seja util depois na parte 2 para as heuristicas...
+;; tabuleiro-altura-agregada: tabuleiro --> inteiro
+;; calcula a soma das alturas todas para usar nas procuras informadas como heuristica
 (defun tabuleiro-altura-agregada (tabuleiro)
 	(reduce #' + (tr-alturas tabuleiro))
 )
 
+;; tabuleiro-bumpiness: tabuleiro --> inteiro
+;; a bumpiness de um tabuleiro diz-nos a variacao das alturas das coluna
+;; e calculada atraves da soma absoluta entre as difrencas das colunas adjacentes
 (defun tabuleiro-bumpiness (tabuleiro)
 	(let(
 		(total 0)
@@ -223,7 +265,8 @@ T)
 )
 
 
-
+;; tabuleiro-linhas-completas: tabuleiro --> inteiro
+;; calcula o numero de linhas completas em um tabuleiro
 (defun tabuleiro-linhas-completas (tabuleiro) ; pode ser optimizado
 	(let(
 		(total 0)
@@ -236,6 +279,10 @@ T)
 	total)
 )
 
+;; tabuleiro-linha-completa-p: tabuleiro x linha --> logico
+;; este reconhecedor recebe um tabuleiro, um inteiro correspondente ao numero de uma linha
+;; e devolve o valor logico verdade se todas as posicoes da linha recebida estiverem preenchidas
+;; e falso caso contrario
 (defun tabuleiro-linha-completa-p (tabuleiro linha) ; pode ser optimizado
 	(loop for i from 0 below *dim-colunas* do
 		(if (null (tabuleiro-preenchido-p tabuleiro linha i))
@@ -247,7 +294,10 @@ T)
 
 
 
-
+;; tabuleiro-preenche!: tabuleiro x linha x coluna --> inteiro
+;; este modificador recebe um tabuleiro um inteiro correspondente ao numero linha e um inteiro
+;; correspondente ao numero da coluna e altera o tabuleiro recebido para na posicao correspondente
+;; a linha e coluna passar a estar preenchido
 (defun tabuleiro-preenche! (tabuleiro linha coluna) ; nao usar directamente
 	(if (not (or (> linha (1- *dim-linhas*)) (> coluna (1- *dim-colunas*))))
 		(block actualiza
@@ -736,11 +786,11 @@ T)
 		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade3))
 		(solucao NIL))
 		(cond 
-			((> (length pecas-por-colocar) 50)
+			((< (length pecas-por-colocar) 10)
 				(setf solucao (executa-procura #'a-star-search problema #'heuristicas)))
-			((> (length pecas-por-colocar) 50) 
+			((> (length pecas-por-colocar) 10) 
 				(setf solucao (executa-procura #'greedy-search problema #'heuristicas)))
-			((< (length pecas-por-colocar) 40) 
+			(NIL 
 				(setf solucao (executa-procura #'recursive-best-first-search problema #'heuristicas MOST-POSITIVE-FIXNUM)))	
 		)
 		(procura-get-solucao solucao)
@@ -813,28 +863,17 @@ T)
 							(setf (node-peso node) (node-peso new-node))
 						)
 					)
-					;(setf (node-peso (node-pai new-node)) (max (node-peso node) (node-peso (node-pai node))))
 					(insert_heap open (node-peso new-node) new-node)
-					;(setf open (insert_lst new-node open))
 				)
-				;(read-char)
 				(setf n1 (extract-min open))
 				(setf n2 (peek-min open))
-				; (if (eq (length open) 1)
-				; 	(setf n2 MOST-POSITIVE-FIXNUM)
-				; 	(setf f2 (node-peso (select-best (cdr open))))
-				; )
 				(loop while (and (<= (node-peso n1) bound) (< (node-peso n1) MOST-POSITIVE-FIXNUM)) do 
-					;(setf open (cdr open))
 					(setf n1 (recursive-best-first-search problema n1 heuristica (min (node-peso n2) bound))) 
 					(if (funcall (problema-solucao problema) (node-estado-actual n1))
 						(return-from recursive-best-first-search n1)	
 					)
 					(insert_heap open (node-peso n1) n1)
 					(setf n1 (extract-min open))
-					;(setf n1 (select-best open))
-
-					;(setf n2 (select-best (cdr open)))
 				)
 				(return-from recursive-best-first-search n1)
 			)
@@ -842,6 +881,8 @@ T)
 		
 	)
 )
+
+
 
 (defun executa-procura (algoritmo problema &optional (heuristica (lambda (a) (declare (ignore a)) 0)) &rest b)
 	(apply algoritmo
