@@ -54,7 +54,7 @@
 	solucao
 	accoes
 	resultado
-	custo-caminho
+	(custo-caminho (lambda (a) (declare (ignore a)) 0))
 )
 
 
@@ -523,7 +523,7 @@ T)
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; Tipo Node ;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
-(defun cria-node-inicial (problema heuristica)
+(defun cria-node-inicial (problema &optional (heuristica (lambda (a) (declare (ignore a)) 0)))
 	(make-node 
 		:estado-actual (problema-estado-inicial problema)
 		:pai NIL
@@ -663,12 +663,7 @@ T)
 		(solucao 
 			(depth-first-search 
 				problema
-				(make-node :estado-actual (problema-estado-inicial problema)
-					:pai NIL
-					:profundidade 0
-					:accao NIL
-					:peso 0
-				)
+				(cria-node-inicial problema)
 			)
 		))
 		(procura-get-solucao solucao))
@@ -702,17 +697,10 @@ T)
 
 (defun procura-A* (problema heuristica)
 	(let (
-		(solucao (a-star-search 
-			problema
-			(make-node 
-					:estado-actual (problema-estado-inicial problema)
-					:pai NIL
-					:profundidade 0
-					:accao NIL
-					:peso (funcall heuristica (problema-estado-inicial problema)))
-			heuristica
-		)))
-		(procura-get-solucao solucao))
+		(solucao (executa-procura #'a-star-search problema heuristica))
+		)
+		(procura-get-solucao solucao)
+	)
 )
 
 (defun a-star-search (problema node heuristica)
@@ -723,10 +711,7 @@ T)
 		)
 		(insert_heap open (node-peso node) node)
 		(loop while (> (heap-size open) 0) do
-			
 			(setf current (extract-min open))
-			;(format t "~d ~c"  (node-peso current) #\linefeed)
-			;(format t "~d ~c"  current #\linefeed)
 			(if (funcall (problema-solucao problema) (node-estado-actual current))
 				(return-from a-star-search current)
 			)
@@ -734,11 +719,9 @@ T)
 			(loop for accao in accoes do
 				(block continue
 					(setf new-node (cria-node-filho problema current accao heuristica))
-					;(format t "~d ~c"  (node-peso new-node) #\linefeed)
 					(insert_heap open (node-peso new-node) new-node)
 				)	
 			)
-			;(format t "---------------------------- ~c" #\linefeed)
 		)
 	)
 	NIL
@@ -858,7 +841,7 @@ T)
 	)
 )
 
-(defun executa-procura (algoritmo problema heuristica &rest b)
+(defun executa-procura (algoritmo problema &optional (heuristica (lambda (a) (declare (ignore a)) 0)) &rest b)
 	(apply algoritmo
 		problema
 		(cria-node-inicial problema heuristica)
