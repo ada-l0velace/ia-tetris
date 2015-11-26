@@ -125,6 +125,17 @@
 		)
 	total)
 )
+
+;; pontos: inteiro --> inteiro
+;; calcula o numero de pontos obtido com o numero de linhas removidas nessa jogada
+(defun pontos (linhas-removidas)
+	(case linhas-removidas 
+		((1) 100)
+		((2) 300)
+		((3) 500)
+		((4) 800)
+	)
+)
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;    Tipo accao    ;;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -314,7 +325,10 @@ T)
 	)
 T)
 
-
+;; tabuleiro-muda-ponto!: tabuleiro x linha x coluna x valor
+;; este modificador recebe um tabuleiro um inteiro correspondente ao numero linha, um inteiro
+;; correspondente ao numero da coluna e o valor a preencher e altera o tabuleiro recebido para 
+;; na posicao correspondente a linha e coluna passar a estar preenchido com o valor que foi escolhido
 (defun tabuleiro-muda-ponto! (tabuleiro linha coluna valor) ; valor T para preencher, NIL para apagar
 	(if (eq valor T)
 		(tabuleiro-preenche! tabuleiro linha coluna)
@@ -322,6 +336,10 @@ T)
 	)
 T)
 
+;; tabuleiro-apaga!: tabuleiro x linha x coluna --> inteiro
+;; este modificador recebe um tabuleiro um inteiro correspondente ao numero linha e um inteiro
+;; correspondente ao numero da coluna e altera o tabuleiro recebido para na posicao correspondente
+;; a linha e coluna passar a estar apagada
 (defun tabuleiro-apaga! (tabuleiro linha coluna) ; nao usar directamente
 	(if (not (or (> linha (1- *dim-linhas*)) (> coluna (1- *dim-colunas*))))
 		(block actualiza
@@ -336,7 +354,9 @@ T)
 T)
 
 
-
+;; tabuleiro-desce-peca: tabuleiro x peca x coluna --> inteiro
+;; esta funcao calcula a altura ate onde a peca pode descer ate encontrar o chao
+;; ou um bloco preenchido onde pousar
 (defun tabuleiro-desce-peca (tabuleiro peca coluna)
 	(let* (
 		(dim-linhas-peca (peca-dimensao-altura peca))
@@ -351,6 +371,10 @@ T)
 	
 )
 
+;; tabuleiro-peca-pode-descer-p: tabuleiro x peca x linha x coluna --> logico
+;; esta funcao recebe um tabuleiro, uma peca, a linha e uma coluna e verifica
+;; se ao longo da sua largura a peca pode descer ou nao retorna verdadeiro se pode
+;; retorna falso se nao
 (defun tabuleiro-peca-pode-descer-p (tabuleiro peca linha coluna)
 	(let (
 		(dim-linhas-peca (peca-dimensao-altura peca))
@@ -378,6 +402,9 @@ T)
 	)
 )
 
+;; tabuleiro-buracos: tabuleiro --> inteiro
+;; esta funcao recebe um tabuleiro e devolve um inteiro correspondente ao numero de buracos no tabuleiro
+;; um buraco e definido se houver um espaco vazio e houver pelo menos um bloco na mesma coluna preenchido
 (defun tabuleiro-buracos (tabuleiro)
 	(let((total 0)
 		(block NIL)
@@ -396,6 +423,10 @@ T)
 	total)
 )
 
+;; tabuleiro-remove-linha!: tabuleiro x inteiro --> {}
+;; este modificador recebe um tabuleiro, um inteiro correspondente ao numero linha, e altera
+;; o tabuleiro recebido removendo essa linha do tabuleiro, e fazendo com que as linhas por cima
+;; da linha removida descam uma linha.
 (defun tabuleiro-remove-linha! (tabuleiro linha) ; pode ser optimizado, removendo varias
 	(loop for i from linha below (1- *dim-linhas*) do
 		(loop for j from 0 below *dim-colunas* do
@@ -407,6 +438,9 @@ T)
 	)
 T)
 
+;; tabuleiro-topo-preenchido-p: tabuleiro --> logico
+;; este reconhecedor recebe um tabuleiro, e devolve o valor logico verdade se existir alguma posicao na linha do topo
+;; do tabuleiro, retorna falso caso contrario
 (defun tabuleiro-topo-preenchido-p (tabuleiro)
 	(loop for i from 0 below *dim-colunas* do
 		(if (eq (tabuleiro-preenchido-p tabuleiro (1- *dim-linhas*) i) T)
@@ -416,10 +450,15 @@ T)
 	NIL	
 )
 
+;; tabuleiro-iguais-p: tabuleiro x tabuleiro1 --> logico
+;; este reconhecedor recebe dois tabuleiros, e devolve o valor logico verdade se os dois tabuleiros forem iguais e falso
+;; caso contrario
 (defun tabuleiros-iguais-p (tabuleiro tabuleiro1)
 	(equalp tabuleiro tabuleiro1)	
 )
 
+;; tabuleiro->array: tabuleiro --> array
+;; este transformador de saida recebe um tabuleiro e devolve um novo array igual ao array do tabuleiro recebido
 (defun tabuleiro->array (tabuleiro)
 	(let (
 		(new-array (make-array (list *dim-linhas* *dim-colunas*)))
@@ -432,6 +471,9 @@ T)
 	new-array)	
 )
 
+;; array->tabuleiro: array --> tabuleiro
+;; este transformador de saida recebe um array e controi um novo tabuleiro com o conteudo do array recebido e
+;; devolve um tabuleiro 
 (defun array->tabuleiro (array)
 	(let (
 		(new-tabuleiro (cria-tabuleiro))
@@ -448,6 +490,8 @@ T)
 ;;  Tipo Estado ;;
 ;;;;;;;;;;;;;;;;;;
 
+;; copia-estado: estado --> estado
+;; este construtor recebe um estado e devolve um novo estado cujo conteudo deve ser copiado a partir do estado original.
 (defun copia-estado (estado)
 	(make-estado 
 		:pontos (estado-pontos estado) 
@@ -457,7 +501,10 @@ T)
 	)
 )
 
-(defun estado-accao (estado accao linha)
+;; estado-accao: estado x accao x inteiro --> {}
+;; este modificador recebe um estado, uma accao e um inteiro correspondente a linha em que a peca vai cair
+;; e coloca a peca no tabuleiro
+(defun estado-accao! (estado accao linha)
 	(loop for i downfrom (1- (array-dimension (accao-peca accao) 0)) downto 0  do
 		(loop for j from 0 below (array-dimension (accao-peca accao) 1) do
 			(if (eq (aref (accao-peca accao) i j) T)
@@ -469,6 +516,9 @@ T)
 	)	
 )
 
+;; estados-iguais-p: estado x estado1 --> logico
+;; este reconhecedor recebe dois estados e devolve o valor logico verdade se os dois estados forem iguais e falso
+;; caso contrario
 (defun estados-iguais-p (estado estado1)
 	(and 
 		(tabuleiros-iguais-p (estado-tabuleiro estado) (estado-tabuleiro estado1))
@@ -478,6 +528,10 @@ T)
 	)
 )
 
+;; estado-final-p: estado --> logico
+;; este reconhecedor recebe um estado e devolve o valor logico verdade se corresponder a um estado final onde o jogador
+;; ja nao possa fazer mais jogadas e falso caso contrario. Um estado e considerado final se o tabuleiro tiver atingido o topo
+;; ou se ja nao existe pecas por colocar
 (defun estado-final-p (estado)
 	(or (tabuleiro-topo-preenchido-p (estado-tabuleiro estado)) (null (estado-pecas-por-colocar estado)))
 )
@@ -487,19 +541,16 @@ T)
 ;;  Funcoes do Problema de Procura ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defun pontos (linhas-removidas)
-	(case linhas-removidas 
-		((1) 100)
-		((2) 300)
-		((3) 500)
-		((4) 800)
-	)
-)
-
+;; solucao: estado --> logico
+;; esta funcao recebe um estado, e devolve o valor logico verdade se o estado recebido corresponder a uma solucao, e falso
+;; caso contrario
 (defun solucao (estado)
 	(and (null (tabuleiro-topo-preenchido-p (estado-tabuleiro estado))) (null (estado-pecas-por-colocar estado)))
 )
 
+;; accoes: estado --> lista de accoes
+;; esta funcao recebe um estado e devolve uma lista de accoes correspondendo a todas as accoes validas que podem ser feitas
+;; com a proxima peca a ser colocada.
 (defun accoes (estado)
 	(let (
 		(peca_cabe 0)
@@ -534,6 +585,10 @@ T)
 	)
 )
 
+;; resultado: estado x accao --> estado
+;; esta funcao recebe um estado e devolve um novo estado que resulta de aplicar a accao recebida no estado original. 
+;; depois de colocada a peca e verificado se o topo do tabuleiro esta preenchido se estiver nao se removem linhas se
+;; nao estiver removem-se as linhas e calculam-se os pontos obtidos
 (defun resultado (estado accao)
 	(let (
 		(new-estado NIL)
@@ -542,8 +597,8 @@ T)
 		)
 		(setf new-estado (copia-estado estado))
 		(if (>= (+ (1- altura) (peca-dimensao-altura (accao-peca accao))) *dim-linhas*)
-			 (estado-accao new-estado accao altura)
-			(estado-accao new-estado accao (tabuleiro-desce-peca (estado-tabuleiro new-estado) (accao-peca accao) (accao-coluna accao)))
+			 (estado-accao! new-estado accao altura)
+			(estado-accao! new-estado accao (tabuleiro-desce-peca (estado-tabuleiro new-estado) (accao-peca accao) (accao-coluna accao)))
 
 		)
 		;tabuleiro-desce-peca
@@ -573,6 +628,10 @@ T)
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; Tipo Node ;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; cria-node-inicial: problema x heuristica (opcional) --> node
+;; este constructor cria o node inicial de uma procura e aplica o valor do ser peso inicial
+;; e devolve o node correspondente
 (defun cria-node-inicial (problema &optional (heuristica (lambda (a) (declare (ignore a)) 0)))
 	(make-node 
 		:estado-actual (problema-estado-inicial problema)
@@ -587,6 +646,9 @@ T)
 	)
 )
 
+;; cria-node-filho: problema pai accao heuristica (opcional) --> node
+;; este constructor cria um node filho executa a funcao resultado do problema 
+;; e atribui os valores correspondentes a profundidade, accao aplicada, peso e estado-actual
 (defun cria-node-filho (problema pai accao &optional (heuristica (lambda (a) (declare (ignore a)) 0)))
 	(let (
 		(estado (funcall (problema-resultado problema) 
@@ -606,6 +668,8 @@ T)
 	
 )
 
+;; nodes-iguais-p: node1 node2 --> logico
+;; este reconhecedor recebe dois nodes e verifica se eles sao iguais retornando um valor logico correspondente
 (defun nodes-iguais-p (node1 node2)
 	(and 
 		(estados-iguais-p (node-estado-actual node1) (node-estado-actual node2))
