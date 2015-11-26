@@ -17,7 +17,6 @@
 (defstruct (tabuleiro (:conc-name tr-))
 	tab
 	alturas
-	alturas-rel
 )
 
 ;; Tipo Estado
@@ -119,7 +118,7 @@
 				(if (eq limit 1)
 					(return-from break)
 				)
-				(incf total (ppm peca))
+				(incf total (peca-pontos-maximo peca))
 				(incf limit)
 			)
 		)
@@ -171,7 +170,6 @@
 	(make-tabuleiro 
 		:tab (make-array (list *dim-linhas* *dim-colunas*))
 		:alturas (make-array (list *dim-colunas*) :initial-element 0)
-		:alturas-rel (make-array (list *dim-colunas*) :initial-element 0)
 	)
 )	
 
@@ -182,7 +180,6 @@
 	(make-tabuleiro 
 		:tab (tabuleiro->array tabuleiro)
 		:alturas (copy-seq (tr-alturas tabuleiro))
-		:alturas-rel (copy-seq (tr-alturas-rel tabuleiro))
 	)
 )
 
