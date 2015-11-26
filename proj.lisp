@@ -622,6 +622,23 @@ T)
 	)
 )
 
+;; qualidade: estado --> inteiro
+;; estado funcao recebe um estado e retorna um valor de qualidade negativo que corresponde ao valor negativo dos
+;; pontos ganhos ate ao momento
+(defun qualidade (estado)
+	(* -1 (estado-pontos estado))
+)
+
+;; custo-oportunidade: estado --> inteiro
+;; esta funcao dado um estado devolve o custo de oportunidade de todas as accoes realizadas ate ao momento assumindo que e sempre
+;; possivel fazer o maximo de pontos por cada peca colocada.
+(defun custo-oportunidade (estado)
+	(* 1 (-  
+	 	(pecas-pontos-maximo (estado-pecas-colocadas estado))
+	 	(estado-pontos estado)
+	))
+)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; Tipo Node ;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -680,14 +697,14 @@ T)
 ;;;;; Heuristicas ;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; buracos: estado --> inteiro
+;; heuristica correspondente ao numero de buracos (objectivo minimiza-lo)
 (defun buracos (estado)
 	(* 1 (tabuleiro-buracos (estado-tabuleiro estado)))
 )
 
-(defun alturas-zero (estado)
-	(* 1 (count 0 (tr-alturas (estado-tabuleiro estado))))
-)
-
+;; media-alturas: estado --> float
+;; heuristica correspondente a media das alturas totais (objectivo minimizar)
 (defun media-alturas (estado)
 	(/
 		(altura-agregada estado)
@@ -695,40 +712,37 @@ T)
 	)
 )
 
-(defun max-alturas (estado)
-	(* 1 (reduce #'max  (tr-alturas (estado-tabuleiro estado))))
-)
-
+;; linhas-completas: estado --> inteiro
+;; heuristica correspondente ao numero de linhas completas no tabuleiro (objectivo minimizar)
+;; (objectivo minimizar)
 (defun linhas-completas (estado)
-	(* 1 (tabuleiro-linhas-completas (estado-tabuleiro estado)))
+	(* -1 (tabuleiro-linhas-completas (estado-tabuleiro estado)))
 )
 
+;; altura-agregada: estado --> inteiro
+;; heuristica correspondente a soma das alturas todas para usar nas procuras informadas como heuristica
+;; (objectivo minimizar)
 (defun altura-agregada (estado)
 	(* 0.3 (tabuleiro-altura-agregada (estado-tabuleiro estado)))
 )
 
+;; bumpiness: estado --> inteiro
+;; heuristica diz-nos a variacao das alturas das colunas
+;; 'e calculada atraves da soma absoluta entre as difrencas das colunas adjacentes
 (defun bumpiness (estado)
 	(* 1 (tabuleiro-bumpiness (estado-tabuleiro estado)))
 )
 
-(defun qualidade (estado)
-	(* -1 (estado-pontos estado))
-)
-
-(defun custo-oportunidade (estado)
-	(* 1 (-  
-	 	(pecas-pontos-maximo (estado-pecas-colocadas estado))
-	 	(estado-pontos estado)
-	))
-)
-
+;; custo-oportunidade3: estado --> inteiro
+;; calcula o desperdicio de pontos da ultima peca jogada no tabuleiro
 (defun custo-oportunidade3 (estado)
 	(* 1 (-  
 	 	(pecas-pontos-maximo2 (estado-pecas-colocadas estado))
 	 	(estado-pontos estado)
 	))
 )
-
+;; custo-oportunidade2: estado --> inteiro
+;; des
 (defun custo-oportunidade2 (estado) ; assume que todas as pecas teem 4 blocos
 	(-  
 		(*
@@ -739,7 +753,9 @@ T)
 	)
 )
 
-
+;; heuristicas: estado --> inteiro
+;; funcao que recebe um estado e retorna um inteiro correspondente a soma de todas as heuristicas
+;; ou seja o valor correspondente a f(node)
 (defun heuristicas(estado)
 	(+ 
 		;(linhas-completas estado)
@@ -754,20 +770,21 @@ T)
 	)
 )
 
+;; problema: tabuleiro x lista x funcao --> problema
+;; constructor do tipo problema recebe um tabuleiro, as pecas por colocar e um funcao de custo
+;; devolve o problema em questao para ser usado nas funcoes de procura
 (defun formulacao-problema (tabuleiro pecas-por-colocar custo)
 	(make-problema 
 			:estado-inicial (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar)
-			:solucao #' solucao
-			:accoes #' accoes
-			:resultado #' resultado
+			:solucao #'solucao
+			:accoes #'accoes
+			:resultado #'resultado
 			:custo-caminho custo)
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; Procuras ;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;
-
-
 
 (defun procura-pp (problema)
 	(let (
