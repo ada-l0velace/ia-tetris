@@ -786,6 +786,12 @@ T)
 ;;;;;;; Procuras ;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;
 
+;; procura-pp: problema -> lista accoes
+;; esta funcao recebe um problema e usa a procura em profundidade primeiro em arvore
+;; devolve um lista de accoes que se executado pela ordem certa leva a um estado objectivo
+;; complexidade: 
+;; tempo -> O(b^m)
+;; espaco -> O(b*m)
 (defun procura-pp (problema)
 	(let (
 		(solucao 
@@ -797,6 +803,9 @@ T)
 		(procura-get-solucao solucao))
 )
 
+;; depth-first-search: problema x node -> node
+;; funcao auxiliar da procura-pp procura o node goal e constroi a solucao para depois
+;; fazer backtrace da solucao na funcao procura-pp
 (defun depth-first-search (problema node)
 	(let (
 		(accoes NIL)
@@ -823,6 +832,12 @@ T)
 		result)
 )
 
+;; procura-pp: problema x heuristica -> lista accoes
+;; esta funcao recebe um problema e uma funcao heuristica e usa a procura A* em arvore e
+;; devolve um lista de accoes que se executado pela ordem certa leva a um estado objectivo
+;; complexidade: 
+;; tempo -> Exponencial
+;; espaco -> Exponencial
 (defun procura-A* (problema heuristica)
 	(let (
 		(solucao (executa-procura #'a-star-search problema heuristica))
@@ -831,6 +846,9 @@ T)
 	)
 )
 
+;; a-star-search: problema x node x heuristica -> node
+;; funcao auxiliar da procura-A* procura o node goal e constroi a solucao para depois
+;; fazer backtrace da solucao na funcao procura-A*
 (defun a-star-search (problema node heuristica)
 	(let ((open (make-instance 'binary-heap))
 		(current NIL)
@@ -855,7 +873,7 @@ T)
 	NIL
 )
 
-
+;; procura-best: array x pecas-por-colocar --> lista accoes
 (defun procura-best (array pecas-por-colocar)
 	(let* (
 		(tabuleiro (array->tabuleiro array))
@@ -875,6 +893,7 @@ T)
 	)
 )
 
+;; greedy-search: problema x node x heuristica --> node
 (defun greedy-search (problema node heuristica)
 	(let (
 			(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
@@ -910,6 +929,7 @@ T)
 	)
 )
 
+;; recursive-best-first-search: problema x node x heuristica x bound --> node
 (defun recursive-best-first-search (problema node heuristica bound)
 	(let (
 		(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
@@ -960,8 +980,7 @@ T)
 	)
 )
 
-
-
+;; executa-procura: algoritmo x problema x heuristica (opcional) x b (resto) --> node
 (defun executa-procura (algoritmo problema &optional (heuristica (lambda (a) (declare (ignore a)) 0)) &rest b)
 	(apply algoritmo
 		problema
@@ -971,6 +990,8 @@ T)
 	)
 )
 
+;; procura-get-solucao: node --> lista accoes
+;; recebe um node goal e faz o backtrace da solucao retornando a lista de accoes
 (defun procura-get-solucao (solucao)
 	(let (
 		(lista-accoes NIL))
