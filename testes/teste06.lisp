@@ -1,19 +1,51 @@
-(load "proj.lisp")
-(format t "---------------------~c" #\linefeed)
-(format t "---------------------~c" #\linefeed)
-(format t "------Procura-pp-----~c" #\linefeed)
-(format t "---------------------~c" #\linefeed)
-(format t "---------------------~c" #\linefeed)
-(time (executa-jogadas (problema-estado-inicial p1) (procura-pp p1)))
-(format t "---------------------~c" #\linefeed)
-(format t "---------------------~c" #\linefeed)
-(format t "------Procura-A*-----~c" #\linefeed)
-(format t "---------------------~c" #\linefeed)
-(format t "---------------------~c" #\linefeed)
-(time (executa-jogadas (problema-estado-inicial p1) (procura-A* p1 #'(lambda (x) 0))))
-(format t "---------------------~c" #\linefeed)
-(format t "---------------------~c" #\linefeed)
-(format t "-----Procura-best----~c" #\linefeed)
-(format t "---------------------~c" #\linefeed)
-(format t "---------------------~c" #\linefeed)
-(time (executa-jogadas (problema-estado-inicial p1) (procura-best (tr-tab (estado-tabuleiro (problema-estado-inicial p1))) (estado-pecas-por-colocar (problema-estado-inicial p1)))))
+(ignore-value (setf a1 '#2A((T T T T NIL NIL T T T T)(T T T NIL NIL NIL T T T T)(T T T NIL NIL NIL T T T T)(T T T NIL NIL NIL T T T T)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL))))
+(ignore-value (setf a2 (tabuleiro->array (cria-tabuleiro))))
+(ignore-value (setf p1 '(t i l l)))
+(ignore-value (setf e1 (make-estado :tabuleiro (array->tabuleiro a1) :pecas-por-colocar p1 :pontos 0 :pecas-colocadas '())))
+(time (setf r1 (procura-best (tr-tab (estado-tabuleiro e1)) p1)))
+(executa-jogadas2 e1 r1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

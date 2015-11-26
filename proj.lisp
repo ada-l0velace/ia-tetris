@@ -4,8 +4,8 @@
 
 (defparameter *dim-linhas* 18)
 (defparameter *dim-colunas* 10)
-(defparameter *SUPPRESS-SIMILAR-CONSTANT-REDEFINITION-WARNING* T)
- 
+
+
 ;; Tipo accao
 
 ; (defstruct (accao)
@@ -91,6 +91,23 @@
 		)
 		(loop for peca in pecas do
 			(incf total (ppm peca))
+		)
+	total)
+)
+
+(defun pecas-pontos-maximo2 (pecas)
+	(let (
+		(total 0)
+		(limit 0)
+		)
+		(block break
+			(loop for peca in pecas do
+				(if (eq limit 1)
+					(return-from break)
+				)
+				(incf total (ppm peca))
+				(incf limit)
+			)
 		)
 	total)
 )
@@ -205,24 +222,7 @@ T)
 		(* 1 total))	
 )
 
-;Nao funciona tenho de rever isto
-(defun tabuleiro-buracos (tabuleiro)
-	(let((total 0)
-		(block NIL)
-		)
-		(loop for c from 0 below *dim-colunas* do
-			(setf block NIL)
-			(loop for l downfrom (tabuleiro-altura-coluna tabuleiro c) downto 0 do
-				(if (eq (tabuleiro-preenchido-p tabuleiro l c) T)
-					(setf block T)
-				)
-				(if (and (eq (tabuleiro-preenchido-p tabuleiro l c) NIL) (eq block T))
-					(incf total)
-				)
-			)
-		)
-	(* 1 total))
-)
+
 
 (defun tabuleiro-linhas-completas (tabuleiro) ; pode ser optimizado
 	(let(
@@ -326,6 +326,24 @@ T)
 		)
 		(return-from tabuleiro-peca-pode-descer-p T)
 	)
+)
+
+(defun tabuleiro-buracos (tabuleiro)
+	(let((total 0)
+		(block NIL)
+		)
+		(loop for c from 0 below *dim-colunas* do
+			(setf block NIL)
+			(loop for l downfrom (tabuleiro-altura-coluna tabuleiro c) downto 0 do
+				(if (eq (tabuleiro-preenchido-p tabuleiro l c) T)
+					(setf block T)
+				)
+				(if (and (eq (tabuleiro-preenchido-p tabuleiro l c) NIL) (eq block T))
+					(incf total)
+				)
+			)
+		)
+	total)
 )
 
 (defun tabuleiro-remove-linha! (tabuleiro linha) ; pode ser optimizado, removendo varias
@@ -505,6 +523,19 @@ T)
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;; Tipo Node ;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
+(defun cria-node-inicial (problema heuristica)
+	(make-node 
+		:estado-actual (problema-estado-inicial problema)
+		:pai NIL
+		:profundidade 0
+		:accao NIL
+		:peso 
+		(+ 
+			(funcall (problema-custo-caminho problema) (problema-estado-inicial problema)) 
+			(funcall heuristica (problema-estado-inicial problema))
+		)
+	)
+)
 
 (defun cria-node-filho (problema pai accao &optional (heuristica (lambda (a) (declare (ignore a)) 0)))
 	(let (
@@ -513,7 +544,7 @@ T)
 				accao))
 		)
 		(make-node
-			:estado-actual estado 
+			:estado-actual estado  
 			:pai pai
 			:accao accao
 			:profundidade (1+ (node-profundidade pai))
@@ -538,6 +569,25 @@ T)
 ;;;;; Heuristicas ;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defun buracos (estado)
+	(* 1 (tabuleiro-buracos (estado-tabuleiro estado)))
+)
+
+(defun alturas-zero (estado)
+	(* 1 (count 0 (tr-alturas (estado-tabuleiro estado))))
+)
+
+(defun media-alturas (estado)
+	(/
+		(altura-agregada estado)
+		*dim-colunas*
+	)
+)
+
+(defun max-alturas (estado)
+	(* 1 (reduce #'max  (tr-alturas (estado-tabuleiro estado))))
+)
+
 (defun linhas-completas (estado)
 	(* 1 (tabuleiro-linhas-completas (estado-tabuleiro estado)))
 )
@@ -561,6 +611,13 @@ T)
 	))
 )
 
+(defun custo-oportunidade3 (estado)
+	(* 1 (-  
+	 	(pecas-pontos-maximo2 (estado-pecas-colocadas estado))
+	 	(estado-pontos estado)
+	))
+)
+
 (defun custo-oportunidade2 (estado) ; assume que todas as pecas teem 4 blocos
 	(-  
 		(*
@@ -571,24 +628,28 @@ T)
 	)
 )
 
+
 (defun heuristicas(estado)
 	(+ 
 		;(linhas-completas estado)
-		;(custo-oportunidade estado)
+		;(custo-oportunidade3 estado)
+		;(max-alturas estado)
 		(altura-agregada estado)
 		(bumpiness estado)
-		(qualidade estado)
-		(tabuleiro-buracos (estado-tabuleiro estado))
+		;(alturas-zero estado)
+		;(media-alturas estado)
+		;(qualidade estado)
+		(buracos estado)
 	)
 )
 
-(defun formulacao-problema (tabuleiro pecas-por-colocar)
+(defun formulacao-problema (tabuleiro pecas-por-colocar custo)
 	(make-problema 
 			:estado-inicial (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar)
 			:solucao #' solucao
 			:accoes #' accoes
 			:resultado #' resultado
-			:custo-caminho #' custo-oportunidade)
+			:custo-caminho custo)
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;
@@ -602,7 +663,12 @@ T)
 		(solucao 
 			(depth-first-search 
 				problema
-				(make-node :estado-actual (problema-estado-inicial problema))
+				(make-node :estado-actual (problema-estado-inicial problema)
+					:pai NIL
+					:profundidade 0
+					:accao NIL
+					:peso 0
+				)
 			)
 		))
 		(procura-get-solucao solucao))
@@ -616,7 +682,12 @@ T)
 		(if (funcall (problema-solucao problema) (node-estado-actual node))
 		 	(return-from depth-first-search node)
 		)
-		(setf accoes (reverse (funcall (problema-accoes problema) (node-estado-actual node))))
+		(if (typep (node-estado-actual node) 'estado)
+			(if (null (estado-final-p (node-estado-actual node)))
+				(setf accoes (reverse (funcall (problema-accoes problema) (node-estado-actual node))))
+			)
+			(setf accoes (reverse (funcall (problema-accoes problema) (node-estado-actual node))))
+		)
 		(loop for accao in accoes do
 			(setf new-node (cria-node-filho problema node accao))
 		 	(setf result (depth-first-search problema new-node))	
@@ -654,6 +725,7 @@ T)
 		(loop while (> (heap-size open) 0) do
 			
 			(setf current (extract-min open))
+			;(format t "~d ~c"  (node-peso current) #\linefeed)
 			;(format t "~d ~c"  current #\linefeed)
 			(if (funcall (problema-solucao problema) (node-estado-actual current))
 				(return-from a-star-search current)
@@ -662,7 +734,7 @@ T)
 			(loop for accao in accoes do
 				(block continue
 					(setf new-node (cria-node-filho problema current accao heuristica))
-
+					;(format t "~d ~c"  (node-peso new-node) #\linefeed)
 					(insert_heap open (node-peso new-node) new-node)
 				)	
 			)
@@ -676,51 +748,122 @@ T)
 (defun procura-best (array pecas-por-colocar)
 	(let* (
 		(tabuleiro (array->tabuleiro array))
-		(problema (formulacao-problema tabuleiro pecas-por-colocar))
-		(estado-inicial (make-estado :tabuleiro tabuleiro :pecas-por-colocar pecas-por-colocar))
-		(solucao (a-star-search 
-			problema
-			(make-node 
-				:estado-actual estado-inicial
-				:pai NIL
-				:profundidade 0
-				:accao NIL
-				:peso (heuristicas estado-inicial)
-			)
-			#'heuristicas))
+		;(problema (formulacao-problema tabuleiro pecas-por-colocar #' (lambda (x) (declare (ignore x))0)))
+		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'qualidade))
+		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade3))
+		(solucao NIL))
+		(cond 
+			((> (length pecas-por-colocar) 50)
+				(setf solucao (executa-procura #'a-star-search problema #'heuristicas)))
+			((> (length pecas-por-colocar) 50) 
+				(setf solucao (executa-procura #'greedy-search problema #'heuristicas)))
+			((< (length pecas-por-colocar) 40) 
+				(setf solucao (executa-procura #'recursive-best-first-search problema #'heuristicas MOST-POSITIVE-FIXNUM)))	
 		)
-		
-	(procura-get-solucao solucao))
+		(procura-get-solucao solucao)
+	)
 )
 
-(defun procura-best-aux (problema node f_limit)
+(defun greedy-search (problema node heuristica)
 	(let (
 			(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
 			(score NIL)
 			(best-score NIL)
 		)
 		(loop while (not (null accoes)) do
-			(setf score (cria-node-filho problema node (car accoes) #' heuristicas))
-			(setf (node-peso score) (max (node-peso score) (node-peso node)))
+			(setf score (cria-node-filho problema node (car accoes) heuristica))
+			;Descomentar para o algoritmo pensar passos a frente (lento)
+			;(if (null (cdr accoes))
+			;  	(setf score (procura-best-aux problema score))	 	
+			; )
 			(if (eq best-score NIL)
 				(setf best-score score)
 				(if (not (null score))
 					(if (< (node-peso score) (node-peso best-score))
-							(setf best-score score)
+						(setf best-score score)
 					)
 				)
 			)	
 			(setf accoes (cdr accoes))
 		)
+
 		(if (not (null best-score))
 		 	(if (null (funcall (problema-solucao problema) (node-estado-actual best-score)))
 				(block not_solution
-					(procura-best-aux problema best-score (min (node-peso best-score) f_limit))
+					(greedy-search problema best-score heuristica)
 				)
 				best-score
 			)
 			node	
 		)
+	)
+)
+
+(defun recursive-best-first-search (problema node heuristica bound)
+	(let (
+		(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
+		(new-node NIL)
+		(open NIL)
+		(n1 NIL)
+		(n2 NIL)
+		)
+		
+		(cond 
+			((> (node-peso node) bound)
+				(return-from recursive-best-first-search (node-pai node))
+			)
+			((funcall (problema-solucao problema) (node-estado-actual node))
+				(return-from recursive-best-first-search node)
+			)
+			((null accoes)
+				(return-from recursive-best-first-search NIL))
+			(t 
+				(loop for accao in accoes do
+					(setf new-node (cria-node-filho problema node accao heuristica))
+					(if (node-pai node)
+						(if (< (node-peso node) (node-peso (node-pai node)))
+							(setf (node-peso node) (max (node-peso (node-pai node)) (node-peso new-node)))
+							(setf (node-peso node) (node-peso new-node))
+						)
+						(if (< (node-peso node) bound)
+							(setf (node-peso node) (max bound (node-peso new-node)))
+							(setf (node-peso node) (node-peso new-node))
+						)
+					)
+					;(setf (node-peso (node-pai new-node)) (max (node-peso node) (node-peso (node-pai node))))
+					(setf open (insert_lst new-node open))
+				)
+				;(read-char)
+				(setf n1 (select-best open))
+				(setf n2 (select-best (cdr open)))
+				; (if (eq (length open) 1)
+				; 	(setf n2 MOST-POSITIVE-FIXNUM)
+				; 	(setf f2 (node-peso (select-best (cdr open))))
+				; )
+				(loop while (and (<= (node-peso n1) bound) (< (node-peso n1) MOST-POSITIVE-FIXNUM)) do 
+					(setf open (cdr open))
+					(setf n1 (recursive-best-first-search problema n1 heuristica (min (node-peso n2) bound))) 
+					(if (funcall (problema-solucao problema) (node-estado-actual n1))
+						(return-from recursive-best-first-search n1)	
+					)
+					(setf open (insert_lst n1 open))
+					(setf n1 (select-best open))
+
+					;(setf n2 (select-best (cdr open)))
+				)
+				(return-from recursive-best-first-search n1)
+			)
+		)
+		
+	)
+)
+
+(defun executa-procura (algoritmo problema heuristica &rest b)
+	(apply algoritmo
+		problema
+		(cria-node-inicial problema heuristica)
+		heuristica
+		b
 	)
 )
 
@@ -737,20 +880,7 @@ T)
 	lista-accoes)	
 )
 
-(load (compile-file "utils.lisp")) 
-;(load "utils.fas")
 
-(defun pecas(simbolo)
-	(cond 
-		((eq 'i simbolo) (list peca-i0 peca-i1)) 
-		((eq 'l simbolo) (list peca-l0 peca-l1 peca-l2 peca-l3))
-		((eq 'j simbolo) (list peca-j0 peca-j1 peca-j2 peca-j3))
-		((eq 'o simbolo) (list peca-o0))
-		((eq 's simbolo) (list peca-s0 peca-s1))
-		((eq 'z simbolo) (list peca-z0 peca-z1))
-		((eq 't simbolo) (list peca-t0 peca-t1 peca-t2 peca-t3))
-	)
-)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;Priority Queues;;;;;;;;;;;;;
@@ -765,7 +895,7 @@ T)
 ;;; by FVALUE.
 (defun insert_lst (node lst)
 	(cond ((null lst)(list node))
-		((< (node-peso node) (node-peso (first lst)))
+		((<= (node-peso node) (node-peso (first lst)))
 			(cons node lst))
 		(t 
 			(cons (first lst) (insert_lst node (rest lst))))
@@ -891,3 +1021,19 @@ T)
         (array (bin-heap-array heap)))
     (perlocate-up array (setf (node_bh-index node) 
                               (vector-push-extend node array)))))
+
+
+(load "utils.lisp")
+;(load "utils.fas")
+
+(defun pecas(simbolo)
+	(cond 
+		((eq 'i simbolo) (list peca-i0 peca-i1)) 
+		((eq 'l simbolo) (list peca-l0 peca-l1 peca-l2 peca-l3))
+		((eq 'j simbolo) (list peca-j0 peca-j1 peca-j2 peca-j3))
+		((eq 'o simbolo) (list peca-o0))
+		((eq 's simbolo) (list peca-s0 peca-s1))
+		((eq 'z simbolo) (list peca-z0 peca-z1))
+		((eq 't simbolo) (list peca-t0 peca-t1 peca-t2 peca-t3))
+	)
+)

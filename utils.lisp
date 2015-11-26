@@ -84,13 +84,26 @@
 		;(desenha-estado estado)
 		(estado-pontos estado)))
 
+(defun executa-jogadas2 (estado-inicial lista-accoes)
+	(let ((estado estado-inicial))
+		(do () ((or (estado-final-p estado) (null lista-accoes)))
+			(desenha-estado estado)
+			(read-char)
+			(desenha-estado estado (first lista-accoes))
+			(read-char)
+			(setf estado (resultado estado (first lista-accoes)))
+			(setf lista-accoes (rest lista-accoes)))
+		(desenha-estado estado)
+		(estado-pontos estado)))
+
+
 ;;; desenha-estado: estado x accao (opcional) --> {}
 ;;; funcao que recebe um estado (e pode receber opcionalmente uma accao) e desenha o estado do jogo de tetris no ecra
 ;;; se for recebida uma accao, entao essa accao contem a proxima jogada a ser feita, e deve ser desenhada na posicao correcta por cima 
 ;;; do tabuleiro de tetris. Esta funcao nao devolve nada.		
 (defun desenha-estado (estado &optional (accao nil))
 	(let ((tabuleiro (estado-tabuleiro estado)))
-		(desenha-linha-exterior) (format T "  Proxima peca:~A~%" (first (estado-pecas-por-colocar estado))) 
+		(desenha-linha-exterior) (format T "  Proximas pecas:~A~%" (estado-pecas-por-colocar estado))  
 		(do ((linha 3 (- linha 1))) ((< linha 0))
 			(desenha-linha-accao accao linha) (format T "~%"))
 		(desenha-linha-exterior) (format T "  Pontuacao:~A~%" (estado-pontos estado))
@@ -138,18 +151,3 @@
 		(format T "~A " (if (tabuleiro-preenchido-p tabuleiro linha coluna) "#" " ")))
 	(format T "|"))			
 
-			
-;exemplo muito simples de um tabuleiro com a primeira e segunda linha quase todas preenchidas
-; (defvar t1 (cria-tabuleiro))
-; (dotimes (coluna 9)
-; 	(tabuleiro-preenche! t1 0 coluna))
-; (dotimes (coluna 9)
-; 	(tabuleiro-preenche! t1 1 coluna))
-; (defvar e1 (make-estado :tabuleiro t1 :pecas-por-colocar '(i o j l t i)))
-; (dotimes (linha 18)(tabuleiro-preenche! t1 linha 0))
-; (defvar p1
-; 	(make-problema :estado-inicial (make-estado :tabuleiro t1 :pecas-por-colocar '(l j))
-; 				   :solucao #'solucao
-; 				   :accoes #'accoes
-; 				   :resultado #'resultado
-; 				   :custo-caminho #'qualidade))

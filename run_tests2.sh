@@ -4,71 +4,30 @@ GREEN='\033[0;32m'
 NC='\033[0m'
 rm -f testes/*.myout
 
-for d in {1..12}; do
-	if [ $d -lt 10 ] ; then
-		rm -f "testes/testes publicos/test0$d/out"
-		rm -f "testes/testes publicos/test0$d/myout"
-		rm -f "testes/testes publicos/test0$d/myout.txt"
-		rm -f "testes/testes publicos/test0$d/temp"
-		sed '/^;/ d' < "testes/testes publicos/test0$d/output" > "testes/testes publicos/test0$d/out"
-		clisp -i proj.lisp < "testes/testes publicos/test0$d/input" > "testes/testes publicos/test0$d/myout"
-		tail -n+26 "testes/testes publicos/test0$d/myout" > "testes/testes publicos/test0$d/temp"
-		head -n -1 "testes/testes publicos/test0$d/temp" > "testes/testes publicos/test0$d/temp2"
-		rm -f "testes/testes publicos/test0$d/myout"
-		mv "testes/testes publicos/test0$d/temp2" "testes/testes publicos/test0$d/myout"
-		rm -f "testes/testes publicos/test0$d/temp"
-		rm -f "testes/testes publicos/test0$d/temp2" 
-		perl -pi -e 'chomp if eof' "testes/testes publicos/test0$d/myout"
-		perl -pi -e 'chomp if eof' "testes/testes publicos/test0$d/out"
-		if ! diff "testes/testes publicos/test0$d/out" "testes/testes publicos/test0$d/myout" > /dev/null ; then
-			printf "${RED} Test $d failed ${NC}\n"
-		else
-			printf "${GREEN} Test $d passed ${NC}\n"
-		fi
+function run_tests {
+	rm -f "testes/testes publicos/test$1/out"
+	rm -f "testes/testes publicos/test$1/myout"
+	rm -f "testes/testes publicos/test$1/myout.txt"
+	rm -f "testes/testes publicos/test$1/temp"
+	sed '/^;/ d' < "testes/testes publicos/test$1/output" > "testes/testes publicos/test$1/out"
+	clisp -i -q -C proj.lisp < "testes/testes publicos/test$1/input" > "testes/testes publicos/test$d/myout"
+	sed '/^;/ d' "testes/testes publicos/test$1/myout" > "testes/testes publicos/test$1/temp"
+	sed -e ':a;N;$!ba;s/0\ errors,\ 0\ warnings\n//g' "testes/testes publicos/test$1/temp" > "testes/testes publicos/test$1/temp2"
+	mv "testes/testes publicos/test$1/temp2" "testes/testes publicos/test$1/temp" 
+	rm -f "testes/testes publicos/test$1/myout"
+	mv "testes/testes publicos/test$1/temp" "testes/testes publicos/test$1/myout"
+	rm -f "testes/testes publicos/test$1/temp"
+	perl -pi -e 'chomp if eof' "testes/testes publicos/test$1/myout"
+	perl -pi -e 'chomp if eof' "testes/testes publicos/test$1/out"
+	if ! diff "testes/testes publicos/test$1/out" "testes/testes publicos/test$1/myout" > /dev/null ; then
+		printf "${RED} Test $1 failed ${NC}\n"
 	else
-		rm -f "testes/testes publicos/test$d/out"
-		rm -f "testes/testes publicos/test$d/myout"
-		rm -f "testes/testes publicos/test$d/myout.txt"
-		rm -f "testes/testes publicos/test$d/temp"
-		sed '/^;/ d' < "testes/testes publicos/test$d/output" > "testes/testes publicos/test$d/out"
-		clisp -i proj.lisp < "testes/testes publicos/test$d/input" > "testes/testes publicos/test$d/myout"
-		tail -n+26 "testes/testes publicos/test$d/myout" > "testes/testes publicos/test$d/temp"
-		head -n -1 "testes/testes publicos/test$d/temp" > "testes/testes publicos/test$d/temp2"
-		rm -f "testes/testes publicos/test$d/myout"
-		mv "testes/testes publicos/test$d/temp2" "testes/testes publicos/test$d/myout"
-		rm -f "testes/testes publicos/test$d/temp"
-		rm -f "testes/testes publicos/test$d/temp2" 
-		perl -pi -e 'chomp if eof' "testes/testes publicos/test$d/myout"
-		perl -pi -e 'chomp if eof' "testes/testes publicos/test$d/out"
-		if ! diff "testes/testes publicos/test$d/out" "testes/testes publicos/test$d/myout" > /dev/null ; then
-			printf "${RED} Test $d failed ${NC}\n"
-		else
-			printf "${GREEN} Test $d passed ${NC}\n"
-		fi
+		printf "${GREEN} Test $1 passed ${NC}\n"
 	fi
+}
 
-done
-
-for d in 14 16 18 19 22 23 24 25 26; do
-	rm -f "testes/testes publicos/test$d/out"
-	rm -f "testes/testes publicos/test$d/myout"
-	rm -f "testes/testes publicos/test$d/myout.txt"
-	rm -f "testes/testes publicos/test$d/temp"	
-	sed '/^;/ d' < "testes/testes publicos/test$d/output" > "testes/testes publicos/test$d/out"
-	clisp -i proj.lisp < "testes/testes publicos/test$d/input" > "testes/testes publicos/test$d/myout"
-	tail -n+26 "testes/testes publicos/test$d/myout" > "testes/testes publicos/test$d/temp"
-	head -n -1 "testes/testes publicos/test$d/temp" > "testes/testes publicos/test$d/temp2"
-	rm -f "testes/testes publicos/test$d/myout"
-	mv "testes/testes publicos/test$d/temp2" "testes/testes publicos/test$d/myout"
-	rm -f "testes/testes publicos/test$d/temp"
-	rm -f "testes/testes publicos/test$d/temp2"
-	perl -pi -e 'chomp if eof' "testes/testes publicos/test$d/myout"
-	perl -pi -e 'chomp if eof' "testes/testes publicos/test$d/out"
-	if ! diff "testes/testes publicos/test$d/out" "testes/testes publicos/test$d/myout" > /dev/null ; then
-		printf "${RED} Test $d failed ${NC}\n"
-	else
-		printf "${GREEN} Test $d passed ${NC}\n"
-	fi
+for d in {01..12} 14 16 18 19 {22..26} 30; do
+	run_tests $d
 done
 
 #for i in **testes/*.lisp; do 
