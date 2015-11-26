@@ -550,36 +550,43 @@ T)
 ;; com a proxima peca a ser colocada.
 (defun accoes (estado)
 	(let (
-		(peca_cabe 0)
 		(lista-accoes NIL)
-		(dim-colunas-peca 0)
 		)
 		(loop for peca in (pecas (car (estado-pecas-por-colocar estado))) do	
-			(setf dim-colunas-peca  (peca-dimensao-largura peca))
-			(loop for j from 0 below *dim-colunas* do
-				(setf peca_cabe 0)
-				(loop for h from j below (min (+ j dim-colunas-peca) *dim-colunas*) do
-					(if (and 
-							(null 
-								(tabuleiro-preenchido-p 
-									(estado-tabuleiro estado) 
-									(tabuleiro-altura-coluna (estado-tabuleiro estado) h)
-									h)
-							)
-							(null (tabuleiro-topo-preenchido-p (estado-tabuleiro estado)))	
-						)
-						(incf peca_cabe)
-					)
-				)
-				(if (eq peca_cabe dim-colunas-peca)
-					(setf lista-accoes (cons (cria-accao j peca) lista-accoes))
-				)
-			)
+			(setf lista-accoes (peca-tabuleiro-accoes peca (estado-tabuleiro estado) lista-accoes))
 		)
 		(if lista-accoes		
 			(return-from accoes (reverse lista-accoes))
 		)
 	)
+)
+
+(defun peca-tabuleiro-accoes (peca tabuleiro lista-accoes)
+	(let (
+		(peca_cabe 0)
+		(dim-colunas-peca 0)
+		)
+		(setf dim-colunas-peca  (peca-dimensao-largura peca))
+		(loop for j from 0 below *dim-colunas* do
+			(setf peca_cabe 0)
+			(loop for h from j below (min (+ j dim-colunas-peca) *dim-colunas*) do
+				(if (and 
+						(null 
+							(tabuleiro-preenchido-p 
+								tabuleiro 
+								(tabuleiro-altura-coluna tabuleiro h)
+								h)
+						)
+						(null (tabuleiro-topo-preenchido-p tabuleiro))	
+					)
+					(incf peca_cabe)
+				)
+			)
+			(if (eq peca_cabe dim-colunas-peca)
+				(setf lista-accoes (cons (cria-accao j peca) lista-accoes))
+			)
+		)
+	lista-accoes)
 )
 
 ;; resultado: estado x accao --> estado
@@ -873,21 +880,29 @@ T)
 	NIL
 )
 
+(defun get-hash-accoes (hash-table estado)
+	(gethash (car (estado-pecas-por-colocar estado)) hash-table) 
+)
+
 ;; procura-best: array x pecas-por-colocar --> lista accoes
 (defun procura-best (array pecas-por-colocar)
 	(let* (
 		(tabuleiro (array->tabuleiro array))
+		(hash-accoes (make-hash-table))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #' (lambda (x) (declare (ignore x))0)))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'qualidade))
 		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade3))
 		(solucao NIL))
+		(loop for rot-pecas in (list 'i 'l 'j 'o 's 'z 't) do
+			(setf (gethash rot-pecas hash-accoes) (peca-tabuleiro-accoes (car (pecas rot-pecas)) (cria-tabuleiro) NIL))
+		)
 		(cond 
-			((< (length pecas-por-colocar) 10)
+			((> (length pecas-por-colocar) 10)
 				(setf solucao (executa-procura #'a-star-search problema #'heuristicas)))
 			((> (length pecas-por-colocar) 10) 
 				(setf solucao (executa-procura #'greedy-search problema #'heuristicas)))
-			(NIL 
-				(setf solucao (executa-procura #'recursive-best-first-search problema #'heuristicas MOST-POSITIVE-FIXNUM)))	
+			(t 
+				(setf solucao (executa-procura #'recursive-best-first-search problema #'heuristicas hash-accoes MOST-POSITIVE-FIXNUM)))	
 		)
 		(procura-get-solucao solucao)
 	)
@@ -930,8 +945,9 @@ T)
 )
 
 ;; recursive-best-first-search: problema x node x heuristica x bound --> node
-(defun recursive-best-first-search (problema node heuristica bound)
+(defun recursive-best-first-search (problema node heuristica hash-accoes bound)
 	(let (
+		;(accoes (get-hash-accoes hash-accoes (node-estado-actual node)))
 		(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
 		(new-node NIL)
 		(open (make-instance 'binary-heap))
@@ -966,7 +982,7 @@ T)
 				(setf n1 (extract-min open))
 				(setf n2 (peek-min open))
 				(loop while (and (<= (node-peso n1) bound) (< (node-peso n1) MOST-POSITIVE-FIXNUM)) do 
-					(setf n1 (recursive-best-first-search problema n1 heuristica (min (node-peso n2) bound))) 
+					(setf n1 (recursive-best-first-search problema n1 heuristica hash-accoes (min (node-peso n2) bound))) 
 					(if (funcall (problema-solucao problema) (node-estado-actual n1))
 						(return-from recursive-best-first-search n1)	
 					)
@@ -1162,3 +1178,4 @@ T)
 		((eq 't simbolo) (list peca-t0 peca-t1 peca-t2 peca-t3))
 	)
 )
+
