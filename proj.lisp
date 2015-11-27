@@ -110,7 +110,7 @@
 		)
 		(block break
 			(loop for peca in pecas do
-				(if (eq limit 0)
+				(if (eq limit 2)
 					(return-from break)
 				)
 				(incf total (peca-pontos-maximo peca))
@@ -213,7 +213,7 @@
 ;; tabuleiro-preenchido-p: tabuleiro x inteiro x inteiro --> logico
 ;; este selector recebe um tabuleiro um inteiro correspondente ao numero de linha e um inteiro
 ;; correspondente ao numero da coluna e devolve o valor logico verdade se a posicao estiver preenchida
-;; e falso caso contrario
+;; e falso caso contrario 
 (defun tabuleiro-preenchido-p (tabuleiro linha coluna)
 	(if (not (or (>= linha *dim-linhas*) (>= coluna *dim-colunas*)))
 		(aref (tr-tab tabuleiro) linha coluna)
@@ -741,7 +741,7 @@ T)
 (defun heuristicas(estado)
 	(+ 
 		;(linhas-completas estado)
-		;(custo-oportunidade3 estado)
+		(custo-oportunidade3 estado)
 		;(max-alturas estado)
 		(altura-agregada estado)
 		(bumpiness estado)
@@ -1141,8 +1141,8 @@ T)
 	lista-accoes)	
 )
 
-(load "utils.lisp") 
-;(load "utils.fas")
+;(load "utils.lisp") 
+(load "utils.fas")
 
 
 
@@ -1299,3 +1299,6 @@ T)
         (array (bin-heap-array heap)))
     (perlocate-up array (setf (node_bh-index node) 
                               (vector-push-extend node array)))))
+
+
+	
