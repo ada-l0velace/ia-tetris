@@ -4,13 +4,8 @@
 
 (defparameter *dim-linhas* 18)
 (defparameter *dim-colunas* 10)
-
-
-;; Tipo accao
-
-; (defstruct (accao)
-; 	coluna-peca
-; )
+(defparameter *hash-accoes* (make-hash-table))
+(defparameter *bit-array* (make-array '(1024) :element-type '(mod 2) :initial-element 1))
 
 ;; Tipo tabuleiro
 
@@ -115,7 +110,7 @@
 		)
 		(block break
 			(loop for peca in pecas do
-				(if (eq limit 1)
+				(if (eq limit 0)
 					(return-from break)
 				)
 				(incf total (peca-pontos-maximo peca))
@@ -135,6 +130,38 @@
 		((4) 800)
 	)
 )
+
+;; peca-tabuleiro-accoes: peca x tabuleiro x lista --> lista accoes
+;; recebe uma peca, um tabuleiro e uma lista e retorna a lista de accoes que foi efectuado
+;; concatenando com lista recebida por parametro
+(defun peca-tabuleiro-accoes (peca tabuleiro lista-accoes)
+	(let (
+		(peca_cabe 0)
+		(dim-colunas-peca 0)
+		)
+		(setf dim-colunas-peca  (peca-dimensao-largura peca))
+		(loop for j from 0 below *dim-colunas* do
+			(setf peca_cabe 0)
+			(loop for h from j below (min (+ j dim-colunas-peca) *dim-colunas*) do
+				(if (and 
+						(null 
+							(tabuleiro-preenchido-p 
+								tabuleiro 
+								(tabuleiro-altura-coluna tabuleiro h)
+								h)
+						)
+						(null (tabuleiro-topo-preenchido-p tabuleiro))	
+					)
+					(incf peca_cabe)
+				)
+			)
+			(if (eq peca_cabe dim-colunas-peca)
+				(setf lista-accoes (cons (cria-accao j peca) lista-accoes))
+			)
+		)
+	lista-accoes)
+)
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;    Tipo accao    ;;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -225,24 +252,6 @@
 	(setf (aref (tr-alturas tabuleiro) coluna) altura)
 T)
 
-(defun tabuleiro-altura-rel (tabuleiro coluna)
-	(aref (tr-alturas-rel tabuleiro) coluna)
-)
-
-;define altura relativa de uma coluna no tabuleiro
-(defun tabuleiro-altura-rel! (tabuleiro coluna altura)
-	(setf (aref (tr-alturas-rel tabuleiro) coluna) altura)
-)
-
-; actualiza a altura relativa da coluna 'a direita da indicada
-(defun tabuleiro-altura-rel-actualiza! (tabuleiro coluna)
-	(if (not (eq coluna (1- *dim-colunas*))) ; se nao for a ultima coluna
-		(tabuleiro-altura-rel! tabuleiro (1+ coluna)
-			(-
-				(tabuleiro-altura-coluna tabuleiro (1+ coluna))
-				(tabuleiro-altura-coluna tabuleiro coluna))))
-)
-
 
 ;; tabuleiro-altura-agregada: tabuleiro --> inteiro
 ;; calcula a soma das alturas todas para usar nas procuras informadas como heuristica
@@ -312,11 +321,7 @@ T)
 			(setf (aref (tr-tab tabuleiro) linha coluna) T)
 
 			(if (> (1+ linha) (tabuleiro-altura-coluna tabuleiro coluna))
-				(block altura
-					(tabuleiro-altura! tabuleiro coluna (1+ linha))
-					;(tabuleiro-altura-rel-actualiza! tabuleiro coluna)
-				)
-				
+				(tabuleiro-altura! tabuleiro coluna (1+ linha))
 			)
 		)
 	)
@@ -342,9 +347,7 @@ T)
 		(block actualiza
 			(setf (aref (tr-tab tabuleiro) linha coluna) NIL)
 			(if (<= linha (tabuleiro-altura-coluna tabuleiro coluna))			
-				(block altura
-					(tabuleiro-altura! tabuleiro coluna (tabuleiro-calcula-altura tabuleiro coluna linha))
-				)
+				(tabuleiro-altura! tabuleiro coluna (tabuleiro-calcula-altura tabuleiro coluna linha))
 			)
 		)
 	)
@@ -561,34 +564,6 @@ T)
 	)
 )
 
-(defun peca-tabuleiro-accoes (peca tabuleiro lista-accoes)
-	(let (
-		(peca_cabe 0)
-		(dim-colunas-peca 0)
-		)
-		(setf dim-colunas-peca  (peca-dimensao-largura peca))
-		(loop for j from 0 below *dim-colunas* do
-			(setf peca_cabe 0)
-			(loop for h from j below (min (+ j dim-colunas-peca) *dim-colunas*) do
-				(if (and 
-						(null 
-							(tabuleiro-preenchido-p 
-								tabuleiro 
-								(tabuleiro-altura-coluna tabuleiro h)
-								h)
-						)
-						(null (tabuleiro-topo-preenchido-p tabuleiro))	
-					)
-					(incf peca_cabe)
-				)
-			)
-			(if (eq peca_cabe dim-colunas-peca)
-				(setf lista-accoes (cons (cria-accao j peca) lista-accoes))
-			)
-		)
-	lista-accoes)
-)
-
 ;; resultado: estado x accao --> estado
 ;; esta funcao recebe um estado e devolve um novo estado que resulta de aplicar a accao recebida no estado original. 
 ;; depois de colocada a peca e verificado se o topo do tabuleiro esta preenchido se estiver nao se removem linhas se
@@ -777,6 +752,54 @@ T)
 	)
 )
 
+(defun bool-converter (flag)
+	(if flag
+		1
+		0
+	)
+)
+(defun tabuleiro-buracos2 (tabuleiro coluna)
+	(let (
+		(grid-mask (1- (ash 1 *dim-colunas*)))
+		(under-mask 0)
+		(l-neighbor-mask 0)
+		(r-neighbor-mask 0)
+		(found-holes 0)
+		(line 0)
+		(filled 0)
+		(min-y 0)
+		)
+
+		(loop while 
+			(and 
+				(< min-y *dim-linhas*) 
+				(eq (bool-converter (aref (tr-tab tabuleiro) min-y coluna)) grid-mask)
+			) 
+		do 
+			(incf min-y)
+		)
+		;(format T "~d~c" grid-mask #\linefeed)
+		(loop for y from min-y below *dim-linhas* do
+			(setf line (bool-converter (aref (tr-tab tabuleiro) y coluna)))
+			(setf filled (logand (lognot line) grid-mask))
+			;(format T "~d~c" under-mask #\linefeed)
+			(setf under-mask (logior under-mask filled))
+			;(format T "~d~c" filled #\linefeed)
+			;(format T "~d~c" under-mask #\linefeed)
+			(setf l-neighbor-mask (logior l-neighbor-mask (ash filled 1)))
+			(setf r-neighbor-mask (logior r-neighbor-mask (ash filled -1)))
+			;(format T "~d~c" (integer-length (logand r-neighbor-mask line)) #\linefeed)
+			(incf found-holes 
+				(+
+					(integer-length (logand under-mask line))
+					(integer-length (logand l-neighbor-mask line))
+					(integer-length (logand r-neighbor-mask line))
+				)
+			)
+		)
+	found-holes)
+)
+
 ;; problema: tabuleiro x lista x funcao --> problema
 ;; constructor do tipo problema recebe um tabuleiro, as pecas por colocar e um funcao de custo
 ;; devolve o problema em questao para ser usado nas funcoes de procura
@@ -847,10 +870,17 @@ T)
 ;; espaco -> Exponencial
 (defun procura-A* (problema heuristica)
 	(let (
-		(solucao (executa-procura #'a-star-search problema heuristica))
-		)
-		(procura-get-solucao solucao)
-	)
+		(solucao (a-star-search 
+			problema
+			(make-node 
+					:estado-actual (problema-estado-inicial problema)
+					:pai NIL
+					:profundidade 0
+					:accao NIL
+					:peso (funcall heuristica (problema-estado-inicial problema)))
+			heuristica
+		)))
+		(procura-get-solucao solucao))
 )
 
 ;; a-star-search: problema x node x heuristica -> node
@@ -888,21 +918,22 @@ T)
 (defun procura-best (array pecas-por-colocar)
 	(let* (
 		(tabuleiro (array->tabuleiro array))
-		(hash-accoes (make-hash-table))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #' (lambda (x) (declare (ignore x))0)))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'qualidade))
-		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade))
+		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade3))
 		(solucao NIL))
 		(loop for peca in (list 'i 'l 'j 'o 's 'z 't) do
-			(setf (gethash peca hash-accoes) (accoes (make-estado :pontos 0 :pecas-por-colocar (list peca) :pecas-colocadas '() :tabuleiro tabuleiro)))
+		(setf (gethash peca *hash-accoes*) (accoes (make-estado :pontos 0 :pecas-por-colocar (list peca) :pecas-colocadas '() :tabuleiro (cria-tabuleiro))))
 		)
 		(cond 
 			((< (length pecas-por-colocar) 10)
-				(setf solucao (executa-procura #'best-first-search problema #'heuristicas hash-accoes)))
+				(setf solucao (executa-procura #'best-first-search problema #'heuristicas *hash-accoes*)))
 			((> (length pecas-por-colocar) 10) 
 				(setf solucao (executa-procura #'greedy-search problema #'heuristicas)))
+			((> (length pecas-por-colocar) 10) 
+				(setf solucao (executa-procura #'ida_star_search problema #'heuristicas)))
 			(t 
-				(setf solucao (executa-procura #'recursive-best-first-search problema #'heuristicas hash-accoes MOST-POSITIVE-FIXNUM)))	
+				(setf solucao (executa-procura #'recursive-best-first-search problema #'heuristicas *hash-accoes* MOST-POSITIVE-FIXNUM)))	
 		)
 		(procura-get-solucao solucao)
 	)
@@ -953,6 +984,7 @@ T)
 		(accoes NIL)
 		(new-node NIL)
 		)
+		
 		(insert_heap open (node-peso node) node)
 		(loop while (> (heap-size open) 0) do
 			(setf current (extract-min open))
@@ -1029,6 +1061,61 @@ T)
 	)
 )
 
+(defun search-ida (problema node g bound heuristica)
+	(let (
+		(f g)
+		(min 0)
+		(accoes NIL)
+		(new-node NIL)
+		(n NIL)
+		)
+		
+		(if (> f bound)
+			(return-from search-ida f)
+		)
+
+		(if (funcall (problema-solucao problema) (node-estado-actual node))
+			(return-from search-ida node)
+		)
+		;(read-char)
+		;(format T "~d ~c" node #\linefeed)
+		(setf min MOST-POSITIVE-FIXNUM)
+		(setf accoes 
+			 (if (estado-final-p (node-estado-actual node)) 
+			 	NIL
+				(get-hash-accoes *hash-accoes* (node-estado-actual node))
+			)
+		)
+		(loop for accao in accoes do
+			(setf new-node (cria-node-filho problema node accao heuristica))
+			(setf n (search-ida problema new-node (node-peso new-node) bound heuristica))
+			(cond 
+				((typep n 'node)
+					(return-from search-ida n))
+				((< n min)
+					(setf min n))
+			)
+		)
+	min)
+)
+
+(defun ida_star_search (problema node heuristica)
+	(let (
+		(bound (node-peso node))
+		(solucao NIL)
+		)
+
+		(loop while t do
+			(setf solucao (search-ida problema node 0 bound heuristica))
+			(if (typep solucao 'node)
+				(return-from ida_star_search solucao)
+			)
+		)	
+	)
+)
+
+
+
 ;; executa-procura: algoritmo x problema x heuristica (opcional) x b (resto) --> node
 (defun executa-procura (algoritmo problema &optional (heuristica (lambda (a) (declare (ignore a)) 0)) &rest b)
 	(apply algoritmo
@@ -1054,6 +1141,23 @@ T)
 	lista-accoes)	
 )
 
+(load "utils.lisp") 
+;(load "utils.fas")
+
+
+
+(defun pecas(simbolo)
+	(cond 
+		((eq 'i simbolo) (list peca-i0 peca-i1)) 
+		((eq 'l simbolo) (list peca-l0 peca-l1 peca-l2 peca-l3))
+		((eq 'j simbolo) (list peca-j0 peca-j1 peca-j2 peca-j3))
+		((eq 'o simbolo) (list peca-o0))
+		((eq 's simbolo) (list peca-s0 peca-s1))
+		((eq 'z simbolo) (list peca-z0 peca-z1))
+		((eq 't simbolo) (list peca-t0 peca-t1 peca-t2 peca-t3))
+	)
+)
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1069,7 +1173,7 @@ T)
 ;;; by FVALUE.
 (defun insert_lst (node lst)
 	(cond ((null lst)(list node))
-		((<= (node-peso node) (node-peso (first lst)))
+		((< (node-peso node) (node-peso (first lst)))
 			(cons node lst))
 		(t 
 			(cons (first lst) (insert_lst node (rest lst))))
@@ -1153,7 +1257,7 @@ T)
     (values (node_bh-data node)
             (node_bh-key node))))
 
-;(declaim (inline swap-nodes))
+;(declaim (inline swap-nodes)) 
 (defun swap-nodes (array i j)
   (declare (type array-index i j))
   (setf (node_bh-index (aref array i)) j
@@ -1195,20 +1299,3 @@ T)
         (array (bin-heap-array heap)))
     (perlocate-up array (setf (node_bh-index node) 
                               (vector-push-extend node array)))))
-
-
-(load "utils.lisp")
-;(load "utils.fas")
-
-(defun pecas(simbolo)
-	(cond 
-		((eq 'i simbolo) (list peca-i0 peca-i1)) 
-		((eq 'l simbolo) (list peca-l0 peca-l1 peca-l2 peca-l3))
-		((eq 'j simbolo) (list peca-j0 peca-j1 peca-j2 peca-j3))
-		((eq 'o simbolo) (list peca-o0))
-		((eq 's simbolo) (list peca-s0 peca-s1))
-		((eq 'z simbolo) (list peca-z0 peca-z1))
-		((eq 't simbolo) (list peca-t0 peca-t1 peca-t2 peca-t3))
-	)
-)
-
