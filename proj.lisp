@@ -1164,7 +1164,7 @@ T)
 
 	(dotimes (i *dim-linhas*)
 		(for j downfrom (1- *dim-colunas*) downto 0)
-			(tabuleiro-muda-ponto! tabuleiro i j (oddp (aref novoarray i)))
+			(tabuleiro-muda-ponto! tabuleiro i j (evenp (aref novoarray i)))
 			(ash (aref novoarray i) -1))
 	)
 
