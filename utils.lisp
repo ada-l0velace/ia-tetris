@@ -72,30 +72,18 @@
 ;;; funcao que recebe um estado e uma lista de accoes e executa as accoes (pela ordem recebida) sobre o tabuleiro do estado inicial,
 ;;; desenhando no ecra os varios estados do tabuleiro. Para avancar entre ecras, o utilizador deve premir a tecla "Enter".
 ;;;	retorna o total de pontos obtidos pela sequencia de accoes no tabuleiro
-(defun executa-jogadas (estado-inicial lista-accoes)
+(defun executa-jogadas (estado-inicial lista-accoes &optional (desenha T))
 	(let ((estado estado-inicial))
 		(do () ((or (estado-final-p estado) (null lista-accoes)))
-			;(desenha-estado estado)
-			;(read-char)
-			;(desenha-estado estado (first lista-accoes))
-			;(read-char)
+			(when desenha
+				(desenha-estado estado)
+				(read-char)
+				(desenha-estado estado (first lista-accoes))
+				(read-char))
 			(setf estado (resultado estado (first lista-accoes)))
 			(setf lista-accoes (rest lista-accoes)))
-		;(desenha-estado estado)
+		(when desenha (desenha-estado estado))
 		(estado-pontos estado)))
-
-(defun executa-jogadas2 (estado-inicial lista-accoes)
-	(let ((estado estado-inicial))
-		(do () ((or (estado-final-p estado) (null lista-accoes)))
-			(desenha-estado estado)
-			(read-char)
-			(desenha-estado estado (first lista-accoes))
-			(read-char)
-			(setf estado (resultado estado (first lista-accoes)))
-			(setf lista-accoes (rest lista-accoes)))
-		(desenha-estado estado)
-		(estado-pontos estado)))
-
 
 ;;; desenha-estado: estado x accao (opcional) --> {}
 ;;; funcao que recebe um estado (e pode receber opcionalmente uma accao) e desenha o estado do jogo de tetris no ecra
@@ -103,11 +91,11 @@
 ;;; do tabuleiro de tetris. Esta funcao nao devolve nada.		
 (defun desenha-estado (estado &optional (accao nil))
 	(let ((tabuleiro (estado-tabuleiro estado)))
-		(desenha-linha-exterior) (format T "  Proximas pecas:~A~%" (estado-pecas-por-colocar estado))  
+		(desenha-linha-exterior) (format T "  Proxima peca:~A~%" (first (estado-pecas-por-colocar estado))) 
 		(do ((linha 3 (- linha 1))) ((< linha 0))
 			(desenha-linha-accao accao linha) (format T "~%"))
 		(desenha-linha-exterior) (format T "  Pontuacao:~A~%" (estado-pontos estado))
-		(do ((linha 16 (- linha 1))) ((< linha 0))
+		(do ((linha 17 (- linha 1))) ((< linha 0))
 			(desenha-linha tabuleiro linha) (format T "~%"))
 		(desenha-linha-exterior)))
 
@@ -149,5 +137,4 @@
 	(format T "| ")
 	(dotimes (coluna 10)
 		(format T "~A " (if (tabuleiro-preenchido-p tabuleiro linha coluna) "#" " ")))
-	(format T "|"))			
-
+	(format T "|"))		

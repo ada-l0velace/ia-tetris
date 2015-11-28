@@ -26,7 +26,7 @@ function run_tests {
 	fi
 }
 
-for d in {01..14} 16 18 19 {22..24} 26 27 30; do
+for d in {01..27}; do
 	run_tests $d
 done
 
