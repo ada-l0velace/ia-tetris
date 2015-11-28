@@ -116,7 +116,7 @@
 		)
 		(block break
 			(loop for peca in pecas do
-				(if (eq limit 2)
+				(if (eq limit 0)
 					(return-from break)
 				)
 				(incf total (peca-pontos-maximo peca))
@@ -425,8 +425,7 @@ T)
 			(and 
 				(< min-y *dim-linhas*) 
 				(eq (tabuleiro-linha-p tabuleiro min-y) *grid-mask*)
-			) 
-		do 
+			) do 
 			(incf min-y)
 		)
 		;(format T "~d~c" grid-mask #\linefeed)
@@ -492,11 +491,17 @@ T)
 (defun array->tabuleiro (array)
 	(let (
 		(new-tabuleiro (cria-tabuleiro))
+			(rank (array-rank array))
 	)
 	(loop for i from 0 below *dim-linhas* do
 		(loop for j from 0 below *dim-colunas* do
-			(if (aref array i j)
-				(tabuleiro-preenche! new-tabuleiro i j)		
+			(if (> rank 1)
+				(when (aref array i j)
+					(tabuleiro-preenche! new-tabuleiro i j)		
+				)
+				(when (> (aref array i) 0)
+					(tabuleiro-preenche! new-tabuleiro i j)		
+				)
 			)
 		)
 	)
@@ -717,7 +722,7 @@ T)
 ;; buracos: estado --> inteiro
 ;; heuristica correspondente ao numero de buracos (objectivo minimiza-lo)
 (defun buracos (estado)
-	(* 1 (tabuleiro-buracos (estado-tabuleiro estado)))
+	(tabuleiro-buracos (estado-tabuleiro estado))
 )
 
 ;; media-alturas: estado --> float
@@ -733,21 +738,21 @@ T)
 ;; heuristica correspondente ao numero de linhas completas no tabuleiro (objectivo minimizar)
 ;; (objectivo minimizar)
 (defun linhas-completas (estado)
-	(* -1 (tabuleiro-linhas-completas (estado-tabuleiro estado)))
+	(tabuleiro-linhas-completas (estado-tabuleiro estado))
 )
 
 ;; altura-agregada: estado --> inteiro
 ;; heuristica correspondente a soma das alturas todas para usar nas procuras informadas como heuristica
 ;; (objectivo minimizar)
 (defun altura-agregada (estado)
-	(* 0.3 (tabuleiro-altura-agregada (estado-tabuleiro estado)))
+	(tabuleiro-altura-agregada (estado-tabuleiro estado))
 )
 
 ;; bumpiness: estado --> inteiro
 ;; heuristica diz-nos a variacao das alturas das colunas
 ;; 'e calculada atraves da soma absoluta entre as difrencas das colunas adjacentes
 (defun bumpiness (estado)
-	(* 1 (tabuleiro-bumpiness (estado-tabuleiro estado)))
+	(tabuleiro-bumpiness (estado-tabuleiro estado))
 )
 
 ;; custo-oportunidade3: estado --> inteiro
@@ -778,12 +783,12 @@ T)
 		;(linhas-completas estado)
 		(custo-oportunidade3 estado)
 		;(max-alturas estado)
-		(altura-agregada estado)
-		(bumpiness estado)
+		(* 3.71 (altura-agregada estado))
+		(* 1.4 (bumpiness estado))
 		;(alturas-zero estado)
 		;(media-alturas estado)
-		;(qualidade estado)
-		(buracos estado)
+		(* 1.87 (qualidade estado))
+		(* 4.79 (buracos estado))
 	)
 )
 
@@ -1106,6 +1111,7 @@ T)
 
 
 
+
 ;; executa-procura: algoritmo x problema x heuristica (opcional) x b (resto) --> node
 (defun executa-procura (algoritmo problema &optional (heuristica (lambda (a) (declare (ignore a)) 0)) &rest b)
 	(apply algoritmo
@@ -1115,6 +1121,39 @@ T)
 		b
 	)
 )
+
+; (defun compute-best-fit (problema node)
+; 	(let ((accoes (funcall (problema-accoes problema) (node-estado-actual node)))
+; 		(postfits1 (funcall (problema-accoes problema) (node-estado-actual node)))
+; 		(postfits2 (funcall (problema-accoes problema) (node-estado-actual node)))
+; 		(scores (make-array (list (length postfits1) * (length postfits2)) :initial-element 0.0))
+; 		)
+
+; 		(loop for i from 0 below (length postfits1) do
+; 			(loop for j from 0 below (length postfits1) do
+
+; 			)
+; 		)
+; 		(setf max (mapcar (problema-resultado problema) 
+; 		  	(make-list (length accoes) :initial-element (node-estado-actual node))  
+; 		  		postfits1))
+; 		(setf max1 (mapcar (problema-resultado problema) 
+; 		  	(make-list (length accoes) :initial-element (node-estado-actual node))  
+; 		  		postfits1))
+; 		(mapcar (problema-resultado problema) 
+; 		  	(make-list (length accoes) :initial-element (node-estado-actual node))  
+; 		  		postfits2))
+; 		 ; (mapcar (problema-resultado problema) 
+		 	
+; 		 ; 	postfits2)
+		 
+		
+; 		(setf accoes value)
+; 		(format T "~d~c" postfits1 #\linefeed)
+
+; 	)
+
+; )
 
 ;; procura-get-solucao: node --> lista accoes
 ;; recebe um node goal e faz o backtrace da solucao retornando a lista de accoes
