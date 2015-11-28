@@ -1145,8 +1145,7 @@ T)
 ;(load "utils.fas")
 
 
-
-(defun pecas(simbolo)
+(defun pecas (simbolo)
 	(cond 
 		((eq 'i simbolo) (list peca-i0 peca-i1)) 
 		((eq 'l simbolo) (list peca-l0 peca-l1 peca-l2 peca-l3))
@@ -1156,6 +1155,20 @@ T)
 		((eq 'z simbolo) (list peca-z0 peca-z1))
 		((eq 't simbolo) (list peca-t0 peca-t1 peca-t2 peca-t3))
 	)
+)
+
+
+(defun binario->tabuleiro (array)
+	(let novoarray (copy-seq array)
+		 tabuleiro (cria-tabuleiro)
+
+	(dotimes (i *dim-linhas*)
+		(for j downfrom (1- *dim-colunas*) downto 0)
+			(tabuleiro-muda-ponto! tabuleiro i j (oddp (aref novoarray i)))
+			(ash (aref novoarray i) -1))
+	)
+
+	tabuleiro)
 )
 
 
