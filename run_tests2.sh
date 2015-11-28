@@ -10,8 +10,7 @@ function run_tests {
 	rm -f "testes/testes publicos/test$1/myout.txt"
 	rm -f "testes/testes publicos/test$1/temp"
 	sed '/^;/ d' < "testes/testes publicos/test$1/output" > "testes/testes publicos/test$1/out"
-	
-	mytime="$( TIMEFORMAT='%lU'; time ( clisp -i -q -C proj.lisp < "testes/testes publicos/test$1/input" > "testes/testes publicos/test$d/myout" ) 2>&1 1>/dev/null )"
+	mytime="$( TIMEFORMAT='%lU'; time ( clisp -i -q -C proj.lisp < "testes/testes publicos/test$1/input" > "testes/testes publicos/test$d/myout" ) 2>&1 1>/dev/null )"	
 	sed '/^;/ d' "testes/testes publicos/test$1/myout" > "testes/testes publicos/test$1/temp"
 	sed -e ':a;N;$!ba;s/0\ errors,\ 0\ warnings\n//g' "testes/testes publicos/test$1/temp" > "testes/testes publicos/test$1/temp2"
 	mv "testes/testes publicos/test$1/temp2" "testes/testes publicos/test$1/temp" 
@@ -27,7 +26,7 @@ function run_tests {
 	fi
 }
 
-for d in {01..12} 14 16 18 19 {22..26} 30; do
+for d in {01..14} 16 18 19 {22..24} 26 27 30; do
 	run_tests $d
 done
 

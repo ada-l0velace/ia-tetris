@@ -1,15 +1,15 @@
 ;;; teste 26 E2, testa abstracao de dados do tipo tabuleiro, na funcoes procura-pp
-;(make-package 'teste)
-;(in-package teste)
+(make-package 'teste)
+(in-package teste)
 ;; o projecto nao pode ser compilado, pois iria ter problemas em redefinir estruturas compiladas em lisp
 ;; retorna T
-;(load "projecto-alunos.lisp") 
+(load "proj.lisp") 
 ;; carrega um tipo tabuleiro mt particular, fazendo override as definicoes dos alunos
 ;; retorna T
-;(load "TAI-tabuleiro.lisp")
+(load "TAI-tabuleiro.lisp")
 ;; carrega o ficheiro de utils nao compilado
 ;; retorna T
-;(load "utils.lisp")
+(load "utils-prof.lisp")
 ;;deve retornar IGNORE
 (progn (setf t1 (cria-tabuleiro)) 'IGNORE)
 ;;deve retornar IGNORE

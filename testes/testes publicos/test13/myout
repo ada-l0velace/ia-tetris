@@ -1,0 +1,5 @@
+IGNORE
+((7 . #2A((NIL NIL T) (T T T))) (7 . #2A((T T T) (NIL NIL T))) (8 . #2A((NIL T) (T T) (NIL T)))
+ (8 . #2A((T T) (T T))) (8 . #2A((T NIL) (T T) (NIL T))) (8 . #2A((NIL T) (T T) (T NIL))) (6 . #2A((T T T T))))
+T
+NIL
