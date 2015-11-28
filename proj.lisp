@@ -116,7 +116,7 @@
 		)
 		(block break
 			(loop for peca in pecas do
-				(if (eq limit 0)
+				(if (eq limit 2)
 					(return-from break)
 				)
 				(incf total (peca-pontos-maximo peca))
@@ -311,12 +311,7 @@ T)
 ;; e devolve o valor logico verdade se todas as posicoes da linha recebida estiverem preenchidas
 ;; e falso caso contrario
 (defun tabuleiro-linha-completa-p (tabuleiro linha) ; pode ser optimizado
-	(loop for i from 0 below *dim-colunas* do
-		(if (null (tabuleiro-preenchido-p tabuleiro linha i))
-			(return-from tabuleiro-linha-completa-p NIL)
-		)
-	)
-	T
+	(eq (tabuleiro-linha-p tabuleiro linha) 1023)
 )
 
 
@@ -470,12 +465,7 @@ T)
 ;; este reconhecedor recebe um tabuleiro, e devolve o valor logico verdade se existir alguma posicao na linha do topo
 ;; do tabuleiro, retorna falso caso contrario
 (defun tabuleiro-topo-preenchido-p (tabuleiro)
-	(loop for i from 0 below *dim-colunas* do
-		(if (eq (tabuleiro-preenchido-p tabuleiro (1- *dim-linhas*) i) T)
-			(return-from tabuleiro-topo-preenchido-p T)
-		)
-	)
-	NIL	
+	(> (tabuleiro-linha-p tabuleiro (1- *dim-linhas*)) 0)
 )
 
 ;; tabuleiro-iguais-p: tabuleiro x tabuleiro1 --> logico
