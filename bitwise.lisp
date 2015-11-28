@@ -55,8 +55,6 @@
 	(custo-caminho (lambda (a) (declare (ignore a)) 0))
 )
 
-(defun logbit (integer index)
-		(ldb (byte 1 index) integer))
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;    Tipo peca     ;;
@@ -201,7 +199,7 @@
 ;; este construtor nao recebe qualquer argumento e devolve um novo tabuleiro vazio
 (defun cria-tabuleiro ()
 	(make-tabuleiro 
-		:tab (make-array (list *dim-linhas*) :initial-element 0)
+		:tab (make-array (list *dim-linhas* *dim-colunas*))
 		:alturas (make-array (list *dim-colunas*) :initial-element 0)
 	)
 )	
@@ -211,7 +209,7 @@
 ;; recebido
 (defun copia-tabuleiro (tabuleiro)
 	(make-tabuleiro 
-		:tab (copy-seq (tr-tab tabuleiro))
+		:tab (tabuleiro->array tabuleiro)
 		:alturas (copy-seq (tr-alturas tabuleiro))
 	)
 )
@@ -221,9 +219,9 @@
 ;; correspondente ao numero da coluna e devolve o valor logico verdade se a posicao estiver preenchida
 ;; e falso caso contrario 
 (defun tabuleiro-preenchido-p (tabuleiro linha coluna)
-	(if (> (logbit (aref (tr-tab tabuleiro) linha) (- (1- *dim-colunas*) coluna)) 0)
-		T
-		NIL
+	(if (not (or (>= linha *dim-linhas*) (>= coluna *dim-colunas*)))
+		(aref (tr-tab tabuleiro) linha coluna)
+		 T
 	)
 )
 
@@ -247,12 +245,9 @@
 ;; este selector recebe um tabuleiro e um inteiro correspondente ao numero de uma coluna e
 ;; devolve a altura de uma coluna ou seja a posicao mais alta que esteja preenchida dessa coluna  
 (defun tabuleiro-altura-coluna (tabuleiro coluna)
-	(aref (tr-alturas tabuleiro) coluna)
+  (aref (tr-alturas tabuleiro) coluna)
 )
 
-
-(defun tabuleiro-linha-p (tabuleiro linha)
-	(aref (tr-tab tabuleiro) linha))
 
 ;; tabuleiro-altura! tabuleiro x inteiro x inteiro --> tabuleiro
 ;; este modificador recebe um tabuleiro um inteiro correspondente ao numero da coluna e um inteiro
@@ -260,7 +255,6 @@
 (defun tabuleiro-altura! (tabuleiro coluna altura)
 	(setf (aref (tr-alturas tabuleiro) coluna) altura)
 T)
-
 
 
 ;; tabuleiro-altura-agregada: tabuleiro --> inteiro
@@ -311,7 +305,12 @@ T)
 ;; e devolve o valor logico verdade se todas as posicoes da linha recebida estiverem preenchidas
 ;; e falso caso contrario
 (defun tabuleiro-linha-completa-p (tabuleiro linha) ; pode ser optimizado
-	(eq (tabuleiro-linha-p tabuleiro linha) 1023)
+	(loop for i from 0 below *dim-colunas* do
+		(if (null (tabuleiro-preenchido-p tabuleiro linha i))
+			(return-from tabuleiro-linha-completa-p NIL)
+		)
+	)
+	T
 )
 
 
@@ -320,11 +319,14 @@ T)
 ;; este modificador recebe um tabuleiro um inteiro correspondente ao numero linha e um inteiro
 ;; correspondente ao numero da coluna e altera o tabuleiro recebido para na posicao correspondente
 ;; a linha e coluna passar a estar preenchido
-(defun tabuleiro-preenche! (tabuleiro linha coluna)
-	(when (and (<= 0 linha (1- *dim-linhas*)) (<= 0 coluna (1- *dim-colunas*)))
-		(setf (aref (tr-tab tabuleiro) linha) (logior (aref (tr-tab tabuleiro) linha) (aref *tabuleiro-mascaras* coluna)))
-		(when (> (1+ linha) (tabuleiro-altura-coluna tabuleiro coluna))
-			(tabuleiro-altura! tabuleiro coluna (1+ linha))
+(defun tabuleiro-preenche! (tabuleiro linha coluna) ; nao usar directamente
+	(if (not (or (> linha (1- *dim-linhas*)) (> coluna (1- *dim-colunas*))))
+		(block actualiza
+			(setf (aref (tr-tab tabuleiro) linha coluna) T)
+
+			(if (> (1+ linha) (tabuleiro-altura-coluna tabuleiro coluna))
+				(tabuleiro-altura! tabuleiro coluna (1+ linha))
+			)
 		)
 	)
 T)
@@ -333,8 +335,8 @@ T)
 ;; este modificador recebe um tabuleiro um inteiro correspondente ao numero linha, um inteiro
 ;; correspondente ao numero da coluna e o valor a preencher e altera o tabuleiro recebido para 
 ;; na posicao correspondente a linha e coluna passar a estar preenchido com o valor que foi escolhido
-(defun tabuleiro-muda-ponto! (tabuleiro linha coluna valor) 
-	(if valor
+(defun tabuleiro-muda-ponto! (tabuleiro linha coluna valor) ; valor T para preencher, NIL para apagar
+	(if (eq valor T)
 		(tabuleiro-preenche! tabuleiro linha coluna)
 		(tabuleiro-apaga! tabuleiro linha coluna)
 	)
@@ -344,11 +346,13 @@ T)
 ;; este modificador recebe um tabuleiro um inteiro correspondente ao numero linha e um inteiro
 ;; correspondente ao numero da coluna e altera o tabuleiro recebido para na posicao correspondente
 ;; a linha e coluna passar a estar apagada
-(defun tabuleiro-apaga! (tabuleiro linha coluna)
-	(when (and (<= 0 linha (1- *dim-linhas*)) (<= 0 coluna (1- *dim-colunas*)))
-		(setf (aref (tr-tab tabuleiro) linha) (logand (aref (tr-tab tabuleiro) linha) (lognot (aref *tabuleiro-mascaras* coluna)))) 
-		(when (<= linha (tabuleiro-altura-coluna tabuleiro coluna))			
-			(tabuleiro-altura! tabuleiro coluna (tabuleiro-calcula-altura tabuleiro coluna linha))
+(defun tabuleiro-apaga! (tabuleiro linha coluna) ; nao usar directamente
+	(if (not (or (> linha (1- *dim-linhas*)) (> coluna (1- *dim-colunas*))))
+		(block actualiza
+			(setf (aref (tr-tab tabuleiro) linha coluna) NIL)
+			(if (<= linha (tabuleiro-altura-coluna tabuleiro coluna))			
+				(tabuleiro-altura! tabuleiro coluna (tabuleiro-calcula-altura tabuleiro coluna linha))
+			)
 		)
 	)
 T)
@@ -406,45 +410,22 @@ T)
 ;; esta funcao recebe um tabuleiro e devolve um inteiro correspondente ao numero de buracos no tabuleiro
 ;; um buraco e definido se houver um espaco vazio e houver pelo menos um bloco na mesma coluna preenchido
 (defun tabuleiro-buracos (tabuleiro)
-	(let (
-		(under-mask 0)
-		(l-neighbor-mask 0)
-		(r-neighbor-mask 0)
-		(found-holes 0)
-		(line 0)
-		(filled 0)
-		(min-y 0)
+	(let((total 0)
+		(block NIL)
 		)
-
-		(loop while 
-			(and 
-				(< min-y *dim-linhas*) 
-				(eq (tabuleiro-linha-p tabuleiro min-y) *grid-mask*)
-			) do 
-			(incf min-y)
-		)
-		;(format T "~d~c" grid-mask #\linefeed)
-		(loop for y from min-y below *dim-linhas* do
-			(setf line (tabuleiro-linha-p tabuleiro y))
-			(setf filled (logand (lognot line) *grid-mask*))
-			;(format T "~d~c" under-mask #\linefeed)
-			(setf under-mask (logior under-mask filled))
-			;(format T "~d~c" filled #\linefeed)
-			;(format T "~d~c" under-mask #\linefeed)
-			(setf l-neighbor-mask (logior l-neighbor-mask (ash filled 1)))
-			(setf r-neighbor-mask (logior r-neighbor-mask (ash filled -1)))
-			;(format T "~d~c" (integer-length (logand r-neighbor-mask line)) #\linefeed)
-			(incf found-holes 
-				(+
-					(integer-length (logand under-mask line))
-					(integer-length (logand l-neighbor-mask line))
-					(integer-length (logand r-neighbor-mask line))
+		(loop for c from 0 below *dim-colunas* do
+			(setf block NIL)
+			(loop for l downfrom (tabuleiro-altura-coluna tabuleiro c) downto 0 do
+				(if (eq (tabuleiro-preenchido-p tabuleiro l c) T)
+					(setf block T)
+				)
+				(if (and (eq (tabuleiro-preenchido-p tabuleiro l c) NIL) (eq block T))
+					(incf total)
 				)
 			)
 		)
-	found-holes)
+	total)
 )
-
 
 ;; tabuleiro-remove-linha!: tabuleiro x inteiro --> {}
 ;; este modificador recebe um tabuleiro, um inteiro correspondente ao numero linha, e altera
@@ -465,7 +446,12 @@ T)
 ;; este reconhecedor recebe um tabuleiro, e devolve o valor logico verdade se existir alguma posicao na linha do topo
 ;; do tabuleiro, retorna falso caso contrario
 (defun tabuleiro-topo-preenchido-p (tabuleiro)
-	(> (tabuleiro-linha-p tabuleiro (1- *dim-linhas*)) 0)
+	(loop for i from 0 below *dim-colunas* do
+		(if (eq (tabuleiro-preenchido-p tabuleiro (1- *dim-linhas*) i) T)
+			(return-from tabuleiro-topo-preenchido-p T)
+		)
+	)
+	NIL	
 )
 
 ;; tabuleiro-iguais-p: tabuleiro x tabuleiro1 --> logico
@@ -473,29 +459,6 @@ T)
 ;; caso contrario
 (defun tabuleiros-iguais-p (tabuleiro tabuleiro1)
 	(equalp tabuleiro tabuleiro1)	
-)
-
-;; array->tabuleiro: array --> tabuleiro
-;; este transformador de saida recebe um array e controi um novo tabuleiro com o conteudo do array recebido e
-;; devolve um tabuleiro 
-(defun array->tabuleiro (array)
-	(let (
-		(new-tabuleiro (cria-tabuleiro))
-			(rank (array-rank array))
-	)
-	(loop for i from 0 below *dim-linhas* do
-		(loop for j from 0 below *dim-colunas* do
-			(if (> rank 1)
-				(when (aref array i j)
-					(tabuleiro-preenche! new-tabuleiro i j)		
-				)
-				(when (> (aref array i) 0)
-					(tabuleiro-preenche! new-tabuleiro i j)		
-				)
-			)
-		)
-	)
-	new-tabuleiro)
 )
 
 ;; tabuleiro->array: tabuleiro --> array
@@ -509,11 +472,30 @@ T)
 	(loop for i from 0 below *dim-linhas* do
 		(loop for j from 0 below *dim-colunas* do
 			(if (tabuleiro-preenchido-p tabuleiro i j)
-				(setf (aref new-array i j) T)
+				(setf (aref new-array i j) (aref (tr-tab tabuleiro) i j))
 			)		
 		)
 	)
 	new-array)	
+)
+
+;; array->tabuleiro: array --> tabuleiro
+;; este transformador de saida recebe um array e controi um novo tabuleiro com o conteudo do array recebido e
+;; devolve um tabuleiro 
+(defun array->tabuleiro (array)
+	(let (
+		(new-tabuleiro 
+			(cria-tabuleiro)
+		)
+	)
+	(loop for i from 0 below *dim-linhas* do
+		(loop for j from 0 below *dim-colunas* do
+			(if (aref array i j)
+				(tabuleiro-muda-ponto! new-tabuleiro i j (aref array i j))		
+			)
+		)
+	)
+	new-tabuleiro)
 )
 
 ;;;;;;;;;;;;;;;;;;
@@ -712,7 +694,7 @@ T)
 ;; buracos: estado --> inteiro
 ;; heuristica correspondente ao numero de buracos (objectivo minimiza-lo)
 (defun buracos (estado)
-	(tabuleiro-buracos (estado-tabuleiro estado))
+	(* 1 (tabuleiro-buracos (estado-tabuleiro estado)))
 )
 
 ;; media-alturas: estado --> float
@@ -728,21 +710,21 @@ T)
 ;; heuristica correspondente ao numero de linhas completas no tabuleiro (objectivo minimizar)
 ;; (objectivo minimizar)
 (defun linhas-completas (estado)
-	(tabuleiro-linhas-completas (estado-tabuleiro estado))
+	(* -1 (tabuleiro-linhas-completas (estado-tabuleiro estado)))
 )
 
 ;; altura-agregada: estado --> inteiro
 ;; heuristica correspondente a soma das alturas todas para usar nas procuras informadas como heuristica
 ;; (objectivo minimizar)
 (defun altura-agregada (estado)
-	(tabuleiro-altura-agregada (estado-tabuleiro estado))
+	(* 0.3 (tabuleiro-altura-agregada (estado-tabuleiro estado)))
 )
 
 ;; bumpiness: estado --> inteiro
 ;; heuristica diz-nos a variacao das alturas das colunas
 ;; 'e calculada atraves da soma absoluta entre as difrencas das colunas adjacentes
 (defun bumpiness (estado)
-	(tabuleiro-bumpiness (estado-tabuleiro estado))
+	(* 1 (tabuleiro-bumpiness (estado-tabuleiro estado)))
 )
 
 ;; custo-oportunidade3: estado --> inteiro
@@ -773,12 +755,12 @@ T)
 		;(linhas-completas estado)
 		(custo-oportunidade3 estado)
 		;(max-alturas estado)
-		(* 3.71 (altura-agregada estado))
-		(* 1.4 (bumpiness estado))
+		(altura-agregada estado)
+		(bumpiness estado)
 		;(alturas-zero estado)
 		;(media-alturas estado)
-		(* 1.87 (qualidade estado))
-		(* 4.79 (buracos estado))
+		;(qualidade estado)
+		(buracos estado)
 	)
 )
 
@@ -833,7 +815,12 @@ T)
 		(if (funcall (problema-solucao problema) (node-estado-actual node))
 		 	(return-from depth-first-search node)
 		)
-		(setf accoes (reverse (funcall (problema-accoes problema) (node-estado-actual node))))
+		(if (typep (node-estado-actual node) 'estado)
+			(if (null (estado-final-p (node-estado-actual node)))
+				(setf accoes (reverse (funcall (problema-accoes problema) (node-estado-actual node))))
+			)
+			(setf accoes (reverse (funcall (problema-accoes problema) (node-estado-actual node))))
+		)
 		(loop for accao in accoes do
 			(setf new-node (cria-node-filho problema node accao))
 		 	(setf result (depth-first-search problema new-node))	
@@ -900,6 +887,7 @@ T)
 
 ;; procura-best: array x pecas-por-colocar --> lista accoes
 (defun procura-best (array pecas-por-colocar)
+	(overide-tipo-tabuleiro)
 	(let* (
 		(tabuleiro (array->tabuleiro array))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #' (lambda (x) (declare (ignore x))0)))
@@ -908,7 +896,7 @@ T)
 		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade3))
 		(solucao NIL))
 		(loop for peca in (list 'i 'l 'j 'o 's 'z 't) do
-			(setf (gethash peca *hash-accoes*) (accoes (make-estado :pontos 0 :pecas-por-colocar (list peca) :pecas-colocadas '() :tabuleiro (cria-tabuleiro))))
+		(setf (gethash peca *hash-accoes*) (accoes (make-estado :pontos 0 :pecas-por-colocar (list peca) :pecas-colocadas '() :tabuleiro (cria-tabuleiro))))
 		)
 		(cond 
 			((< (length pecas-por-colocar) 10)
@@ -1101,7 +1089,6 @@ T)
 
 
 
-
 ;; executa-procura: algoritmo x problema x heuristica (opcional) x b (resto) --> node
 (defun executa-procura (algoritmo problema &optional (heuristica (lambda (a) (declare (ignore a)) 0)) &rest b)
 	(apply algoritmo
@@ -1111,39 +1098,6 @@ T)
 		b
 	)
 )
-
-; (defun compute-best-fit (problema node)
-; 	(let ((accoes (funcall (problema-accoes problema) (node-estado-actual node)))
-; 		(postfits1 (funcall (problema-accoes problema) (node-estado-actual node)))
-; 		(postfits2 (funcall (problema-accoes problema) (node-estado-actual node)))
-; 		(scores (make-array (list (length postfits1) * (length postfits2)) :initial-element 0.0))
-; 		)
-
-; 		(loop for i from 0 below (length postfits1) do
-; 			(loop for j from 0 below (length postfits1) do
-
-; 			)
-; 		)
-; 		(setf max (mapcar (problema-resultado problema) 
-; 		  	(make-list (length accoes) :initial-element (node-estado-actual node))  
-; 		  		postfits1))
-; 		(setf max1 (mapcar (problema-resultado problema) 
-; 		  	(make-list (length accoes) :initial-element (node-estado-actual node))  
-; 		  		postfits1))
-; 		(mapcar (problema-resultado problema) 
-; 		  	(make-list (length accoes) :initial-element (node-estado-actual node))  
-; 		  		postfits2))
-; 		 ; (mapcar (problema-resultado problema) 
-		 	
-; 		 ; 	postfits2)
-		 
-		
-; 		(setf accoes value)
-; 		(format T "~d~c" postfits1 #\linefeed)
-
-; 	)
-
-; )
 
 ;; procura-get-solucao: node --> lista accoes
 ;; recebe um node goal e faz o backtrace da solucao retornando a lista de accoes
@@ -1160,16 +1114,149 @@ T)
 	lista-accoes)	
 )
 
-;(load "utils.lisp") 
-(defparameter peca-i0 NIL) (defparameter peca-i1 NIL)
-(defparameter peca-l0 NIL) (defparameter peca-l1 NIL) (defparameter peca-l2 NIL) (defparameter peca-l3 NIL)
-(defparameter peca-j0 NIL) (defparameter peca-j1 NIL) (defparameter peca-j2 NIL) (defparameter peca-j3 NIL)
-(defparameter peca-o0 NIL)
-(defparameter peca-s0 NIL) (defparameter peca-s1 NIL)
-(defparameter peca-z0 NIL) (defparameter peca-z1 NIL)
-(defparameter peca-t0 NIL) (defparameter peca-t1 NIL) (defparameter peca-t2 NIL) (defparameter peca-t3 NIL)
 
-(defun pecas (simbolo)
+
+;(load "utils.lisp") 
+(load "utils.fas")
+(defun overide-tipo-tabuleiro ()
+	(defun logbit (integer index)
+		(ldb (byte 1 index) integer))
+ 
+	(defun cria-tabuleiro ()
+		(make-tabuleiro 
+			:tab (make-array (list *dim-linhas*) :initial-element 0)
+			:alturas (make-array (list *dim-colunas*) :initial-element 0)
+		)
+	)
+
+	(defun copia-tabuleiro (tabuleiro)
+		(make-tabuleiro 
+			:tab (copy-seq (tr-tab tabuleiro))
+			:alturas (copy-seq (tr-alturas tabuleiro))
+		)
+	)
+
+	(defun tabuleiro-preenchido-p (tabuleiro linha coluna)
+		(if (> (logbit (aref (tr-tab tabuleiro) linha) (- (1- *dim-colunas*) coluna)) 0)
+			T
+			NIL
+		)
+	)
+
+	(defun tabuleiro-linha-p (tabuleiro linha)
+		(aref (tr-tab tabuleiro) linha))
+
+
+
+	(defun tabuleiro-preenche! (tabuleiro linha coluna)
+		(when (and (<= 0 linha (1- *dim-linhas*)) (<= 0 coluna (1- *dim-colunas*)))
+			(setf (aref (tr-tab tabuleiro) linha) (logior (aref (tr-tab tabuleiro) linha) (aref *tabuleiro-mascaras* coluna)))
+			(when (> (1+ linha) (tabuleiro-altura-coluna tabuleiro coluna))
+				(tabuleiro-altura! tabuleiro coluna (1+ linha))
+			)
+		)
+	T)
+
+	(defun tabuleiro-muda-ponto! (tabuleiro linha coluna valor) 
+		(if (eq valor T)
+			(tabuleiro-preenche! tabuleiro linha coluna)
+			(tabuleiro-apaga! tabuleiro linha coluna)
+		)
+	T)
+
+	(defun tabuleiro-apaga! (tabuleiro linha coluna)
+		(when (and (<= 0 linha (1- *dim-linhas*)) (<= 0 coluna (1- *dim-colunas*)))
+			(setf (aref (tr-tab tabuleiro) linha) (logand (aref (tr-tab tabuleiro) linha) (lognot (aref *tabuleiro-mascaras* coluna)))) 
+			(when (<= linha (tabuleiro-altura-coluna tabuleiro coluna))			
+				(tabuleiro-altura! tabuleiro coluna (tabuleiro-calcula-altura tabuleiro coluna linha))
+			)
+		)
+	T)
+
+	(defun tabuleiro-altura-coluna (tabuleiro coluna)
+		(aref (tr-alturas tabuleiro) coluna))
+
+	(defun tabuleiro-altura! (tabuleiro coluna altura)
+		(setf (aref (tr-alturas tabuleiro) coluna) altura)
+	T)
+
+	;; array->tabuleiro: array --> tabuleiro
+	;; este transformador de saida recebe um array e controi um novo tabuleiro com o conteudo do array recebido e
+	;; devolve um tabuleiro 
+	(defun array->tabuleiro (array)
+		(let (
+			(new-tabuleiro (cria-tabuleiro))
+		)
+		(loop for i from 0 below *dim-linhas* do
+			(loop for j from 0 below *dim-colunas* do
+				(if (aref array i j)
+					(tabuleiro-preenche! new-tabuleiro i j)		
+				)
+			)
+		)
+		new-tabuleiro)
+	)
+
+	(defun tabuleiro->array (tabuleiro)
+		(let (
+			(new-array 
+				(make-array (list *dim-linhas* *dim-colunas*))
+			)
+		)
+		(loop for i from 0 below *dim-linhas* do
+			(loop for j from 0 below *dim-colunas* do
+				(if (tabuleiro-preenchido-p tabuleiro i j)
+					(setf (aref new-array i j) T)
+				)		
+			)
+		)
+		new-array)	
+	)
+
+	(defun tabuleiro-buracos (tabuleiro)
+		(let (
+			(under-mask 0)
+			(l-neighbor-mask 0)
+			(r-neighbor-mask 0)
+			(found-holes 0)
+			(line 0)
+			(filled 0)
+			(min-y 0)
+			)
+
+			(loop while 
+				(and 
+					(< min-y *dim-linhas*) 
+					(eq (tabuleiro-linha-p tabuleiro min-y) *grid-mask*)
+				) 
+			do 
+				(incf min-y)
+			)
+			;(format T "~d~c" grid-mask #\linefeed)
+			(loop for y from min-y below *dim-linhas* do
+				(setf line (tabuleiro-linha-p tabuleiro y))
+				(setf filled (logand (lognot line) *grid-mask*))
+				;(format T "~d~c" under-mask #\linefeed)
+				(setf under-mask (logior under-mask filled))
+				;(format T "~d~c" filled #\linefeed)
+				;(format T "~d~c" under-mask #\linefeed)
+				(setf l-neighbor-mask (logior l-neighbor-mask (ash filled 1)))
+				(setf r-neighbor-mask (logior r-neighbor-mask (ash filled -1)))
+				;(format T "~d~c" (integer-length (logand r-neighbor-mask line)) #\linefeed)
+				(incf found-holes 
+					(+
+						(integer-length (logand under-mask line))
+						(integer-length (logand l-neighbor-mask line))
+						(integer-length (logand r-neighbor-mask line))
+					)
+				)
+			)
+		found-holes)
+	)
+)
+
+
+(defun pecas(simbolo)
 	(cond 
 		((eq 'i simbolo) (list peca-i0 peca-i1)) 
 		((eq 'l simbolo) (list peca-l0 peca-l1 peca-l2 peca-l3))
@@ -1179,20 +1266,6 @@ T)
 		((eq 'z simbolo) (list peca-z0 peca-z1))
 		((eq 't simbolo) (list peca-t0 peca-t1 peca-t2 peca-t3))
 	)
-)
-
-
-(defun binario->tabuleiro (array)
-	(let novoarray (copy-seq array)
-		 tabuleiro (cria-tabuleiro)
-
-	(dotimes (i *dim-linhas*)
-		(for j downfrom (1- *dim-colunas*) downto 0)
-			(tabuleiro-muda-ponto! tabuleiro i j (evenp (aref novoarray i)))
-			(ash (aref novoarray i) -1))
-	)
-
-	tabuleiro)
 )
 
 

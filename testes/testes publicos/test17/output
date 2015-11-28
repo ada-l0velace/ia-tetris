@@ -1,0 +1,8 @@
+;;; Teste 17 E2
+;;; procura A* num tabuleiro onde nao existe solucao
+;;deve retornar IGNORE
+IGNORE
+;;deve retornar IGNORE
+IGNORE
+;;deve retornar NIL (nao existe solucao)
+NIL
