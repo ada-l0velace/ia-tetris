@@ -1,0 +1,7 @@
+;;; teste 28 E2, testa abstracao de dados do tipo tabuleiro, na funcoes procura-pp
+;;deve retornar IGNORE
+(progn (setf t1 (cria-tabuleiro)) 'IGNORE)
+;;deve retornar IGNORE
+(progn (dotimes (linha 17) (dotimes (coluna 8) (tabuleiro-preenche! t1 linha (+ coluna 2)))) 'IGNORE)
+;;deve retornar uma lista de accoes (ver ficheiro output)
+(procura-pp (make-problema :estado-inicial (make-estado :pontos 0 :tabuleiro t1  :pecas-por-colocar '(o l t s z)) :solucao #'solucao :accoes #'accoes :resultado #'resultado :custo-caminho #'(lambda (x) 0)))
