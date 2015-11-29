@@ -10,7 +10,8 @@ function run_tests {
 		printf "${RED} Test $1 failed $mytime ${NC}\n"
 	else
 		printf "${GREEN} Test $1 passed $mytime ${NC}\n"
-	fi	
+	fi
+	rm -f "${DIR_TESTS}/test$1/myout"	
 }
 
 rm -f run-test.fas
@@ -18,14 +19,20 @@ sed "1s/^/(defconstant peca-i0 (make-array (list 4 1) :initial-element T)) (defc
 APPEND="(loop (let ((line (read-line *standard-input* NIL))) (when (not line) (return)) (if (equal #\; (char (string-trim \" \" line) 0)) (format T \"~A~%\" line) (let ((result (multiple-value-list (eval (read-from-string line))))) (format T \"~A\" (first result)) (dolist (other-value (rest result)) (format T \"; ~A\" other-value)) (format T \"~%\")))))"
 FILE_NAME="$(cat run-test.lisp)"
 echo "$FILE_NAME $APPEND" > run-test.lisp
-compile="$(clisp -q -c run-test.lisp 2>&1 1>/dev/null)"
-if [ "$compile" == "0 errors, 0 warnings" ]; then
-	printf "${GREEN} $compile ${NC}\n\n"
-	for d in {00..02} {10..16}; do
-		run_tests $d
-	done
+asciichars="$(grep --color='auto' -P -n "[\x80-\xFF]" run-test.lisp)"
+if [ "$asciichars" != "" ]; then
+	printf "${RED} The file contains ascii characters in here: ${NC}\n"
+	grep --color='auto' -P -n "[\x80-\xFF]" run-test.lisp
 else
-	printf "${RED} $compile ${NC}\n"
+	compile="$(clisp -q -c run-test.lisp 2>&1 1>/dev/null)"
+	if [ "$compile" == "0 errors, 0 warnings" ]; then
+		printf "${GREEN} $compile ${NC}\n\n"
+		for d in {10..23}; do
+			run_tests $d
+		done
+	else
+		printf "${RED} $compile ${NC}\n"
+	fi
 fi
 rm -f run-test.lisp
 rm -f run-test.fas

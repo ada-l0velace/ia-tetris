@@ -86,7 +86,7 @@
 )
 
 ;; peca-tabuleiro-coluna-altura peca x tabuleiro x coluna --> inteiro
-;; funcao que calcula qual é a altura maxima no tabuleiro no sito onde a peca vai cair
+;; funcao que calcula qual e a altura maxima no tabuleiro no sito onde a peca vai cair
 (defun peca-tabuleiro-coluna-altura (peca tabuleiro coluna)
 	(let( 
 		(peca-l (peca-dimensao-largura peca))
@@ -804,7 +804,7 @@ T)
 		;(alturas-zero estado)
 		;(media-alturas estado)
 		(* 1.87 (qualidade estado))
-		(* 4.79 (buracos estado))
+		;(* 4.79 (buracos estado))
 	)
 )
 
@@ -926,8 +926,8 @@ T)
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #' (lambda (x) (declare (ignore x))0)))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'qualidade))
 
-		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade))
-		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-ultimas-pecas))
+		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade))
+		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-ultimas-pecas))
 		(solucao NIL))
 		(loop for peca in (list 'i 'l 'j 'o 's 'z 't) do
 			(setf (gethash peca *hash-accoes*) (accoes (make-estado :pontos 0 :pecas-por-colocar (list peca) :pecas-colocadas '() :tabuleiro (cria-tabuleiro))))
@@ -936,7 +936,7 @@ T)
 			((< (length pecas-por-colocar) 10)
 				(setf solucao (executa-procura #'best-first-search problema #'heuristicas *hash-accoes*)))
 			((> (length pecas-por-colocar) 10) 
-				(setf solucao (executa-procura #'greedy-search problema #'heuristicas)))
+				(setf solucao (executa-procura #'greedy-search problema #'heuristicas *hash-accoes*)))
 			((> (length pecas-por-colocar) 10) 
 				(setf solucao (executa-procura #'ida_star_search problema #'heuristicas)))
 			(t 
@@ -947,18 +947,23 @@ T)
 )
 
 ;; greedy-search: problema x node x heuristica --> node
-(defun greedy-search (problema node heuristica)
+(defun greedy-search (problema node heuristica hash-accoes)
 	(let (
-			(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
+			(accoes (get-hash-accoes hash-accoes (node-estado-actual node)))
 			(score NIL)
 			(best-score NIL)
 		)
+		(if (funcall (problema-solucao problema) (node-estado-actual node))
+			(return-from greedy-search node)
+		)
 		(loop while (not (null accoes)) do
 			(setf score (cria-node-filho problema node (car accoes) heuristica))
-			;Descomentar para o algoritmo pensar passos a frente (lento)
-			;(if (null (cdr accoes))
-			;  	(setf score (procura-best-aux problema score))	 	
-			; )
+			(if (null (cdr accoes))
+			  	(setf score (greedy-search problema score heuristica hash-accoes))	 	
+			)
+			(if (funcall (problema-solucao problema) (node-estado-actual score))
+				(return-from greedy-search score)
+			)
 			(if (eq best-score NIL)
 				(setf best-score score)
 				(if (not (null score))
@@ -969,17 +974,7 @@ T)
 			)	
 			(setf accoes (cdr accoes))
 		)
-
-		(if (not (null best-score))
-		 	(if (null (funcall (problema-solucao problema) (node-estado-actual best-score)))
-				(block not_solution
-					(greedy-search problema best-score heuristica)
-				)
-				best-score
-			)
-			node	
-		)
-	)
+	NIL)
 )
 
 ;; best-first-search: problema x node x heuristica x hash-table -> node
@@ -998,7 +993,10 @@ T)
 			(if (funcall (problema-solucao problema) (node-estado-actual current))
 				(return-from best-first-search current)
 			)
-			(setf accoes (get-hash-accoes hash-accoes (node-estado-actual current)))
+			(if (estado-final-p (node-estado-actual current))
+				(setf accoes NIL)
+				(setf accoes (get-hash-accoes hash-accoes (node-estado-actual current)))
+			)
 			;(setf accoes (funcall (problema-accoes problema) (node-estado-actual current)))
 			(loop for accao in accoes do
 				(block continue
