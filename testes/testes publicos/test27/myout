@@ -1,8 +1,18 @@
+;;; teste 27 E2, testa abstracao de dados do tipo tabuleiro, na funcoes procura-A*
 #<PACKAGE TESTE>
 #<PACKAGE TESTE>
+;; o projecto nao pode ser compilado, pois iria ter problemas em redefinir estruturas compiladas em lisp
+;; retorna T
 T
+;; carrega um tipo tabuleiro mt particular, fazendo override as definicoes dos alunos
+;; retorna T
 T
+;; carrega o ficheiro de utils nao compilado
+;; retorna T
 T
+;;deve retornar IGNORE
 IGNORE
+;;deve retornar IGNORE
 IGNORE
+;;deve retornar uma lista de accoes (ver ficheiro output)
 ((8 . #2A((NIL T) (NIL T) (T T))) (8 . #2A((T NIL) (T NIL) (T T))))

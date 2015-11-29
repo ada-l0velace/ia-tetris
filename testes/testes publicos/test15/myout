@@ -1,7 +1,15 @@
+;;; Teste 15 E2
+;;; procura profundidade primeiro num tabuleiro muito preenchido, eventualmente vao ser feitas algumas linhas, e tb num tabuleiro que nao tem solucao
+;;deve retornar IGNORE
 IGNORE
+;;deve retornar IGNORE
 IGNORE
+;;deve retornar uma lista de accoes (ver ficheiro output)
 ((0 . #2A((T T) (T T))) (7 . #2A((T T T) (NIL NIL T))) (0 . #2A((NIL T) (T T) (NIL T)))
  (5 . #2A((NIL T) (T T) (T NIL))) (3 . #2A((T NIL) (T T) (NIL T))))
+;;deve retornar IGNORE
 IGNORE
+;;deve retornar IGNORE
 IGNORE
+;;deve retornar NIL (nao existe solucao)
 NIL

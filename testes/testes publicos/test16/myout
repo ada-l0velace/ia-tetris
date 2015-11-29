@@ -1,1 +1,4 @@
+;;; Teste 16 E2
+;;; procura profundidade primeiro num problema alternativo ao jogo do tetris, a implementacao da procura-pp deve ser independente do problema de procura
+;;deve retornar uma lista de accoes (ver ficheiro output)
 (RIGHT LEFT RIGHT)
