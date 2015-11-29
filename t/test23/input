@@ -9,5 +9,5 @@
 (ignore-value (setf e1 (make-estado :tabuleiro (array->tabuleiro a1) :pecas-por-colocar p1 :pontos 0 :pecas-colocadas '())))
 ;; retorna IGNORE
 (ignore-value (setf r1 (procura-best a1 p1)))
-;; retorna ate 900
-(<= 900 (executa-jogadas e1 r1 NIL))
+;; retorna ate 100
+(<= 100 (executa-jogadas e1 r1 NIL))
