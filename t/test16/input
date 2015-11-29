@@ -1,4 +1,4 @@
-;; Teste 00 - Basicamente uma copia do test do mooshak
+;; Teste 16 - Basicamente uma copia do test do mooshak
 ;; retorna IGNORE
 (ignore-value (setf a1 '#2A((T T T T T NIL T T T T)(T T T T T NIL NIL T T T)(T T T T T NIL NIL NIL T T)(T T T T NIL NIL NIL NIL NIL NIL)(T NIL NIL NIL NIL NIL NIL NIL NIL NIL)(T NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)(NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL))))
 ;; retorna IGNORE
@@ -9,5 +9,5 @@
 (ignore-value (setf e1 (make-estado :tabuleiro (array->tabuleiro a1) :pecas-por-colocar p1 :pontos 0 :pecas-colocadas '())))
 ;; retorna IGNORE
 (ignore-value (setf r1 (procura-best a1 p1)))
-;; retorna pelo menos 500
-(>= 500 (executa-jogadas e1 r1 NIL))
+;; retorna ate 500
+(<= 500 (executa-jogadas e1 r1 NIL))
