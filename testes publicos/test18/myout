@@ -1,8 +1,0 @@
-;;; Teste 18 E2
-;;; procura A* num tabuleiro vazio. Nao e possivel fazer nenhuma linha, por isso aqui testamos apenas se trabalham com a lista de abertos/fronteira de acordo com a ordem especificada
-;;deve retornar IGNORE
-IGNORE
-;;deve retornar uma lista de accoes (ver ficheiro output)
-((8 . #2A((NIL T) (T T) (NIL T))) (8 . #2A((NIL T) (T T) (T NIL))))
-;;deve retornar uma lista de accoes (ver ficheiro output)
-((0 . #2A((T T) (T NIL) (T NIL))) (6 . #2A((T T T T))))
