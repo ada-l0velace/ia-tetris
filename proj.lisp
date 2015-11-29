@@ -12,13 +12,18 @@
 
 
 ;; Tipo tabuleiro
-
+;; tab - array do tabuleiro 1 dimensao cada numero na base decimal corresponde uma coluna
+;; alturas - array das alturas de cada coluna do tabuleiro
 (defstruct (tabuleiro (:conc-name tr-))
 	tab
 	alturas
 )
 
 ;; Tipo Estado
+;; pontos -
+;; pecas-por-colocar -
+;; pecas-colocadas -
+;; tabuleiro -
 (defstruct (estado 
 	)
 	(pontos 0 :type integer)
@@ -74,12 +79,14 @@
 	(array-dimension peca 0)
 )
 
-;; peca-dimensao-altura: peca --> inteiro
+;; peca-preenchido-p: peca x linha x coluna --> logico
+;; funcao que verifica se uma posicao na peca esta preenchida
 (defun peca-preenchido-p (peca linha coluna)
 	(aref peca linha coluna)
 )
 
-;; peca-tabuleiro-coluna-altura --> inteiro
+;; peca-tabuleiro-coluna-altura peca x tabuleiro x coluna --> inteiro
+;; funcao que calcula qual é a altura maxima no tabuleiro no sito onde a peca vai cair
 (defun peca-tabuleiro-coluna-altura (peca tabuleiro coluna)
 	(let( 
 		(peca-l (peca-dimensao-largura peca))
@@ -796,7 +803,7 @@ T)
 		(* 1.4 (bumpiness estado))
 		;(alturas-zero estado)
 		;(media-alturas estado)
-		(* 1.87 (qualidade estado))
+		;(* 1.87 (qualidade estado))
 		(* 4.79 (buracos estado))
 	)
 )
@@ -873,16 +880,10 @@ T)
 ;; espaco -> Exponencial
 (defun procura-A* (problema heuristica)
 	(let (
-		(solucao (a-star-search 
-			problema
-			(make-node 
-					:estado-actual (problema-estado-inicial problema)
-					:pai NIL
-					:profundidade 0
-					:accao NIL
-					:peso (funcall heuristica (problema-estado-inicial problema)))
-			heuristica
-		)))
+		(solucao (executa-procura 
+			#'a-star-search 
+			problema 
+			heuristica)))
 		(procura-get-solucao solucao))
 )
 
@@ -913,6 +914,10 @@ T)
 	NIL
 )
 
+;; get-hash-accoes: hash-table x estado --> lista accoes
+;; hash-table para guardar as accoes pre calculadas das pecas
+;; so e usada na procura best pois nas outras iria dar problemas nos testes
+;; pois o objectivo e que elas funcionem em todos tipos de problemas
 (defun get-hash-accoes (hash-table estado)
 	(gethash (car (estado-pecas-por-colocar estado)) hash-table) 
 )
@@ -1123,12 +1128,12 @@ T)
 
 
 ;; executa-procura: algoritmo x problema x heuristica (opcional) x b (resto) --> node
-(defun executa-procura (algoritmo problema &optional (heuristica (lambda (a) (declare (ignore a)) 0)) &rest b)
+(defun executa-procura (algoritmo problema &optional (h (lambda (a) (declare (ignore a)) 0)) &rest resto)
 	(apply algoritmo
 		problema
-		(cria-node-inicial problema heuristica)
-		heuristica
-		b
+		(cria-node-inicial problema h)
+		h
+		resto
 	)
 )
 
@@ -1159,6 +1164,7 @@ T)
 )
 ;;; Insere um no na lista ordenado por no-peso
 ;;; insere-lista: lista x node --> {}
+;; complexidade: O(n)
 (defun insere-lista (lista node)
 	(cond ((null lista)(list node))
 		((< (node-peso node) (node-peso (car lista)))
@@ -1243,7 +1249,7 @@ T)
 
 ;; extract-min: heap --> node
 ;; recebe um heap e retorna o node com o peso mais pequeno no heap e reajusta os nodes
-;; complexidade log(n)
+;; complexidade: O(log(n))
 (defun extract-min (heap)
   (let ((array (bin-heap-array heap))
 	(node (aref (bin-heap-array heap) 0)))

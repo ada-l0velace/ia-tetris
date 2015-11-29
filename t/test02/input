@@ -1,0 +1,5 @@
+(ignore-value (setf a2 (tabuleiro->array (cria-tabuleiro))))
+(ignore-value (setf p1 '(i i i i i i)))
+(ignore-value (setf e1 (make-estado :tabuleiro (array->tabuleiro a2) :pecas-por-colocar p1 :pontos 0 :pecas-colocadas '())))
+(time (setf r1 (procura-best a2 p1)))
+(executa-jogadas e1 r1)

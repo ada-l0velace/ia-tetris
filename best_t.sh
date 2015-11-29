@@ -2,7 +2,7 @@
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
-DIR_TESTS='testes publicos'
+DIR_TESTS='t'
 
 function run_tests {
 	mytime="$( TIMEFORMAT='%lU'; time ( clisp run-test.fas < "${DIR_TESTS}/test$1/input" > "${DIR_TESTS}/test$d/myout" ) 2>&1 1>/dev/null )"	
@@ -21,7 +21,7 @@ echo "$FILE_NAME $APPEND" > run-test.lisp
 compile="$(clisp -q -c run-test.lisp 2>&1 1>/dev/null)"
 if [ "$compile" == "0 errors, 0 warnings" ]; then
 	printf "${GREEN} $compile ${NC}\n\n"
-	for d in {01..29}; do
+	for d in 00; do
 		run_tests $d
 	done
 else
@@ -30,18 +30,3 @@ fi
 rm -f run-test.lisp
 rm -f run-test.fas
 rm -f run-test.lib
-
-
-#for i in **testes/*.lisp; do 
-#	if [ "$i" != "testes/teste06.lisp" ] ; then
-#		eval "clisp $i >> ${i::-4}myout"
-#	fi
-#done
-
-#for i in **testes/*.out; do
-#	if ! diff "$i" "${i::-3}myout" > /dev/null ; then
-#	  printf "${RED}Test $i failed ${NC}\n"
-#	else
-#		printf "${GREEN} ${i::-3}lisp passed ${NC}\n"
-#	fi
-#done
