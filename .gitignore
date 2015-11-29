@@ -1,4 +1,4 @@
-\*myout
+/**\*myout
 *.FASL
 *.fasl
 *.lisp-temp
