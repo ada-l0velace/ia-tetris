@@ -21,7 +21,7 @@ echo "$FILE_NAME $APPEND" > run-test.lisp
 compile="$(clisp -q -c run-test.lisp 2>&1 1>/dev/null)"
 if [ "$compile" == "0 errors, 0 warnings" ]; then
 	printf "${GREEN} $compile ${NC}\n\n"
-	for d in {00..03} {10..16}; do
+	for d in {00..02} {10..16}; do
 		run_tests $d
 	done
 else
