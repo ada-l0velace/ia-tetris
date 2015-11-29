@@ -1,4 +1,8 @@
-t/**\*myout
+/*
+
+!.gitignore
+!\*myout
+!/t/
 *.FASL
 *.fasl
 *.lisp-temp
