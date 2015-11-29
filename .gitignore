@@ -1,6 +1,4 @@
-!t/.gitignore
-!t/*out
-!t/*input
+\*myout
 *.FASL
 *.fasl
 *.lisp-temp
