@@ -803,7 +803,7 @@ T)
 		(* 1.4 (bumpiness estado))
 		;(alturas-zero estado)
 		;(media-alturas estado)
-		;(* 1.87 (qualidade estado))
+		(* 1.87 (qualidade estado))
 		(* 4.79 (buracos estado))
 	)
 )
@@ -926,8 +926,8 @@ T)
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #' (lambda (x) (declare (ignore x))0)))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'qualidade))
 
-		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade))
-		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-ultimas-pecas))
+		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade))
+		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-ultimas-pecas))
 		(solucao NIL))
 		(loop for peca in (list 'i 'l 'j 'o 's 'z 't) do
 			(setf (gethash peca *hash-accoes*) (accoes (make-estado :pontos 0 :pecas-por-colocar (list peca) :pecas-colocadas '() :tabuleiro (cria-tabuleiro))))
@@ -1197,30 +1197,39 @@ T)
 
 ;(declaim (inline parent left right %make-node))
 
+;; parent: key --> inteiro
+;; devolve a key imutavel coorespondente ao pai
 (defun parent (k)
   (declare (type array-index k))
   (floor (1- k) 2))
 
+;; parent: key --> inteiro
+;; devolve a key imutavel coorespondente ao filho da esquerda
 (defun left (k)
   (declare (type (integer 0 #.(floor array-dimension-limit 2)) k))
   (1+ (* k 2)))
 
+;; parent: key --> inteiro
+;; devolve a key imutavel coorespondente ao filho da direita
 (defun right (k)
   (declare (type (integer 0 #.(floor array-dimension-limit 2)) k))
   (* (1+ k) 2))
 
 ;; peek-min: heap --> node
+;; recebe um heap e devolve o node com o peso mais pequeno
 (defun peek-min (heap)
   (let ((node (aref (bin-heap-array heap) 0)))
     (values (node_bh-data node)
             (node_bh-key node))))
 
 ;; peek-min: heap --> bh-node
+;; recebe um heap e devolve o binary heap node com o peso mais pequeno
 (defun peek-min-node (heap)
   (let ((node (aref (bin-heap-array heap) 0)))
     node))
 
-;; peek-min: heap x node --> logico
+;; heap-contains: heap x node --> logico
+;; verifica se este node esta contido no heap
 (defun heap-contains (heap node)
 	(if (< (node_bh-index node) (heap-size heap))
 		(equalp 
@@ -1232,10 +1241,12 @@ T)
 )
 
 ;; clear-heap: heap --> {}
+;; apaga todos os nodes do min-heap
 (defun clear-heap (heap)
   (setf (fill-pointer (bin-heap-array heap)) 0))
 
 ;; empty-p: heap --> logico
+;; verifica se um heap esta vazio ou nao
 (defun empty-p (heap)
   (zerop (fill-pointer (bin-heap-array heap))))
 
@@ -1259,14 +1270,16 @@ T)
             (node_bh-key node))))
 
 ;; swap-nodes: array x inteiro x inteiro --> {}
-;;
-;; 
+;; troca o node no indice i pelo node do indice j fazendo a rotacao necessaria
 (defun swap-nodes (array i j)
   (declare (type array-index i j))
   (setf (node_bh-index (aref array i)) j
         (node_bh-index (aref array j)) i)
   (rotatef (aref array i) (aref array j)))
 
+;; sink: array x index --> {}
+;; recebe um array e o indice modificando o array reajustado-o
+;; depois de um node ser removido e percorrida esta funcao para reajustar os nodes do heap
 (defun sink (array index)
   (let ((maxindex (1- (length array))))
     (if (zerop maxindex)
@@ -1288,6 +1301,9 @@ T)
                 (swap-nodes array i j)
               finally (return array)))))
 
+;; percolate-up: array index --> {}
+;; recebe um array e um indice e modifica o array reajustando-o os nos
+;; depois de um node ser adicionado e' percorrida esta funcao para reajustar os nodes do heap
 (defun perlocate-up (array vindex)
   (loop for index = vindex then parent
         for parent = (parent index)
@@ -1297,6 +1313,9 @@ T)
         do (swap-nodes array index parent) 
         finally (return (aref array index))))
 
+;; insert_heap: heap x peso x node --> {}
+;; insere um no' num heap de forma ordenada, nao retorna nada
+;; complexidade: O(log(n))
 (defun insert_heap (heap key data)
   (let ((node (%make-node_bh key data 0))
         (array (bin-heap-array heap)))

@@ -1,5 +1,12 @@
+;; retorna IGNORE
 (ignore-value (setf a2 (tabuleiro->array (cria-tabuleiro))))
+;; retorna IGNORE
 (ignore-value (setf p1 '(i i i i i i)))
+;; retorna IGNORE
 (ignore-value (setf e1 (make-estado :tabuleiro (array->tabuleiro a2) :pecas-por-colocar p1 :pontos 0 :pecas-colocadas '())))
-(time (setf r1 (procura-best a2 p1)))
-(executa-jogadas e1 r1)
+;; retorna IGNORE
+(ignore-value (setf r1 (procura-best a2 p1)))
+;; retorna pelo menos 400
+(>= 400 (executa-jogadas e1 r1 NIL))
+;; pontos
+(executa-jogadas e1 r1 NIL)
