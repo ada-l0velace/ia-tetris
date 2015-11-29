@@ -18,7 +18,7 @@ sed "1s/^/(defconstant peca-i0 (make-array (list 4 1) :initial-element T)) (defc
 APPEND="(loop (let ((line (read-line *standard-input* NIL))) (when (not line) (return)) (if (equal #\; (char (string-trim \" \" line) 0)) (format T \"~A~%\" line) (let ((result (multiple-value-list (eval (read-from-string line))))) (format T \"~A\" (first result)) (dolist (other-value (rest result)) (format T \"; ~A\" other-value)) (format T \"~%\")))))"
 FILE_NAME="$(cat run-test.lisp)"
 echo "$FILE_NAME $APPEND" > run-test.lisp
-compile="$(clisp -q -C -c run-test.lisp 2>&1 1>/dev/null)"
+compile="$(clisp -q -c run-test.lisp 2>&1 1>/dev/null)"
 if [ "$compile" == "0 errors, 0 warnings" ]; then
 	printf "${GREEN} $compile ${NC}\n\n"
 	for d in {01..29}; do

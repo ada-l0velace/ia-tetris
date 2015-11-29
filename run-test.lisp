@@ -501,11 +501,13 @@ T)
 
 ;; array->tabuleiro: array --> tabuleiro
 ;; este transformador de saida recebe um array e controi um novo tabuleiro com o conteudo do array recebido e
-;; devolve um tabuleiro 
+;; devolve um tabuleiro
+;; infelizmente devia a uma falha nos testes feitos pela cadeira e necessario verificar o rank de array recebido
+;; devido ao nosso array tabuleiro ter apenas uma dimensao 
 (defun array->tabuleiro (array)
 	(let (
 		(new-tabuleiro (cria-tabuleiro))
-			(rank (array-rank array))
+		(rank (array-rank array))
 	)
 
     (loop for i from 0 below *dim-linhas* do
@@ -1131,39 +1133,6 @@ T)
 	)
 )
 
-; (defun compute-best-fit (problema node)
-; 	(let ((accoes (funcall (problema-accoes problema) (node-estado-actual node)))
-; 		(postfits1 (funcall (problema-accoes problema) (node-estado-actual node)))
-; 		(postfits2 (funcall (problema-accoes problema) (node-estado-actual node)))
-; 		(scores (make-array (list (length postfits1) * (length postfits2)) :initial-element 0.0))
-; 		)
-
-; 		(loop for i from 0 below (length postfits1) do
-; 			(loop for j from 0 below (length postfits1) do
-
-; 			)
-; 		)
-; 		(setf max (mapcar (problema-resultado problema) 
-; 		  	(make-list (length accoes) :initial-element (node-estado-actual node))  
-; 		  		postfits1))
-; 		(setf max1 (mapcar (problema-resultado problema) 
-; 		  	(make-list (length accoes) :initial-element (node-estado-actual node))  
-; 		  		postfits1))
-; 		(mapcar (problema-resultado problema) 
-; 		  	(make-list (length accoes) :initial-element (node-estado-actual node))  
-; 		  		postfits2))
-; 		 ; (mapcar (problema-resultado problema) 
-		 	
-; 		 ; 	postfits2)
-		 
-		
-; 		(setf accoes value)
-; 		(format T "~d~c" postfits1 #\linefeed)
-
-; 	)
-
-; )
-
 ;; procura-get-solucao: node --> lista accoes
 ;; recebe um node goal e faz o backtrace da solucao retornando a lista de accoes
 (defun procura-get-solucao (solucao)
@@ -1183,29 +1152,30 @@ T)
 ;;;;;;;;;;;;;Priority Queues;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;;;;;;;;;;;;;listaS ordenada;;;;;;;;;;;;;;;;
-;;; SELECT-BEST chooses a node in step 3... 
-(defun select-best (lst)
-	(first lst)
+;;;;;;;;;;;;;lista ordenada;;;;;;;;;;;;;;;;
+;;; seleciona-melhor: lista -> node 
+;;; devolve o primeiro no da lista que corresponde ao no com o menor peso... 
+(defun seleciona-melhor (lista)
+	(car lista)
 )
-;;; INSERT puts NODE onto LST, which is ordered
-;;; by FVALUE.
-(defun insert_lst (node lst)
-	(cond ((null lst)(list node))
-		((< (node-peso node) (node-peso (first lst)))
-			(cons node lst))
+;;; Insere um no na lista ordenado por no-peso
+;;; insere-lista: lista x node --> {}
+(defun insere-lista (lista node)
+	(cond ((null lista)(list node))
+		((< (node-peso node) (node-peso (car lista)))
+			(cons node lista))
 		(t 
-			(cons (first lst) (insert_lst node (rest lst))))
+			(cons (car lista) (insere-lista node (cdr lista))))
 	)
 )	
 
 ;;;;;;;;;;;;;binary min-heap;;;;;;;;;;;;;;;; 
-(deftype array-index () `(integer 0 ,(1- array-dimension-limit)))
 
+(deftype array-index () `(integer 0 ,(1- array-dimension-limit)))
 (defconstant +initial-size+ 50 "initial queue vector size")
 
 
-
+;; node binary heap
 (defstruct (node_bh (:constructor %make-node_bh (key data index)))
   (key 0 )
   (index 0 :type array-index)
