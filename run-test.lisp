@@ -897,7 +897,7 @@ T)
 		(new-node NIL)
 		)
 		(insert_heap open (node-peso node) node)
-		(loop while (> (heap-size open) 0) do
+		(loop while (not (empty-p open)) do
 			(setf current (extract-min open))
 			(if (funcall (problema-solucao problema) (node-estado-actual current))
 				(return-from a-star-search current)
@@ -1207,15 +1207,18 @@ T)
   (declare (type (integer 0 #.(floor array-dimension-limit 2)) k))
   (* (1+ k) 2))
 
+;; peek-min: heap --> node
 (defun peek-min (heap)
   (let ((node (aref (bin-heap-array heap) 0)))
     (values (node_bh-data node)
             (node_bh-key node))))
+
+;; peek-min: heap --> bh-node
 (defun peek-min-node (heap)
   (let ((node (aref (bin-heap-array heap) 0)))
     node))
 
-
+;; peek-min: heap x node --> logico
 (defun heap-contains (heap node)
 	(if (< (node_bh-index node) (heap-size heap))
 		(equalp 
@@ -1226,12 +1229,15 @@ T)
 	)
 )
 
+;; clear-heap: heap --> {}
 (defun clear-heap (heap)
   (setf (fill-pointer (bin-heap-array heap)) 0))
 
+;; empty-p: heap --> logico
 (defun empty-p (heap)
   (zerop (fill-pointer (bin-heap-array heap))))
 
+;; heap-size: heap --> inteiro
 (defun heap-size (heap)
   (length (bin-heap-array heap)))
 
