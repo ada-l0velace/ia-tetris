@@ -125,7 +125,7 @@
 ;; peca-pontos-maximo: lista x pecas --> inteiro
 ;; funcao que recebe uma lista de pecas e retorna um inteiro correspondente ao valor total de pontos
 ;; da ultima peca jogada no tabuleiro
-(defun pecas-pontos-maximo2 (pecas)
+(defun pecas-pontos-maximo-limitado (pecas)
 	(let (
 		(total 0)
 		(limit 0)
@@ -773,24 +773,13 @@ T)
 	(tabuleiro-bumpiness (estado-tabuleiro estado))
 )
 
-;; custo-oportunidade3: estado --> inteiro
+;; custo-ultimas-pecas: estado --> inteiro
 ;; calcula o desperdicio de pontos da ultima peca jogada no tabuleiro
-(defun custo-oportunidade3 (estado)
+(defun custo-ultimas-pecas (estado)
 	(* 1 (-  
-	 	(pecas-pontos-maximo2 (estado-pecas-colocadas estado))
+	 	(pecas-pontos-maximo-limitado (estado-pecas-colocadas estado))
 	 	(estado-pontos estado)
 	))
-)
-;; custo-oportunidade2: estado --> inteiro
-;; des
-(defun custo-oportunidade2 (estado) ; assume que todas as pecas teem 4 blocos
-	(-  
-		(*
-			(/ (length (estado-pecas-colocadas estado)) *dim-colunas*)
-			(pontos 4)
-		)
-		(estado-pontos estado)
-	)
 )
 
 ;; heuristicas: estado --> inteiro
@@ -933,7 +922,8 @@ T)
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #' (lambda (x) (declare (ignore x))0)))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'qualidade))
 
-		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade3))
+		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade))
+		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-ultimas-pecas))
 		(solucao NIL))
 		(loop for peca in (list 'i 'l 'j 'o 's 'z 't) do
 			(setf (gethash peca *hash-accoes*) (accoes (make-estado :pontos 0 :pecas-por-colocar (list peca) :pecas-colocadas '() :tabuleiro (cria-tabuleiro))))
