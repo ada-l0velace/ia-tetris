@@ -809,10 +809,7 @@ T)
 )
 
 (defun bool-converter (flag)
-	(if flag
-		1
-		0
-	)
+	(if flag 1 0)
 )
 
 ;; problema: tabuleiro x lista x funcao --> problema
@@ -986,8 +983,8 @@ T)
 )
 
 ;; best-first-search: problema x node x heuristica x hash-table -> node
-;; funcao auxiliar da procura-pp procura o node goal e constroi a solucao para depois
-;; fazer backtrace da solucao na funcao procura-pp
+;; funcao auxiliar da procura-best procura o node goal e constroi a solucao para depois
+;; fazer backtrace da solucao na funcao procura-best
 (defun best-first-search (problema node heuristica hash-accoes)
 	(let ((open (make-instance 'binary-heap))
 		(current NIL)
@@ -996,7 +993,7 @@ T)
 		)
 		
 		(insert_heap open (node-peso node) node)
-		(loop while (> (heap-size open) 0) do
+		(loop while (not (empty-p open)) do
 			(setf current (extract-min open))
 			(if (funcall (problema-solucao problema) (node-estado-actual current))
 				(return-from best-first-search current)
