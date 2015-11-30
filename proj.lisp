@@ -888,7 +888,7 @@ T)
 		;(alturas-zero estado)
 		;(media-alturas estado)
 		(* 2.68 (qualidade estado))
-		(* 2.79 (buracos estado))
+		(* 20 (buracos estado))
 	)
 )
 
