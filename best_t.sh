@@ -24,10 +24,10 @@ if [ "$asciichars" != "" ]; then
 	printf "${RED} The file contains ascii characters in here: ${NC}\n"
 	grep --color='auto' -P -n "[\x80-\xFF]" run-test.lisp
 else
-	compile="$(clisp -q -c run-test.lisp 2>&1 1>/dev/null)"
+	compile="$(clisp -q -c run-test.lisp utils.lisp 2>&1 1>/dev/null)"
 	if [ "$compile" == "0 errors, 0 warnings" ]; then
 		printf "${GREEN} $compile ${NC}\n\n"
-		for d in {10..23}; do
+		for d in {00..02} {10..24}; do
 			run_tests $d
 		done
 	else

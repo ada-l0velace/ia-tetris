@@ -256,10 +256,7 @@
 ;; correspondente ao numero da coluna e devolve o valor logico verdade se a posicao estiver preenchida
 ;; e falso caso contrario 
 (defun tabuleiro-preenchido-p (tabuleiro linha coluna)
-	(if (> (logbit (aref (tr-tab tabuleiro) linha) (- (1- *dim-colunas*) coluna)) 0)
-		T
-		NIL
-	)
+	(not (eq (logand (aref (tr-tab tabuleiro) linha) (aref *tabuleiro-mascaras* coluna)) 0))
 )
 
 ;; tabuleiro-calcula-altura: tabuleiro x coluna x topo --> inteiro
@@ -302,6 +299,24 @@ T)
 ;; calcula a soma das alturas todas para usar nas procuras informadas como heuristica
 (defun tabuleiro-altura-agregada (tabuleiro)
 	(reduce #' + (tr-alturas tabuleiro))
+)
+
+(defun list-of-bits (integer)
+  (let ((bits '()))
+    (dotimes (index (integer-length integer) bits)
+      (push (if (logbitp index integer) 1 0) bits))))
+
+(defun tabuleiro-espacos-livres (tabuleiro)
+	(let (
+		(espacos 0)
+		)
+
+		(loop for linha downfrom (1- *dim-linhas*) downto 0 do
+ 			(when (null (tabuleiro-linha-completa-p tabuleiro linha))
+				(incf espacos (reduce #'+ (list-of-bits (tabuleiro-linha-p tabuleiro linha))))
+			)
+		)
+	espacos)
 )
 
 ;; tabuleiro-bumpiness: tabuleiro --> inteiro
@@ -452,11 +467,11 @@ T)
 		(loop while 
 			(and 
 				(< min-y *dim-linhas*) 
-				(eq (tabuleiro-linha-p tabuleiro min-y) *grid-mask*)
+				(eq (tabuleiro-linha-p tabuleiro min-y) 0)
 			) do 
 			(incf min-y)
 		)
-		;(format T "~d~c" grid-mask #\linefeed)
+		;(format T "~d~c" (grid-mask #\linefeed)
 		(loop for y from min-y below *dim-linhas* do
 			(setf line (tabuleiro-linha-p tabuleiro y))
 			(setf filled (logand (lognot line) *grid-mask*))
@@ -468,17 +483,54 @@ T)
 			(setf r-neighbor-mask (logior r-neighbor-mask (ash filled -1)))
 			;(format T "~d~c" (integer-length (logand r-neighbor-mask line)) #\linefeed)
 			(incf found-holes 
+				(*
 				(+
-					(integer-length (logand under-mask line))
-					(integer-length (logand l-neighbor-mask line))
-					(integer-length (logand r-neighbor-mask line))
+					(logcount (logand under-mask line))
+					(logcount (logand l-neighbor-mask line))
+					(logcount (logand r-neighbor-mask line))
+				)
+				10
 				)
 			)
 		)
 	found-holes)
 )
 
-
+(defun tabuleiro-transicoes-linhas (tabuleiro)
+	(let (
+		(transicoes-l 0)
+		(solid-found NIL)
+		(solid T)
+		(transicoes 0)
+		)
+		(loop for i from 0 below *dim-linhas* do
+			(setf solid-found NIL)
+			(setf solid T)
+			(setf transicoes 0)
+			(loop for j from 0 below (1+ *dim-colunas*) do
+				(if (eq j *dim-colunas*)
+					(when (null solid)
+						(incf transicoes)
+					)
+					(if (null (tabuleiro-preenchido-p tabuleiro i j))
+						(when solid
+							(setf solid NIL)
+							(incf transicoes))
+						(progn
+							(setf solid-found T)
+							(when (null solid)
+								(setf solid T)
+								(incf transicoes))
+						)
+					)
+				)
+			)
+			(when solid-found
+				(incf transicoes-l transicoes))	
+		)
+	transicoes-l)
+)
+ 
 ;; tabuleiro-remove-linha!: tabuleiro x inteiro --> {}
 ;; este modificador recebe um tabuleiro, um inteiro correspondente ao numero linha, e altera
 ;; o tabuleiro recebido removendo essa linha do tabuleiro, e fazendo com que as linhas por cima
@@ -504,6 +556,14 @@ T)
 (defun tabuleiros-iguais-p (tabuleiro tabuleiro1)
 	(equalp tabuleiro tabuleiro1)	
 )
+
+(defun tabuleiro-vazio-p (tabuleiro)
+	(loop for linha from 0 below (1- *dim-linhas*) do
+		(when (> (tabuleiro-linha-p tabuleiro linha) 0)
+			(return-from tabuleiro-vazio-p NIL)
+		) 
+	)
+T)
 
 ;; array->tabuleiro: array --> tabuleiro
 ;; este transformador de saida recebe um array e controi um novo tabuleiro com o conteudo do array recebido e
@@ -761,6 +821,16 @@ T)
 	)
 )
 
+(defun linhas-transicoes (estado)
+	(tabuleiro-transicoes-linhas (estado-tabuleiro estado))
+)
+
+;; media-alturas: estado --> float
+;; heuristica correspondente a media das alturas totais (objectivo minimizar)
+(defun max-alturas (estado)
+	(reduce #'max (tr-alturas (estado-tabuleiro estado)))
+ )
+
 ;; linhas-completas: estado --> inteiro
 ;; heuristica correspondente ao numero de linhas completas no tabuleiro (objectivo minimizar)
 ;; (objectivo minimizar)
@@ -791,6 +861,10 @@ T)
 	))
 )
 
+(defun espacos-livres (estado)
+	(tabuleiro-espacos-livres (estado-tabuleiro estado))
+)
+
 ;; heuristicas: estado --> inteiro
 ;; funcao que recebe um estado e retorna um inteiro correspondente a soma de todas as heuristicas
 ;; ou seja o valor correspondente a f(node)
@@ -798,13 +872,16 @@ T)
 	(+ 
 		;(linhas-completas estado)
 		;(custo-oportunidade3 estado)
-		;(max-alturas estado)
-		(* 3.71 (altura-agregada estado))
-		(* 1.4 (bumpiness estado))
+		;(* 4 (max-alturas estado))
+		(* 2.11 (altura-agregada estado))
+		(* 3.4 (bumpiness estado))
+		;(* 0.5 (espacos-livres estado))
+		;(* 1 (linhas-transicoes estado))
+		;(* 2 ())
 		;(alturas-zero estado)
 		;(media-alturas estado)
-		(* 1.87 (qualidade estado))
-		;(* 4.79 (buracos estado))
+		(* 2.68 (qualidade estado))
+		(* 2.79 (buracos estado))
 	)
 )
 
@@ -933,48 +1010,18 @@ T)
 			(setf (gethash peca *hash-accoes*) (accoes (make-estado :pontos 0 :pecas-por-colocar (list peca) :pecas-colocadas '() :tabuleiro (cria-tabuleiro))))
 		)
 		(cond 
-			((< (length pecas-por-colocar) 10)
+			((not (tabuleiro-vazio-p tabuleiro))
 				(setf solucao (executa-procura #'best-first-search problema #'heuristicas *hash-accoes*)))
-			((> (length pecas-por-colocar) 10) 
-				(setf solucao (executa-procura #'greedy-search problema #'heuristicas *hash-accoes*)))
-			((> (length pecas-por-colocar) 10) 
+			((< (length pecas-por-colocar) 10) 
+				(setf problema (formulacao-problema tabuleiro pecas-por-colocar #' (lambda (x) (declare (ignore x))0)))
+				(setf solucao (executa-procura #'best-first-search problema #'heuristicas *hash-accoes*)))
+			((< (length pecas-por-colocar) 10) 
 				(setf solucao (executa-procura #'ida_star_search problema #'heuristicas)))
 			(t 
 				(setf solucao (executa-procura #'recursive-best-first-search problema #'heuristicas *hash-accoes* MOST-POSITIVE-FIXNUM)))	
 		)
 		(procura-get-solucao solucao)
 	)
-)
-
-;; greedy-search: problema x node x heuristica --> node
-(defun greedy-search (problema node heuristica hash-accoes)
-	(let (
-			(accoes (get-hash-accoes hash-accoes (node-estado-actual node)))
-			(score NIL)
-			(best-score NIL)
-		)
-		(if (funcall (problema-solucao problema) (node-estado-actual node))
-			(return-from greedy-search node)
-		)
-		(loop while (not (null accoes)) do
-			(setf score (cria-node-filho problema node (car accoes) heuristica))
-			(if (null (cdr accoes))
-			  	(setf score (greedy-search problema score heuristica hash-accoes))	 	
-			)
-			(if (funcall (problema-solucao problema) (node-estado-actual score))
-				(return-from greedy-search score)
-			)
-			(if (eq best-score NIL)
-				(setf best-score score)
-				(if (not (null score))
-					(if (< (node-peso score) (node-peso best-score))
-						(setf best-score score)
-					)
-				)
-			)	
-			(setf accoes (cdr accoes))
-		)
-	NIL)
 )
 
 ;; best-first-search: problema x node x heuristica x hash-table -> node
@@ -990,7 +1037,7 @@ T)
 		(insert_heap open (node-peso node) node)
 		(loop while (not (empty-p open)) do
 			(setf current (extract-min open))
-			(if (funcall (problema-solucao problema) (node-estado-actual current))
+			(when (funcall (problema-solucao problema) (node-estado-actual current))
 				(return-from best-first-search current)
 			)
 			(if (estado-final-p (node-estado-actual current))
