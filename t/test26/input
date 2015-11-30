@@ -1,0 +1,14 @@
+;; Teste 26 - Basicamente uma copia do test do mooshak
+;; retorna IGNORE
+(ignore-value #2A((T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)))
+;; retorna IGNORE
+(ignore-value (setf a2 (tabuleiro->array (cria-tabuleiro))))
+;; retorna IGNORE
+(ignore-value (setf p1 '(l j z s l i)))
+;; retorna IGNORE
+(ignore-value (setf e1 (make-estado :tabuleiro (array->tabuleiro a1) :pecas-por-colocar p1 :pontos 0 :pecas-colocadas '())))
+;; retorna IGNORE
+(ignore-value (setf r1 (procura-best a1 p1)))
+;; retorna ate 1300
+(<= 1300 (executa-jogadas e1 r1 NIL))
+;; o outro grupo fez 0.446s
