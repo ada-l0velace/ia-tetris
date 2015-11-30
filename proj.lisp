@@ -139,7 +139,7 @@
 		)
 		(block break
 			(loop for peca in pecas do
-				(if (eq limit 2)
+				(if (eq limit 1)
 					(return-from break)
 				)
 				(incf total (peca-pontos-maximo peca))
@@ -494,41 +494,6 @@ T)
 		)
 	found-holes)
 )
-
-(defun tabuleiro-transicoes-linhas (tabuleiro)
-	(let (
-		(transicoes-l 0)
-		(solid-found NIL)
-		(solid T)
-		(transicoes 0)
-		)
-		(loop for i from 0 below *dim-linhas* do
-			(setf solid-found NIL)
-			(setf solid T)
-			(setf transicoes 0)
-			(loop for j from 0 below (1+ *dim-colunas*) do
-				(if (eq j *dim-colunas*)
-					(when (null solid)
-						(incf transicoes)
-					)
-					(if (null (tabuleiro-preenchido-p tabuleiro i j))
-						(when solid
-							(setf solid NIL)
-							(incf transicoes))
-						(progn
-							(setf solid-found T)
-							(when (null solid)
-								(setf solid T)
-								(incf transicoes))
-						)
-					)
-				)
-			)
-			(when solid-found
-				(incf transicoes-l transicoes))	
-		)
-	transicoes-l)
-)
  
 ;; tabuleiro-remove-linha!: tabuleiro x inteiro --> {}
 ;; este modificador recebe um tabuleiro, um inteiro correspondente ao numero linha, e altera
@@ -829,10 +794,6 @@ T)
 	)
 )
 
-(defun linhas-transicoes (estado)
-	(tabuleiro-transicoes-linhas (estado-tabuleiro estado))
-)
-
 ;; media-alturas: estado --> float
 ;; heuristica correspondente a media das alturas totais (objectivo minimizar)
 (defun max-alturas (estado)
@@ -883,11 +844,11 @@ T)
 		;(* 4 (max-alturas estado))
 		(* 2.11 (altura-agregada estado))
 		(* 3.4 (bumpiness estado))
-		;(* 0.5 (espacos-livres estado))
+		;(* 5.5 (espacos-livres estado))
 		;(* 1 (linhas-transicoes estado))
 		;(alturas-zero estado)
 		;(media-alturas estado)
-		(* 2.68 (qualidade estado))
+		(* 2.38 (qualidade estado))
 		(* 20 (buracos estado))
 	)
 )
@@ -1059,6 +1020,9 @@ T)
 )
 
 ;; recursive-best-first-search: problema x node x heuristica x bound --> node
+;; implementamos este algoritmo mas nao utilizamos na nossa funcao best e mais lento
+;; que o proprio A-star mas poupa imensa memoria vai ser usado para testar testes
+;; para o relatorio
 (defun recursive-best-first-search (problema node heuristica hash-accoes bound)
 	(let (
 		(accoes 
@@ -1115,6 +1079,11 @@ T)
 	)
 )
 
+
+;; search-ida: problema x node x g x bound heuristica --> node
+;; implementamos este algoritmo mas nao utilizamos na nossa funcao best e mais lento
+;; que o proprio A-star mas poupa imensa memoria vai ser usado para testar testes
+;; para o relatorio
 (defun search-ida (problema node g bound heuristica)
 	(let (
 		(f g)
@@ -1153,7 +1122,11 @@ T)
 	min)
 )
 
-(defun ida_star_search (problema node heuristica)
+;; ida-star-search: problema x node x heuristica --> lista de accoes
+;; implementamos este algoritmo mas nao utilizamos na nossa funcao best e mais lento
+;; que o proprio A-star mas poupa imensa memoria vai ser usado para testar testes
+;; para o relatorio
+(defun ida-star-search (problema node heuristica)
 	(let (
 		(bound (node-peso node))
 		(solucao NIL)
@@ -1162,7 +1135,7 @@ T)
 		(loop while t do
 			(setf solucao (search-ida problema node 0 bound heuristica))
 			(if (typep solucao 'node)
-				(return-from ida_star_search solucao)
+				(return-from ida-star-search solucao)
 			)
 		)	
 	)
@@ -1172,6 +1145,7 @@ T)
 
 
 ;; executa-procura: algoritmo x problema x heuristica (opcional) x b (resto) --> node
+;; funcao auxiliar par facilitar a execucao de um algoritmo
 (defun executa-procura (algoritmo problema &optional (h (lambda (a) (declare (ignore a)) 0)) &rest resto)
 	(apply algoritmo
 		problema
