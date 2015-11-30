@@ -30,7 +30,7 @@ else
 		# for d in {00..02} {10..32}; do
 		# 	run_tests $d
 		# done
-		for d in {00..02} {10..33}; do
+		for d in {00..02} {10..34}; do
 			run_tests $d
 		done
 	else
