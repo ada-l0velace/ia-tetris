@@ -485,12 +485,10 @@ T)
 			(setf r-neighbor-mask (logior r-neighbor-mask (ash filled -1)))
 			;(format T "~d~c" (integer-length (logand r-neighbor-mask line)) #\linefeed)
 			(incf found-holes 
-				(*
 				(+
 					(logcount (logand under-mask line))
 					(logcount (logand l-neighbor-mask line))
 					(logcount (logand r-neighbor-mask line))
-				)
 				)
 			)
 		)
@@ -575,16 +573,25 @@ T)
 	(let (
 		(new-tabuleiro (cria-tabuleiro))
 		(rank (array-rank array))
+		(col 0)
 	)
 
     (loop for i from 0 below *dim-linhas* do
-		(loop for j from 0 below *dim-colunas* do
-			(if (> rank 1)
-				(when (aref array i j)
-					(tabuleiro-preenche! new-tabuleiro i j)		
-				)
-				(when (> (aref array i) 0)
-					(tabuleiro-preenche! new-tabuleiro i j)		
+		(when (> rank 1)
+			(loop for j from 0 below *dim-colunas* do
+					(when (aref array i j)
+						(tabuleiro-preenche! new-tabuleiro i j)		
+					)	
+			)
+		)
+		(when (eq rank 1)
+			(setf col 0)
+			(when (> (aref array i) 0)
+				(loop for bit in (list-of-bits (aref array i)) do
+					(when (eq bit 1)
+						(tabuleiro-preenche! new-tabuleiro i col)
+					)
+					(incf col)		
 				)
 			)
 		)
@@ -1003,7 +1010,6 @@ T)
 		(tabuleiro (array->tabuleiro array))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #' (lambda (x) (declare (ignore x))0)))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'qualidade))
-
 		(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-oportunidade))
 		;(problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-ultimas-pecas))
 		(solucao NIL))
@@ -1013,13 +1019,9 @@ T)
 		(cond 
 			((not (tabuleiro-vazio-p tabuleiro))
 				(setf solucao (executa-procura #'best-first-search problema #'heuristicas *hash-accoes*)))
-			((< (length pecas-por-colocar) 10) 
+			(t 
 				(setf problema (formulacao-problema tabuleiro pecas-por-colocar #' (lambda (x) (declare (ignore x))0)))
 				(setf solucao (executa-procura #'best-first-search problema #'heuristicas *hash-accoes*)))
-			((< (length pecas-por-colocar) 10) 
-				(setf solucao (executa-procura #'ida_star_search problema #'heuristicas)))
-			(t 
-				(setf solucao (executa-procura #'recursive-best-first-search problema #'heuristicas *hash-accoes* MOST-POSITIVE-FIXNUM)))	
 		)
 		(procura-get-solucao solucao)
 	)

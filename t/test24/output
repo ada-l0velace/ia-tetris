@@ -9,5 +9,5 @@ IGNORE
 IGNORE
 ;; retorna IGNORE
 IGNORE
-;; retorna ate 100
+;; melhor pontuacao 800 tem de retornar pelo menso 500
 T
