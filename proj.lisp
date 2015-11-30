@@ -5,7 +5,7 @@
 (defparameter *dim-linhas* 18)
 (defparameter *dim-colunas* 10)
 (defparameter *hash-accoes* (make-hash-table))
-(defparameter *grid-mask* (ash 1 *dim-colunas*))
+(defparameter *grid-mask* (1- (ash 1 *dim-colunas*)))
 (defparameter *suppress-check-redefinition* T)
 (defparameter *SUPPRESS-SIMILAR-CONSTANT-REDEFINITION-WARNING* T)
 (defconstant *tabuleiro-mascaras* #(512 256 128 64 32 16 8 4 2 1))
@@ -453,6 +453,8 @@ T)
 ;; tabuleiro-buracos: tabuleiro --> inteiro
 ;; esta funcao recebe um tabuleiro e devolve um inteiro correspondente ao numero de buracos no tabuleiro
 ;; um buraco e definido se houver um espaco vazio e houver pelo menos um bloco na mesma coluna preenchido
+;; #S(TABULEIRO :TAB #(560 608 512 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0) :ALTURAS #(3 0 0 2 2 1 0 0 0 0))
+;; 9 buracos
 (defun tabuleiro-buracos (tabuleiro)
 	(let (
 		(under-mask 0)
@@ -489,7 +491,6 @@ T)
 					(logcount (logand l-neighbor-mask line))
 					(logcount (logand r-neighbor-mask line))
 				)
-				10
 				)
 			)
 		)
