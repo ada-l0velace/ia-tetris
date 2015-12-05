@@ -61,7 +61,7 @@
 )
 
 (defun logbit (integer index)
-		(ldb (byte 1 index) integer))
+	(ldb (byte 1 index) integer))
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;    Tipo peca     ;;
@@ -473,17 +473,13 @@ T)
 			) do 
 			(incf min-y)
 		)
-		;(format T "~d~c" (grid-mask #\linefeed)
+		
 		(loop for y from min-y below *dim-linhas* do
 			(setf line (tabuleiro-linha-p tabuleiro y))
 			(setf filled (logand (lognot line) *grid-mask*))
-			;(format T "~d~c" under-mask #\linefeed)
 			(setf under-mask (logior under-mask filled))
-			;(format T "~d~c" filled #\linefeed)
-			;(format T "~d~c" under-mask #\linefeed)
 			(setf l-neighbor-mask (logior l-neighbor-mask (ash filled 1)))
 			(setf r-neighbor-mask (logior r-neighbor-mask (ash filled -1)))
-			;(format T "~d~c" (integer-length (logand r-neighbor-mask line)) #\linefeed)
 			(incf found-holes 
 				(+
 					(logcount (logand under-mask line))
