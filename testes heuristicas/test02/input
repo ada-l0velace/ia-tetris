@@ -10,4 +10,4 @@
 ;; retorna IGNORE
 (ignore-value (setf r1 (procura-best a1 p1)))
 ;; retorna ate 500
-(<= 500 (executa-jogadas e1 r1 NIL))
+(executa-jogadas e1 r1 NIL)
