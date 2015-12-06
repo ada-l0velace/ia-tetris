@@ -9,3 +9,7 @@
 *.lib
 *.fas
 pedro.bat
+t/test36/input
+t/test36/output
+t/test99/input
+t/test99/output
