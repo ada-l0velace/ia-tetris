@@ -6,8 +6,6 @@
 (defparameter *dim-colunas* 10)
 (defparameter *hash-accoes* (make-hash-table))
 (defparameter *grid-mask* (1- (ash 1 *dim-colunas*)))
-(defparameter *suppress-check-redefinition* T)
-(defparameter *SUPPRESS-SIMILAR-CONSTANT-REDEFINITION-WARNING* T)
 (defconstant *tabuleiro-mascaras* #(512 256 128 64 32 16 8 4 2 1))
 
 
@@ -834,6 +832,7 @@ T)
 ;; funcao que recebe um estado e retorna um inteiro correspondente a soma de todas as heuristicas
 ;; ou seja o valor correspondente a f(node)
 (defun heuristicas(estado)
+	;(declare (ignore estado))
 	(+ 
 		;(linhas-completas estado)
 		;(custo-oportunidade3 estado)
@@ -919,7 +918,7 @@ T)
 (defun procura-A* (problema heuristica)
 	(let (
 		(solucao (executa-procura 
-			#'a-star-search 
+			#'a-star-search
 			problema 
 			heuristica)))
 		(procura-get-solucao solucao))
@@ -929,6 +928,7 @@ T)
 ;; funcao auxiliar da procura-A* procura o node goal e constroi a solucao para depois
 ;; fazer backtrace da solucao na funcao procura-A*
 (defun a-star-search (problema node heuristica)
+
 	(let ((open (make-instance 'binary-heap))
 		(current NIL)
 		(accoes NIL)
@@ -974,7 +974,8 @@ T)
 		)
 		(cond 
 			((not (tabuleiro-vazio-p tabuleiro))
-				(setf solucao (executa-procura #'best-first-search problema #'heuristicas *hash-accoes*)))
+				(setf solucao (executa-procura #'best-first-search problema #'heuristicas)))
+				;(setf solucao (executa-procura #'best-first-search problema #'heuristicas *hash-accoes*)))
 			(t 
 				(setf problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-ultimas-pecas))
 				(setf solucao (executa-procura #'best-first-search problema #'heuristicas *hash-accoes*)))
@@ -983,10 +984,10 @@ T)
 	)
 )
 
-;; best-first-search: problema x node x heuristica x hash-table -> node
+;; best-first-search: problema x node x heuristica -> node
 ;; funcao auxiliar da procura-best procura o node goal e constroi a solucao para depois
 ;; fazer backtrace da solucao na funcao procura-best
-(defun best-first-search (problema node heuristica hash-accoes)
+(defun best-first-search (problema node heuristica)
 	(let ((open (make-instance 'binary-heap))
 		(current NIL)
 		(accoes NIL)
@@ -1001,7 +1002,7 @@ T)
 			)
 			(if (estado-final-p (node-estado-actual current))
 				(setf accoes NIL)
-				(setf accoes (get-hash-accoes hash-accoes (node-estado-actual current)))
+				(setf accoes (get-hash-accoes *hash-accoes* (node-estado-actual current)))
 			)
 			;(setf accoes (funcall (problema-accoes problema) (node-estado-actual current)))
 			(loop for accao in accoes do
@@ -1015,66 +1016,72 @@ T)
 	NIL
 )
 
+(defun procura-RBFS (problema heuristica)
+	(loop for peca in (list 'i 'l 'j 'o 's 'z 't) do
+		(setf (gethash peca *hash-accoes*) (accoes (make-estado :pontos 0 :pecas-por-colocar (list peca) :pecas-colocadas '() :tabuleiro (cria-tabuleiro))))
+	)
+	(let (
+		(solucao (executa-procura 
+			#'recursive-bfs
+			problema 
+			heuristica)))
+		(procura-get-solucao solucao))
+)
+
 ;; recursive-best-first-search: problema x node x heuristica x bound --> node
 ;; implementamos este algoritmo mas nao utilizamos na nossa funcao best e mais lento
 ;; que o proprio A-star mas poupa imensa memoria vai ser usado para testar testes
 ;; para o relatorio
-(defun recursive-best-first-search (problema node heuristica hash-accoes bound)
+(defun recursive-bfs (problema node heuristica)
 	(let (
-		(accoes 
-			(if (estado-final-p (node-estado-actual node))
-				NIL
-				(get-hash-accoes hash-accoes (node-estado-actual node))
-			)
-		)
-		;(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
-		(new-node NIL)
-		(open (make-instance 'binary-heap))
-		(n1 NIL)
-		(n2 NIL)
-		)
-		
-		(cond 
-			((> (node-peso node) bound)
-				(return-from recursive-best-first-search (node-pai node))
-			)
-			((funcall (problema-solucao problema) (node-estado-actual node))
-				(return-from recursive-best-first-search node)
-			)
-			((null accoes)
-				(return-from recursive-best-first-search NIL))
-			(t 
-				(loop for accao in accoes do
+		(result NIL)
+		(best_f 0))
+		(defun rbfs (problema node bound)
+			(let 
+				(
+				(open (make-instance 'binary-heap))
+				(accoes (get-hash-accoes *hash-accoes* (node-estado-actual node)))
+				(best NIL)
+				(new-node NIL)
+				(alternative NIL)
+				(result NIL)
+				(best_f 0)
+				)
+				
+				(when (funcall (problema-solucao problema) (node-estado-actual node))
+					(return-from rbfs (values node 0)))
+
+				(when (null accoes)
+					(return-from rbfs (values NIL MOST-POSITIVE-FIXNUM)))		
+
+				(loop for accao in accoes do 
 					(setf new-node (cria-node-filho problema node accao heuristica))
-					(if (node-pai node)
-						(if (< (node-peso node) (node-peso (node-pai node)))
-							(setf (node-peso node) (max (node-peso (node-pai node)) (node-peso new-node)))
-							(setf (node-peso node) (node-peso new-node))
-						)
-						(if (< (node-peso node) bound)
-							(setf (node-peso node) (max bound (node-peso new-node)))
-							(setf (node-peso node) (node-peso new-node))
-						)
+					(if (< (node-peso node) (node-peso new-node))
+					 	(setf (node-peso node) (max (node-peso node) (node-peso new-node)))
+					 	(setf (node-peso node) (node-peso new-node))
 					)
 					(insert_heap open (node-peso new-node) new-node)
 				)
-				(setf n1 (extract-min open))
-				(setf n2 (peek-min open))
-				(loop while (and (<= (node-peso n1) bound) (< (node-peso n1) MOST-POSITIVE-FIXNUM)) do 
-					(setf n1 (recursive-best-first-search problema n1 heuristica hash-accoes (min (node-peso n2) bound))) 
-					(if (funcall (problema-solucao problema) (node-estado-actual n1))
-						(return-from recursive-best-first-search n1)	
+
+				(loop while T do
+					(setf best (extract-min open))
+					(when (> (node-peso best) bound) 
+						(return-from rbfs (values NIL (node-peso best))))
+					(if (> (heap-size open) 1)
+						(setf alternative (node-peso (peek-min open)))
+						(setf alternative MOST-POSITIVE-FIXNUM)
 					)
-					(insert_heap open (node-peso n1) n1)
-					(setf n1 (extract-min open))
+					(multiple-value-setq (result best_f) (rbfs problema best (min bound alternative)))
+					(when result
+						(return-from rbfs (values result best_f)))
+					(setf (node-peso best) best_f)
+					(insert_heap open best_f best)
 				)
-				(return-from recursive-best-first-search n1)
 			)
 		)
-		
-	)
+	(multiple-value-setq (result best_f) (rbfs problema node MOST-POSITIVE-FIXNUM))
+	result)
 )
-
 
 ;; search-ida: problema x node x g x bound heuristica --> node
 ;; implementamos este algoritmo mas nao utilizamos na nossa funcao best e mais lento
@@ -1176,15 +1183,16 @@ T)
 (defun seleciona-melhor (lista)
 	(car lista)
 )
+
 ;;; Insere um no na lista ordenado por no-peso
 ;;; insere-lista: lista x node --> {}
 ;; complexidade: O(n)
 (defun insere-lista (lista node)
 	(cond ((null lista)(list node))
-		((< (node-peso node) (node-peso (car lista)))
+		((<= (node-peso node) (node-peso (car lista)))
 			(cons node lista))
 		(t 
-			(cons (car lista) (insere-lista node (cdr lista))))
+			(cons (car lista) (insere-lista (cdr lista) node)))
 	)
 )	
 
