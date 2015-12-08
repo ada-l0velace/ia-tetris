@@ -978,7 +978,7 @@ T)
 				;(setf solucao (executa-procura #'best-first-search problema #'heuristicas *hash-accoes*)))
 			(t 
 				(setf problema (formulacao-problema tabuleiro pecas-por-colocar #'custo-ultimas-pecas))
-				(setf solucao (executa-procura #'best-first-search problema #'heuristicas *hash-accoes*)))
+				(setf solucao (executa-procura #'best-first-search problema #'heuristicas)))
 		)
 		(procura-get-solucao solucao)
 	)
@@ -1028,6 +1028,15 @@ T)
 		(procura-get-solucao solucao))
 )
 
+(defun procura-IDA* (problema heuristica)
+	(let (
+		(solucao (executa-procura 
+			#'ida-star-search
+			problema 
+			heuristica)))
+		(procura-get-solucao solucao))
+)
+
 ;; recursive-best-first-search: problema x node x heuristica x bound --> node
 ;; implementamos este algoritmo mas nao utilizamos na nossa funcao best e mais lento
 ;; que o proprio A-star mas poupa imensa memoria vai ser usado para testar testes
@@ -1056,10 +1065,11 @@ T)
 
 				(loop for accao in accoes do 
 					(setf new-node (cria-node-filho problema node accao heuristica))
-					(if (< (node-peso node) (node-peso new-node))
-					 	(setf (node-peso node) (max (node-peso node) (node-peso new-node)))
-					 	(setf (node-peso node) (node-peso new-node))
-					)
+					; (if (< (node-peso node) (node-peso new-node))
+					;  	(setf (node-peso node) (max (node-peso node) (node-peso new-node)))
+					;  	(setf (node-peso node) (node-peso new-node))
+					; )
+					;(setf (node-peso new-node) (max (node-peso node) (node-peso new-node)))
 					(insert_heap open (node-peso new-node) new-node)
 				)
 
@@ -1083,13 +1093,13 @@ T)
 	result)
 )
 
-;; search-ida: problema x node x g x bound heuristica --> node
+;; search-ida: problema x node x bound heuristica --> node
 ;; implementamos este algoritmo mas nao utilizamos na nossa funcao best e mais lento
 ;; que o proprio A-star mas poupa imensa memoria vai ser usado para testar testes
 ;; para o relatorio
 (defun search-ida (problema node g bound heuristica)
 	(let (
-		(f g)
+		(f (+ g (node-peso node)))
 		(min 0)
 		(accoes NIL)
 		(new-node NIL)
@@ -1106,20 +1116,14 @@ T)
 		;(read-char)
 		;(format T "~d ~c" node #\linefeed)
 		(setf min MOST-POSITIVE-FIXNUM)
-		(setf accoes 
-			 (if (estado-final-p (node-estado-actual node)) 
-			 	NIL
-				(get-hash-accoes *hash-accoes* (node-estado-actual node))
-			)
-		)
+		;(setf accoes (get-hash-accoes *hash-accoes* (node-estado-actual node)))
+		(setf accoes (reverse (funcall (problema-accoes problema) (node-estado-actual node))))
 		(loop for accao in accoes do
 			(setf new-node (cria-node-filho problema node accao heuristica))
-			(setf n (search-ida problema new-node (node-peso new-node) bound heuristica))
-			(cond 
-				((typep n 'node)
-					(return-from search-ida n))
-				((< n min)
-					(setf min n))
+			(setf n (search-ida problema new-node (node-peso node) bound heuristica))
+			(if (typep n 'node)
+				(return-from search-ida n)
+				(setf min (min min n))
 			)
 		)
 	min)
@@ -1140,6 +1144,10 @@ T)
 			(if (typep solucao 'node)
 				(return-from ida-star-search solucao)
 			)
+			(if (eq solucao MOST-POSITIVE-FIXNUM)
+				(return-from ida-star-search NIL)
+			)
+			(setf bound solucao)
 		)	
 	)
 )
