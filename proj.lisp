@@ -918,7 +918,7 @@ T)
 (defun procura-A* (problema heuristica)
 	(let (
 		(solucao (executa-procura 
-			#'a-star-search
+			#'ida-star-search
 			problema 
 			heuristica)))
 		(procura-get-solucao solucao))
@@ -1017,9 +1017,6 @@ T)
 )
 
 (defun procura-RBFS (problema heuristica)
-	(loop for peca in (list 'i 'l 'j 'o 's 'z 't) do
-		(setf (gethash peca *hash-accoes*) (accoes (make-estado :pontos 0 :pecas-por-colocar (list peca) :pecas-colocadas '() :tabuleiro (cria-tabuleiro))))
-	)
 	(let (
 		(solucao (executa-procura 
 			#'recursive-bfs
@@ -1049,7 +1046,7 @@ T)
 			(let 
 				(
 				(open (make-instance 'binary-heap))
-				(accoes (get-hash-accoes *hash-accoes* (node-estado-actual node)))
+				(accoes (funcall (problema-accoes problema) (node-estado-actual node)))
 				(best NIL)
 				(new-node NIL)
 				(alternative NIL)
@@ -1097,36 +1094,29 @@ T)
 ;; implementamos este algoritmo mas nao utilizamos na nossa funcao best e mais lento
 ;; que o proprio A-star mas poupa imensa memoria vai ser usado para testar testes
 ;; para o relatorio
-(defun search-ida (problema node g bound heuristica)
+(defun search-ida (problema node bound heuristica)
 	(let (
-		(f (+ g (node-peso node)))
-		(min 0)
+		(f (node-peso node))
+		(min MOST-POSITIVE-FIXNUM)
 		(accoes NIL)
 		(new-node NIL)
+		(fn 0)
 		(n NIL)
 		)
-		
-		(if (> f bound)
-			(return-from search-ida f)
-		)
-
-		(if (funcall (problema-solucao problema) (node-estado-actual node))
-			(return-from search-ida node)
-		)
-		;(read-char)
-		;(format T "~d ~c" node #\linefeed)
-		(setf min MOST-POSITIVE-FIXNUM)
-		;(setf accoes (get-hash-accoes *hash-accoes* (node-estado-actual node)))
+		(when (> f bound)
+			(return-from search-ida (values NIL f)))
+		(when (funcall (problema-solucao problema) (node-estado-actual node))
+			(return-from search-ida (values node f)))
 		(setf accoes (reverse (funcall (problema-accoes problema) (node-estado-actual node))))
 		(loop for accao in accoes do
 			(setf new-node (cria-node-filho problema node accao heuristica))
-			(setf n (search-ida problema new-node (node-peso node) bound heuristica))
-			(if (typep n 'node)
-				(return-from search-ida n)
-				(setf min (min min n))
+			(multiple-value-setq (n fn) (search-ida problema new-node bound heuristica))
+			(if n
+				(return-from search-ida (values n fn))
+				(setf min (min min fn))
 			)
 		)
-	min)
+	(values NIL min))
 )
 
 ;; ida-star-search: problema x node x heuristica --> lista de accoes
@@ -1137,17 +1127,21 @@ T)
 	(let (
 		(bound (node-peso node))
 		(solucao NIL)
+		(fn 0)
 		)
 
 		(loop while t do
-			(setf solucao (search-ida problema node 0 bound heuristica))
-			(if (typep solucao 'node)
-				(return-from ida-star-search solucao)
+			(setf solucao (search-ida problema node bound heuristica))
+			(multiple-value-setq (solucao fn) (search-ida problema node bound heuristica))
+			(cond 
+				(solucao 
+					(return-from ida-star-search solucao))
+				((eq fn MOST-POSITIVE-FIXNUM) 
+					(return-from ida-star-search NIL))
+				(t 
+					(setf bound fn))
 			)
-			(if (eq solucao MOST-POSITIVE-FIXNUM)
-				(return-from ida-star-search NIL)
-			)
-			(setf bound solucao)
+			
 		)	
 	)
 )
