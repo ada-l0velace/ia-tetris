@@ -1,0 +1,1544 @@
+desc: --time-unit=B --pages-as-heap=yes --massif-out-file=rt/procuras/test01/massif.out
+cmd: /opt/clisp-2.49/src/base/lisp.run -B /opt/clisp-2.49/src -M /opt/clisp-2.49/src/base/lispinit.mem -N /opt/clisp-2.49/src/locale run-test.fas
+time_unit: B
+#-----------
+snapshot=0
+#-----------
+time=2170880
+mem_heap_B=2170880
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=1
+#-----------
+time=2359296
+mem_heap_B=2359296
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=2
+#-----------
+time=2371584
+mem_heap_B=2371584
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=3
+#-----------
+time=2502656
+mem_heap_B=2502656
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=4
+#-----------
+time=2523136
+mem_heap_B=2523136
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=5
+#-----------
+time=2547712
+mem_heap_B=2547712
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=6
+#-----------
+time=4653056
+mem_heap_B=4653056
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=7
+#-----------
+time=4661248
+mem_heap_B=4661248
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=8
+#-----------
+time=4849664
+mem_heap_B=4849664
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=9
+#-----------
+time=7999488
+mem_heap_B=7999488
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=10
+#-----------
+time=8011776
+mem_heap_B=8011776
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=11
+#-----------
+time=10334208
+mem_heap_B=10334208
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=12
+#-----------
+time=10342400
+mem_heap_B=10342400
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=detailed
+n2: 10342400 (page allocation syscalls) mmap/mremap/brk, --alloc-fns, etc.
+ n3: 7802880 0x4017319: mmap (syscall-template.S:81)
+  n1: 7577600 0x4006220: _dl_map_object_from_fd (dl-load.c:1293)
+   n2: 7577600 0x400809D: _dl_map_object (dl-load.c:2605)
+    n1: 5472256 0x400C3A0: openaux (dl-deps.c:63)
+     n1: 5472256 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 5472256 0x400C5F3: _dl_map_object_deps (dl-deps.c:254)
+       n1: 5472256 0x4002DB2: dl_main (rtld.c:1743)
+        n1: 5472256 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 5472256 0x4004A14: _dl_start (rtld.c:331)
+          n1: 5472256 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 5472256 0x6: ???
+            n1: 5472256 0xFFF00010D: ???
+             n1: 5472256 0xFFF00012F: ???
+              n1: 5472256 0xFFF000132: ???
+               n1: 5472256 0xFFF000146: ???
+                n1: 5472256 0xFFF000149: ???
+                 n1: 5472256 0xFFF00016F: ???
+                  n1: 5472256 0xFFF000172: ???
+                   n0: 5472256 0xFFF00018D: ???
+    n1: 2105344 0x400137C: map_doit (rtld.c:626)
+     n1: 2105344 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2105344 0x4000B2D: do_preload (rtld.c:815)
+       n1: 2105344 0x4004126: dl_main (rtld.c:1634)
+        n1: 2105344 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 2105344 0x4004A14: _dl_start (rtld.c:331)
+          n1: 2105344 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 2105344 0x6: ???
+            n1: 2105344 0xFFF00010D: ???
+             n1: 2105344 0xFFF00012F: ???
+              n1: 2105344 0xFFF000132: ???
+               n1: 2105344 0xFFF000146: ???
+                n1: 2105344 0xFFF000149: ???
+                 n1: 2105344 0xFFF00016F: ???
+                  n1: 2105344 0xFFF000172: ???
+                   n0: 2105344 0xFFF00018D: ???
+  n1: 188416 0x400F903: _dl_sysdep_read_whole_file (dl-misc.c:62)
+   n1: 188416 0x4014D1D: _dl_load_cache_lookup (dl-cache.c:196)
+    n1: 188416 0x400832F: _dl_map_object (dl-load.c:2468)
+     n1: 188416 0x400C3A0: openaux (dl-deps.c:63)
+      n1: 188416 0x400E8B2: _dl_catch_error (dl-error.c:187)
+       n1: 188416 0x400C5F3: _dl_map_object_deps (dl-deps.c:254)
+        n1: 188416 0x4002DB2: dl_main (rtld.c:1743)
+         n1: 188416 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+          n1: 188416 0x4004A14: _dl_start (rtld.c:331)
+           n1: 188416 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+            n1: 188416 0x6: ???
+             n1: 188416 0xFFF00010D: ???
+              n1: 188416 0xFFF00012F: ???
+               n1: 188416 0xFFF000132: ???
+                n1: 188416 0xFFF000146: ???
+                 n1: 188416 0xFFF000149: ???
+                  n1: 188416 0xFFF00016F: ???
+                   n1: 188416 0xFFF000172: ???
+                    n0: 188416 0xFFF00018D: ???
+  n0: 36864 in 2 places, all below massif's threshold (01.00%)
+ n0: 2539520 0xFFFFFFFFFFFFFFFF: ???
+#-----------
+snapshot=13
+#-----------
+time=10530816
+mem_heap_B=10530816
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=14
+#-----------
+time=12931072
+mem_heap_B=12931072
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=15
+#-----------
+time=12972032
+mem_heap_B=12972032
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=16
+#-----------
+time=15220736
+mem_heap_B=15220736
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=17
+#-----------
+time=15233024
+mem_heap_B=15233024
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=18
+#-----------
+time=17502208
+mem_heap_B=17502208
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=19
+#-----------
+time=17522688
+mem_heap_B=17522688
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=20
+#-----------
+time=19636224
+mem_heap_B=19636224
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=detailed
+n2: 19636224 (page allocation syscalls) mmap/mremap/brk, --alloc-fns, etc.
+ n2: 17096704 0x4017319: mmap (syscall-template.S:81)
+  n1: 16609280 0x4006220: _dl_map_object_from_fd (dl-load.c:1293)
+   n2: 16609280 0x400809D: _dl_map_object (dl-load.c:2605)
+    n1: 14503936 0x400C3A0: openaux (dl-deps.c:63)
+     n1: 14503936 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 14503936 0x400C5F3: _dl_map_object_deps (dl-deps.c:254)
+       n1: 14503936 0x4002DB2: dl_main (rtld.c:1743)
+        n1: 14503936 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 14503936 0x4004A14: _dl_start (rtld.c:331)
+          n1: 14503936 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 14503936 0x6: ???
+            n1: 14503936 0xFFF00010D: ???
+             n1: 14503936 0xFFF00012F: ???
+              n1: 14503936 0xFFF000132: ???
+               n1: 14503936 0xFFF000146: ???
+                n1: 14503936 0xFFF000149: ???
+                 n1: 14503936 0xFFF00016F: ???
+                  n1: 14503936 0xFFF000172: ???
+                   n0: 14503936 0xFFF00018D: ???
+    n1: 2105344 0x400137C: map_doit (rtld.c:626)
+     n1: 2105344 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2105344 0x4000B2D: do_preload (rtld.c:815)
+       n1: 2105344 0x4004126: dl_main (rtld.c:1634)
+        n1: 2105344 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 2105344 0x4004A14: _dl_start (rtld.c:331)
+          n1: 2105344 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 2105344 0x6: ???
+            n1: 2105344 0xFFF00010D: ???
+             n1: 2105344 0xFFF00012F: ???
+              n1: 2105344 0xFFF000132: ???
+               n1: 2105344 0xFFF000146: ???
+                n1: 2105344 0xFFF000149: ???
+                 n1: 2105344 0xFFF00016F: ???
+                  n1: 2105344 0xFFF000172: ???
+                   n0: 2105344 0xFFF00018D: ???
+  n0: 487424 in 4 places, all below massif's threshold (01.00%)
+ n0: 2539520 0xFFFFFFFFFFFFFFFF: ???
+#-----------
+snapshot=21
+#-----------
+time=19644416
+mem_heap_B=19644416
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=22
+#-----------
+time=23482368
+mem_heap_B=23482368
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=23
+#-----------
+time=23506944
+mem_heap_B=23506944
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=24
+#-----------
+time=23531520
+mem_heap_B=23531520
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=25
+#-----------
+time=23715840
+mem_heap_B=23347200
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=detailed
+n2: 23347200 (page allocation syscalls) mmap/mremap/brk, --alloc-fns, etc.
+ n2: 20807680 0x4017319: mmap (syscall-template.S:81)
+  n1: 20447232 0x4006220: _dl_map_object_from_fd (dl-load.c:1293)
+   n2: 20447232 0x400809D: _dl_map_object (dl-load.c:2605)
+    n1: 18341888 0x400C3A0: openaux (dl-deps.c:63)
+     n1: 18341888 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 18341888 0x400C5F3: _dl_map_object_deps (dl-deps.c:254)
+       n1: 18341888 0x4002DB2: dl_main (rtld.c:1743)
+        n1: 18341888 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 18341888 0x4004A14: _dl_start (rtld.c:331)
+          n1: 18341888 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 18341888 0x6: ???
+            n1: 18341888 0xFFF00010D: ???
+             n1: 18341888 0xFFF00012F: ???
+              n1: 18341888 0xFFF000132: ???
+               n1: 18341888 0xFFF000146: ???
+                n1: 18341888 0xFFF000149: ???
+                 n1: 18341888 0xFFF00016F: ???
+                  n1: 18341888 0xFFF000172: ???
+                   n0: 18341888 0xFFF00018D: ???
+    n1: 2105344 0x400137C: map_doit (rtld.c:626)
+     n1: 2105344 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2105344 0x4000B2D: do_preload (rtld.c:815)
+       n1: 2105344 0x4004126: dl_main (rtld.c:1634)
+        n1: 2105344 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 2105344 0x4004A14: _dl_start (rtld.c:331)
+          n1: 2105344 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 2105344 0x6: ???
+            n1: 2105344 0xFFF00010D: ???
+             n1: 2105344 0xFFF00012F: ???
+              n1: 2105344 0xFFF000132: ???
+               n1: 2105344 0xFFF000146: ???
+                n1: 2105344 0xFFF000149: ???
+                 n1: 2105344 0xFFF00016F: ???
+                  n1: 2105344 0xFFF000172: ???
+                   n0: 2105344 0xFFF00018D: ???
+  n0: 360448 in 4 places, all below massif's threshold (01.00%)
+ n0: 2539520 0xFFFFFFFFFFFFFFFF: ???
+#-----------
+snapshot=26
+#-----------
+time=23719936
+mem_heap_B=23343104
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=27
+#-----------
+time=23855104
+mem_heap_B=23478272
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=28
+#-----------
+time=25464832
+mem_heap_B=25088000
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=29
+#-----------
+time=26255360
+mem_heap_B=25878528
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=30
+#-----------
+time=28409856
+mem_heap_B=28033024
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=31
+#-----------
+time=29470720
+mem_heap_B=29093888
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=32
+#-----------
+time=29503488
+mem_heap_B=29126656
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=detailed
+n4: 29126656 (page allocation syscalls) mmap/mremap/brk, --alloc-fns, etc.
+ n2: 20803584 0x4017319: mmap (syscall-template.S:81)
+  n1: 20447232 0x4006220: _dl_map_object_from_fd (dl-load.c:1293)
+   n2: 20447232 0x400809D: _dl_map_object (dl-load.c:2605)
+    n1: 18341888 0x400C3A0: openaux (dl-deps.c:63)
+     n1: 18341888 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 18341888 0x400C5F3: _dl_map_object_deps (dl-deps.c:254)
+       n1: 18341888 0x4002DB2: dl_main (rtld.c:1743)
+        n1: 18341888 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 18341888 0x4004A14: _dl_start (rtld.c:331)
+          n1: 18341888 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 18341888 0x6: ???
+            n1: 18341888 0xFFF00010D: ???
+             n1: 18341888 0xFFF00012F: ???
+              n1: 18341888 0xFFF000132: ???
+               n1: 18341888 0xFFF000146: ???
+                n1: 18341888 0xFFF000149: ???
+                 n1: 18341888 0xFFF00016F: ???
+                  n1: 18341888 0xFFF000172: ???
+                   n0: 18341888 0xFFF00018D: ???
+    n1: 2105344 0x400137C: map_doit (rtld.c:626)
+     n1: 2105344 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2105344 0x4000B2D: do_preload (rtld.c:815)
+       n1: 2105344 0x4004126: dl_main (rtld.c:1634)
+        n1: 2105344 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 2105344 0x4004A14: _dl_start (rtld.c:331)
+          n1: 2105344 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 2105344 0x6: ???
+            n1: 2105344 0xFFF00010D: ???
+             n1: 2105344 0xFFF00012F: ???
+              n1: 2105344 0xFFF000132: ???
+               n1: 2105344 0xFFF000146: ???
+                n1: 2105344 0xFFF000149: ???
+                 n1: 2105344 0xFFF00016F: ???
+                  n1: 2105344 0xFFF000172: ???
+                   n0: 2105344 0xFFF00018D: ???
+  n0: 356352 in 4 places, all below massif's threshold (01.00%)
+ n4: 5648384 0x5ADC149: mmap (syscall-template.S:81)
+  n3: 3244032 0x439A29: mmap_zeromap (spvw_mmap.d:339)
+   n1: 2154496 0x43BA16: loadmem_from_handle (spvw_memfile.d:1549)
+    n1: 2154496 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 2154496 0x43F949: main (spvw.d:3267)
+   n1: 1060864 0x43BA90: loadmem_from_handle (spvw_memfile.d:1559)
+    n1: 1060864 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 1060864 0x43F949: main (spvw.d:3267)
+   n0: 28672 in 2 places, all below massif's threshold (01.00%)
+  n1: 1609728 0x5A272FB: _nl_load_locale_from_archive (loadarchive.c:228)
+   n1: 1609728 0x5A262B0: _nl_find_locale (findlocale.c:154)
+    n1: 1609728 0x5A25BF1: setlocale (setlocale.c:417)
+     n0: 1609728 0x43F5B7: main (spvw_ctype.d:30)
+  n1: 790528 0x5A74E0B: _int_malloc (malloc.c:2305)
+   n1: 790528 0x5A7606E: malloc (malloc.c:2891)
+    n0: 790528 0x43F6B8: main (spvw_allocate.d:150)
+  n0: 4096 in 1 place, below massif's threshold (01.00%)
+ n0: 2539520 0xFFFFFFFFFFFFFFFF: ???
+ n0: 135168 in 1 place, below massif's threshold (01.00%)
+#-----------
+snapshot=33
+#-----------
+time=29507584
+mem_heap_B=29122560
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=34
+#-----------
+time=29696000
+mem_heap_B=29310976
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=35
+#-----------
+time=29724672
+mem_heap_B=29339648
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=36
+#-----------
+time=31834112
+mem_heap_B=31449088
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=37
+#-----------
+time=31866880
+mem_heap_B=31481856
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=38
+#-----------
+time=31899648
+mem_heap_B=31514624
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=39
+#-----------
+time=31932416
+mem_heap_B=31547392
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=40
+#-----------
+time=31965184
+mem_heap_B=31580160
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=41
+#-----------
+time=31997952
+mem_heap_B=31612928
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=42
+#-----------
+time=32018432
+mem_heap_B=31633408
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=43
+#-----------
+time=32051200
+mem_heap_B=31666176
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=44
+#-----------
+time=32083968
+mem_heap_B=31698944
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=45
+#-----------
+time=32116736
+mem_heap_B=31731712
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=46
+#-----------
+time=32149504
+mem_heap_B=31764480
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=detailed
+n4: 31764480 (page allocation syscalls) mmap/mremap/brk, --alloc-fns, etc.
+ n2: 22921216 0x4017319: mmap (syscall-template.S:81)
+  n1: 22556672 0x4006220: _dl_map_object_from_fd (dl-load.c:1293)
+   n3: 22556672 0x400809D: _dl_map_object (dl-load.c:2605)
+    n1: 18341888 0x400C3A0: openaux (dl-deps.c:63)
+     n1: 18341888 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 18341888 0x400C5F3: _dl_map_object_deps (dl-deps.c:254)
+       n1: 18341888 0x4002DB2: dl_main (rtld.c:1743)
+        n1: 18341888 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 18341888 0x4004A14: _dl_start (rtld.c:331)
+          n1: 18341888 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 18341888 0x6: ???
+            n1: 18341888 0xFFF00010D: ???
+             n1: 18341888 0xFFF00012F: ???
+              n1: 18341888 0xFFF000132: ???
+               n1: 18341888 0xFFF000146: ???
+                n1: 18341888 0xFFF000149: ???
+                 n1: 18341888 0xFFF00016F: ???
+                  n1: 18341888 0xFFF000172: ???
+                   n0: 18341888 0xFFF00018D: ???
+    n1: 2109440 0x4012A23: dl_open_worker (dl-open.c:235)
+     n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2109440 0x4012439: _dl_open (dl-open.c:661)
+       n1: 2109440 0x5B15780: do_dlopen (dl-libc.c:87)
+        n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+         n1: 2109440 0x5B1581D: dlerror_run (dl-libc.c:46)
+          n1: 2109440 0x5B1588F: __libc_dlopen_mode (dl-libc.c:163)
+           n1: 2109440 0x5A2572E: __gconv_find_shlib (gconv_dl.c:116)
+            n1: 2109440 0x5A24E7C: find_module (gconv_cache.c:195)
+             n1: 2109440 0x5A25353: __gconv_lookup_cache (gconv_cache.c:392)
+              n1: 2109440 0x5A1DD18: __gconv_find_transform (gconv_db.c:730)
+               n1: 2109440 0x5A1C69D: __gconv_open (gconv_open.c:172)
+                n1: 2109440 0x5A2985E: _nl_find_msg (dcigettext.c:982)
+                 n1: 2109440 0x5A2A072: __dcigettext (dcigettext.c:638)
+                  n1: 2109440 0x434B7C: clgettext (spvw_language.d:249)
+                   n1: 2109440 0x43C4BB: CLSTEXT (spvw_language.d:274)
+                    n1: 2109440 0x528C76: C_text (i18n.d:53)
+                     n1: 2109440 0x444F9D: funcall_subr (eval.d:5227)
+                      n1: 2109440 0x447431: funcall (eval.d:4867)
+                       n1: 2109440 0x44BFF3: interpret_bytecode_ (eval.d:6796)
+                        n1: 2109440 0x459169: funcall_closure (eval.d:5611)
+                         n1: 2109440 0x447445: funcall (eval.d:4869)
+                          n1: 2109440 0x43DCB5: main_actions (spvw.d:3576)
+                           n0: 2109440 0x441BF3: main (spvw.d:3885)
+    n1: 2105344 0x400137C: map_doit (rtld.c:626)
+     n1: 2105344 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2105344 0x4000B2D: do_preload (rtld.c:815)
+       n1: 2105344 0x4004126: dl_main (rtld.c:1634)
+        n1: 2105344 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 2105344 0x4004A14: _dl_start (rtld.c:331)
+          n1: 2105344 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 2105344 0x6: ???
+            n1: 2105344 0xFFF00010D: ???
+             n1: 2105344 0xFFF00012F: ???
+              n1: 2105344 0xFFF000132: ???
+               n1: 2105344 0xFFF000146: ???
+                n1: 2105344 0xFFF000149: ???
+                 n1: 2105344 0xFFF00016F: ???
+                  n1: 2105344 0xFFF000172: ???
+                   n0: 2105344 0xFFF00018D: ???
+  n0: 364544 in 4 places, all below massif's threshold (01.00%)
+ n4: 6168576 0x5ADC149: mmap (syscall-template.S:81)
+  n3: 3551232 0x439A29: mmap_zeromap (spvw_mmap.d:339)
+   n1: 2154496 0x43BA16: loadmem_from_handle (spvw_memfile.d:1549)
+    n1: 2154496 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 2154496 0x43F949: main (spvw.d:3267)
+   n1: 1060864 0x43BA90: loadmem_from_handle (spvw_memfile.d:1559)
+    n1: 1060864 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 1060864 0x43F949: main (spvw.d:3267)
+   n0: 335872 in 2 places, all below massif's threshold (01.00%)
+  n1: 1609728 0x5A272FB: _nl_load_locale_from_archive (loadarchive.c:228)
+   n1: 1609728 0x5A262B0: _nl_find_locale (findlocale.c:154)
+    n1: 1609728 0x5A25BF1: setlocale (setlocale.c:417)
+     n0: 1609728 0x43F5B7: main (spvw_ctype.d:30)
+  n1: 790528 0x5A74E0B: _int_malloc (malloc.c:2305)
+   n1: 790528 0x5A7606E: malloc (malloc.c:2891)
+    n0: 790528 0x43F6B8: main (spvw_allocate.d:150)
+  n0: 217088 in 3 places, all below massif's threshold (01.00%)
+ n0: 2539520 0xFFFFFFFFFFFFFFFF: ???
+ n0: 135168 in 1 place, below massif's threshold (01.00%)
+#-----------
+snapshot=47
+#-----------
+time=32182272
+mem_heap_B=31797248
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=48
+#-----------
+time=32198656
+mem_heap_B=31813632
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=49
+#-----------
+time=32223232
+mem_heap_B=31838208
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=50
+#-----------
+time=32227328
+mem_heap_B=31842304
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=51
+#-----------
+time=32231424
+mem_heap_B=31846400
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=detailed
+n4: 31846400 (page allocation syscalls) mmap/mremap/brk, --alloc-fns, etc.
+ n2: 22921216 0x4017319: mmap (syscall-template.S:81)
+  n1: 22556672 0x4006220: _dl_map_object_from_fd (dl-load.c:1293)
+   n3: 22556672 0x400809D: _dl_map_object (dl-load.c:2605)
+    n1: 18341888 0x400C3A0: openaux (dl-deps.c:63)
+     n1: 18341888 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 18341888 0x400C5F3: _dl_map_object_deps (dl-deps.c:254)
+       n1: 18341888 0x4002DB2: dl_main (rtld.c:1743)
+        n1: 18341888 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 18341888 0x4004A14: _dl_start (rtld.c:331)
+          n1: 18341888 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 18341888 0x6: ???
+            n1: 18341888 0xFFF00010D: ???
+             n1: 18341888 0xFFF00012F: ???
+              n1: 18341888 0xFFF000132: ???
+               n1: 18341888 0xFFF000146: ???
+                n1: 18341888 0xFFF000149: ???
+                 n1: 18341888 0xFFF00016F: ???
+                  n1: 18341888 0xFFF000172: ???
+                   n0: 18341888 0xFFF00018D: ???
+    n1: 2109440 0x4012A23: dl_open_worker (dl-open.c:235)
+     n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2109440 0x4012439: _dl_open (dl-open.c:661)
+       n1: 2109440 0x5B15780: do_dlopen (dl-libc.c:87)
+        n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+         n1: 2109440 0x5B1581D: dlerror_run (dl-libc.c:46)
+          n1: 2109440 0x5B1588F: __libc_dlopen_mode (dl-libc.c:163)
+           n1: 2109440 0x5A2572E: __gconv_find_shlib (gconv_dl.c:116)
+            n1: 2109440 0x5A24E7C: find_module (gconv_cache.c:195)
+             n1: 2109440 0x5A25353: __gconv_lookup_cache (gconv_cache.c:392)
+              n1: 2109440 0x5A1DD18: __gconv_find_transform (gconv_db.c:730)
+               n1: 2109440 0x5A1C69D: __gconv_open (gconv_open.c:172)
+                n1: 2109440 0x5A2985E: _nl_find_msg (dcigettext.c:982)
+                 n1: 2109440 0x5A2A072: __dcigettext (dcigettext.c:638)
+                  n1: 2109440 0x434B7C: clgettext (spvw_language.d:249)
+                   n1: 2109440 0x43C4BB: CLSTEXT (spvw_language.d:274)
+                    n1: 2109440 0x528C76: C_text (i18n.d:53)
+                     n1: 2109440 0x444F9D: funcall_subr (eval.d:5227)
+                      n1: 2109440 0x447431: funcall (eval.d:4867)
+                       n1: 2109440 0x44BFF3: interpret_bytecode_ (eval.d:6796)
+                        n1: 2109440 0x459169: funcall_closure (eval.d:5611)
+                         n1: 2109440 0x447445: funcall (eval.d:4869)
+                          n1: 2109440 0x43DCB5: main_actions (spvw.d:3576)
+                           n0: 2109440 0x441BF3: main (spvw.d:3885)
+    n1: 2105344 0x400137C: map_doit (rtld.c:626)
+     n1: 2105344 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2105344 0x4000B2D: do_preload (rtld.c:815)
+       n1: 2105344 0x4004126: dl_main (rtld.c:1634)
+        n1: 2105344 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 2105344 0x4004A14: _dl_start (rtld.c:331)
+          n1: 2105344 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 2105344 0x6: ???
+            n1: 2105344 0xFFF00010D: ???
+             n1: 2105344 0xFFF00012F: ???
+              n1: 2105344 0xFFF000132: ???
+               n1: 2105344 0xFFF000146: ???
+                n1: 2105344 0xFFF000149: ???
+                 n1: 2105344 0xFFF00016F: ???
+                  n1: 2105344 0xFFF000172: ???
+                   n0: 2105344 0xFFF00018D: ???
+  n0: 364544 in 4 places, all below massif's threshold (01.00%)
+ n4: 6250496 0x5ADC149: mmap (syscall-template.S:81)
+  n3: 3633152 0x439A29: mmap_zeromap (spvw_mmap.d:339)
+   n1: 2154496 0x43BA16: loadmem_from_handle (spvw_memfile.d:1549)
+    n1: 2154496 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 2154496 0x43F949: main (spvw.d:3267)
+   n1: 1060864 0x43BA90: loadmem_from_handle (spvw_memfile.d:1559)
+    n1: 1060864 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 1060864 0x43F949: main (spvw.d:3267)
+   n0: 417792 in 2 places, all below massif's threshold (01.00%)
+  n1: 1609728 0x5A272FB: _nl_load_locale_from_archive (loadarchive.c:228)
+   n1: 1609728 0x5A262B0: _nl_find_locale (findlocale.c:154)
+    n1: 1609728 0x5A25BF1: setlocale (setlocale.c:417)
+     n0: 1609728 0x43F5B7: main (spvw_ctype.d:30)
+  n1: 790528 0x5A74E0B: _int_malloc (malloc.c:2305)
+   n1: 790528 0x5A7606E: malloc (malloc.c:2891)
+    n0: 790528 0x43F6B8: main (spvw_allocate.d:150)
+  n0: 217088 in 3 places, all below massif's threshold (01.00%)
+ n0: 2539520 0xFFFFFFFFFFFFFFFF: ???
+ n0: 135168 in 1 place, below massif's threshold (01.00%)
+#-----------
+snapshot=52
+#-----------
+time=32235520
+mem_heap_B=31850496
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=53
+#-----------
+time=32239616
+mem_heap_B=31854592
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=54
+#-----------
+time=32243712
+mem_heap_B=31858688
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=55
+#-----------
+time=32247808
+mem_heap_B=31862784
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=56
+#-----------
+time=32251904
+mem_heap_B=31866880
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=57
+#-----------
+time=32256000
+mem_heap_B=31870976
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=58
+#-----------
+time=32260096
+mem_heap_B=31875072
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=59
+#-----------
+time=32264192
+mem_heap_B=31879168
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=60
+#-----------
+time=32268288
+mem_heap_B=31883264
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=61
+#-----------
+time=32272384
+mem_heap_B=31887360
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=detailed
+n4: 31887360 (page allocation syscalls) mmap/mremap/brk, --alloc-fns, etc.
+ n2: 22921216 0x4017319: mmap (syscall-template.S:81)
+  n1: 22556672 0x4006220: _dl_map_object_from_fd (dl-load.c:1293)
+   n3: 22556672 0x400809D: _dl_map_object (dl-load.c:2605)
+    n1: 18341888 0x400C3A0: openaux (dl-deps.c:63)
+     n1: 18341888 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 18341888 0x400C5F3: _dl_map_object_deps (dl-deps.c:254)
+       n1: 18341888 0x4002DB2: dl_main (rtld.c:1743)
+        n1: 18341888 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 18341888 0x4004A14: _dl_start (rtld.c:331)
+          n1: 18341888 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 18341888 0x6: ???
+            n1: 18341888 0xFFF00010D: ???
+             n1: 18341888 0xFFF00012F: ???
+              n1: 18341888 0xFFF000132: ???
+               n1: 18341888 0xFFF000146: ???
+                n1: 18341888 0xFFF000149: ???
+                 n1: 18341888 0xFFF00016F: ???
+                  n1: 18341888 0xFFF000172: ???
+                   n0: 18341888 0xFFF00018D: ???
+    n1: 2109440 0x4012A23: dl_open_worker (dl-open.c:235)
+     n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2109440 0x4012439: _dl_open (dl-open.c:661)
+       n1: 2109440 0x5B15780: do_dlopen (dl-libc.c:87)
+        n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+         n1: 2109440 0x5B1581D: dlerror_run (dl-libc.c:46)
+          n1: 2109440 0x5B1588F: __libc_dlopen_mode (dl-libc.c:163)
+           n1: 2109440 0x5A2572E: __gconv_find_shlib (gconv_dl.c:116)
+            n1: 2109440 0x5A24E7C: find_module (gconv_cache.c:195)
+             n1: 2109440 0x5A25353: __gconv_lookup_cache (gconv_cache.c:392)
+              n1: 2109440 0x5A1DD18: __gconv_find_transform (gconv_db.c:730)
+               n1: 2109440 0x5A1C69D: __gconv_open (gconv_open.c:172)
+                n1: 2109440 0x5A2985E: _nl_find_msg (dcigettext.c:982)
+                 n1: 2109440 0x5A2A072: __dcigettext (dcigettext.c:638)
+                  n1: 2109440 0x434B7C: clgettext (spvw_language.d:249)
+                   n1: 2109440 0x43C4BB: CLSTEXT (spvw_language.d:274)
+                    n1: 2109440 0x528C76: C_text (i18n.d:53)
+                     n1: 2109440 0x444F9D: funcall_subr (eval.d:5227)
+                      n1: 2109440 0x447431: funcall (eval.d:4867)
+                       n1: 2109440 0x44BFF3: interpret_bytecode_ (eval.d:6796)
+                        n1: 2109440 0x459169: funcall_closure (eval.d:5611)
+                         n1: 2109440 0x447445: funcall (eval.d:4869)
+                          n1: 2109440 0x43DCB5: main_actions (spvw.d:3576)
+                           n0: 2109440 0x441BF3: main (spvw.d:3885)
+    n1: 2105344 0x400137C: map_doit (rtld.c:626)
+     n1: 2105344 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2105344 0x4000B2D: do_preload (rtld.c:815)
+       n1: 2105344 0x4004126: dl_main (rtld.c:1634)
+        n1: 2105344 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 2105344 0x4004A14: _dl_start (rtld.c:331)
+          n1: 2105344 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 2105344 0x6: ???
+            n1: 2105344 0xFFF00010D: ???
+             n1: 2105344 0xFFF00012F: ???
+              n1: 2105344 0xFFF000132: ???
+               n1: 2105344 0xFFF000146: ???
+                n1: 2105344 0xFFF000149: ???
+                 n1: 2105344 0xFFF00016F: ???
+                  n1: 2105344 0xFFF000172: ???
+                   n0: 2105344 0xFFF00018D: ???
+  n0: 364544 in 4 places, all below massif's threshold (01.00%)
+ n4: 6291456 0x5ADC149: mmap (syscall-template.S:81)
+  n3: 3674112 0x439A29: mmap_zeromap (spvw_mmap.d:339)
+   n1: 2154496 0x43BA16: loadmem_from_handle (spvw_memfile.d:1549)
+    n1: 2154496 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 2154496 0x43F949: main (spvw.d:3267)
+   n1: 1060864 0x43BA90: loadmem_from_handle (spvw_memfile.d:1559)
+    n1: 1060864 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 1060864 0x43F949: main (spvw.d:3267)
+   n0: 458752 in 2 places, all below massif's threshold (01.00%)
+  n1: 1609728 0x5A272FB: _nl_load_locale_from_archive (loadarchive.c:228)
+   n1: 1609728 0x5A262B0: _nl_find_locale (findlocale.c:154)
+    n1: 1609728 0x5A25BF1: setlocale (setlocale.c:417)
+     n0: 1609728 0x43F5B7: main (spvw_ctype.d:30)
+  n1: 790528 0x5A74E0B: _int_malloc (malloc.c:2305)
+   n1: 790528 0x5A7606E: malloc (malloc.c:2891)
+    n0: 790528 0x43F6B8: main (spvw_allocate.d:150)
+  n0: 217088 in 3 places, all below massif's threshold (01.00%)
+ n0: 2539520 0xFFFFFFFFFFFFFFFF: ???
+ n0: 135168 in 1 place, below massif's threshold (01.00%)
+#-----------
+snapshot=62
+#-----------
+time=32276480
+mem_heap_B=31891456
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=63
+#-----------
+time=32280576
+mem_heap_B=31895552
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=64
+#-----------
+time=32284672
+mem_heap_B=31899648
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=65
+#-----------
+time=32288768
+mem_heap_B=31903744
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=66
+#-----------
+time=32292864
+mem_heap_B=31907840
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=67
+#-----------
+time=32296960
+mem_heap_B=31911936
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=68
+#-----------
+time=32301056
+mem_heap_B=31916032
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=69
+#-----------
+time=32305152
+mem_heap_B=31920128
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=70
+#-----------
+time=32309248
+mem_heap_B=31924224
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=71
+#-----------
+time=32313344
+mem_heap_B=31928320
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=detailed
+n4: 31928320 (page allocation syscalls) mmap/mremap/brk, --alloc-fns, etc.
+ n2: 22921216 0x4017319: mmap (syscall-template.S:81)
+  n1: 22556672 0x4006220: _dl_map_object_from_fd (dl-load.c:1293)
+   n3: 22556672 0x400809D: _dl_map_object (dl-load.c:2605)
+    n1: 18341888 0x400C3A0: openaux (dl-deps.c:63)
+     n1: 18341888 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 18341888 0x400C5F3: _dl_map_object_deps (dl-deps.c:254)
+       n1: 18341888 0x4002DB2: dl_main (rtld.c:1743)
+        n1: 18341888 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 18341888 0x4004A14: _dl_start (rtld.c:331)
+          n1: 18341888 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 18341888 0x6: ???
+            n1: 18341888 0xFFF00010D: ???
+             n1: 18341888 0xFFF00012F: ???
+              n1: 18341888 0xFFF000132: ???
+               n1: 18341888 0xFFF000146: ???
+                n1: 18341888 0xFFF000149: ???
+                 n1: 18341888 0xFFF00016F: ???
+                  n1: 18341888 0xFFF000172: ???
+                   n0: 18341888 0xFFF00018D: ???
+    n1: 2109440 0x4012A23: dl_open_worker (dl-open.c:235)
+     n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2109440 0x4012439: _dl_open (dl-open.c:661)
+       n1: 2109440 0x5B15780: do_dlopen (dl-libc.c:87)
+        n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+         n1: 2109440 0x5B1581D: dlerror_run (dl-libc.c:46)
+          n1: 2109440 0x5B1588F: __libc_dlopen_mode (dl-libc.c:163)
+           n1: 2109440 0x5A2572E: __gconv_find_shlib (gconv_dl.c:116)
+            n1: 2109440 0x5A24E7C: find_module (gconv_cache.c:195)
+             n1: 2109440 0x5A25353: __gconv_lookup_cache (gconv_cache.c:392)
+              n1: 2109440 0x5A1DD18: __gconv_find_transform (gconv_db.c:730)
+               n1: 2109440 0x5A1C69D: __gconv_open (gconv_open.c:172)
+                n1: 2109440 0x5A2985E: _nl_find_msg (dcigettext.c:982)
+                 n1: 2109440 0x5A2A072: __dcigettext (dcigettext.c:638)
+                  n1: 2109440 0x434B7C: clgettext (spvw_language.d:249)
+                   n1: 2109440 0x43C4BB: CLSTEXT (spvw_language.d:274)
+                    n1: 2109440 0x528C76: C_text (i18n.d:53)
+                     n1: 2109440 0x444F9D: funcall_subr (eval.d:5227)
+                      n1: 2109440 0x447431: funcall (eval.d:4867)
+                       n1: 2109440 0x44BFF3: interpret_bytecode_ (eval.d:6796)
+                        n1: 2109440 0x459169: funcall_closure (eval.d:5611)
+                         n1: 2109440 0x447445: funcall (eval.d:4869)
+                          n1: 2109440 0x43DCB5: main_actions (spvw.d:3576)
+                           n0: 2109440 0x441BF3: main (spvw.d:3885)
+    n1: 2105344 0x400137C: map_doit (rtld.c:626)
+     n1: 2105344 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2105344 0x4000B2D: do_preload (rtld.c:815)
+       n1: 2105344 0x4004126: dl_main (rtld.c:1634)
+        n1: 2105344 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 2105344 0x4004A14: _dl_start (rtld.c:331)
+          n1: 2105344 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 2105344 0x6: ???
+            n1: 2105344 0xFFF00010D: ???
+             n1: 2105344 0xFFF00012F: ???
+              n1: 2105344 0xFFF000132: ???
+               n1: 2105344 0xFFF000146: ???
+                n1: 2105344 0xFFF000149: ???
+                 n1: 2105344 0xFFF00016F: ???
+                  n1: 2105344 0xFFF000172: ???
+                   n0: 2105344 0xFFF00018D: ???
+  n0: 364544 in 4 places, all below massif's threshold (01.00%)
+ n4: 6332416 0x5ADC149: mmap (syscall-template.S:81)
+  n3: 3715072 0x439A29: mmap_zeromap (spvw_mmap.d:339)
+   n1: 2154496 0x43BA16: loadmem_from_handle (spvw_memfile.d:1549)
+    n1: 2154496 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 2154496 0x43F949: main (spvw.d:3267)
+   n1: 1060864 0x43BA90: loadmem_from_handle (spvw_memfile.d:1559)
+    n1: 1060864 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 1060864 0x43F949: main (spvw.d:3267)
+   n0: 499712 in 2 places, all below massif's threshold (01.00%)
+  n1: 1609728 0x5A272FB: _nl_load_locale_from_archive (loadarchive.c:228)
+   n1: 1609728 0x5A262B0: _nl_find_locale (findlocale.c:154)
+    n1: 1609728 0x5A25BF1: setlocale (setlocale.c:417)
+     n0: 1609728 0x43F5B7: main (spvw_ctype.d:30)
+  n1: 790528 0x5A74E0B: _int_malloc (malloc.c:2305)
+   n1: 790528 0x5A7606E: malloc (malloc.c:2891)
+    n0: 790528 0x43F6B8: main (spvw_allocate.d:150)
+  n0: 217088 in 3 places, all below massif's threshold (01.00%)
+ n0: 2539520 0xFFFFFFFFFFFFFFFF: ???
+ n0: 135168 in 1 place, below massif's threshold (01.00%)
+#-----------
+snapshot=72
+#-----------
+time=32317440
+mem_heap_B=31932416
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=73
+#-----------
+time=32321536
+mem_heap_B=31936512
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=74
+#-----------
+time=32325632
+mem_heap_B=31940608
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=75
+#-----------
+time=32329728
+mem_heap_B=31944704
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=76
+#-----------
+time=32333824
+mem_heap_B=31948800
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=77
+#-----------
+time=32337920
+mem_heap_B=31952896
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=78
+#-----------
+time=32342016
+mem_heap_B=31956992
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=79
+#-----------
+time=32346112
+mem_heap_B=31961088
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=80
+#-----------
+time=32350208
+mem_heap_B=31965184
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=81
+#-----------
+time=32354304
+mem_heap_B=31969280
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=detailed
+n4: 31969280 (page allocation syscalls) mmap/mremap/brk, --alloc-fns, etc.
+ n2: 22921216 0x4017319: mmap (syscall-template.S:81)
+  n1: 22556672 0x4006220: _dl_map_object_from_fd (dl-load.c:1293)
+   n3: 22556672 0x400809D: _dl_map_object (dl-load.c:2605)
+    n1: 18341888 0x400C3A0: openaux (dl-deps.c:63)
+     n1: 18341888 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 18341888 0x400C5F3: _dl_map_object_deps (dl-deps.c:254)
+       n1: 18341888 0x4002DB2: dl_main (rtld.c:1743)
+        n1: 18341888 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 18341888 0x4004A14: _dl_start (rtld.c:331)
+          n1: 18341888 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 18341888 0x6: ???
+            n1: 18341888 0xFFF00010D: ???
+             n1: 18341888 0xFFF00012F: ???
+              n1: 18341888 0xFFF000132: ???
+               n1: 18341888 0xFFF000146: ???
+                n1: 18341888 0xFFF000149: ???
+                 n1: 18341888 0xFFF00016F: ???
+                  n1: 18341888 0xFFF000172: ???
+                   n0: 18341888 0xFFF00018D: ???
+    n1: 2109440 0x4012A23: dl_open_worker (dl-open.c:235)
+     n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2109440 0x4012439: _dl_open (dl-open.c:661)
+       n1: 2109440 0x5B15780: do_dlopen (dl-libc.c:87)
+        n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+         n1: 2109440 0x5B1581D: dlerror_run (dl-libc.c:46)
+          n1: 2109440 0x5B1588F: __libc_dlopen_mode (dl-libc.c:163)
+           n1: 2109440 0x5A2572E: __gconv_find_shlib (gconv_dl.c:116)
+            n1: 2109440 0x5A24E7C: find_module (gconv_cache.c:195)
+             n1: 2109440 0x5A25353: __gconv_lookup_cache (gconv_cache.c:392)
+              n1: 2109440 0x5A1DD18: __gconv_find_transform (gconv_db.c:730)
+               n1: 2109440 0x5A1C69D: __gconv_open (gconv_open.c:172)
+                n1: 2109440 0x5A2985E: _nl_find_msg (dcigettext.c:982)
+                 n1: 2109440 0x5A2A072: __dcigettext (dcigettext.c:638)
+                  n1: 2109440 0x434B7C: clgettext (spvw_language.d:249)
+                   n1: 2109440 0x43C4BB: CLSTEXT (spvw_language.d:274)
+                    n1: 2109440 0x528C76: C_text (i18n.d:53)
+                     n1: 2109440 0x444F9D: funcall_subr (eval.d:5227)
+                      n1: 2109440 0x447431: funcall (eval.d:4867)
+                       n1: 2109440 0x44BFF3: interpret_bytecode_ (eval.d:6796)
+                        n1: 2109440 0x459169: funcall_closure (eval.d:5611)
+                         n1: 2109440 0x447445: funcall (eval.d:4869)
+                          n1: 2109440 0x43DCB5: main_actions (spvw.d:3576)
+                           n0: 2109440 0x441BF3: main (spvw.d:3885)
+    n1: 2105344 0x400137C: map_doit (rtld.c:626)
+     n1: 2105344 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2105344 0x4000B2D: do_preload (rtld.c:815)
+       n1: 2105344 0x4004126: dl_main (rtld.c:1634)
+        n1: 2105344 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 2105344 0x4004A14: _dl_start (rtld.c:331)
+          n1: 2105344 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 2105344 0x6: ???
+            n1: 2105344 0xFFF00010D: ???
+             n1: 2105344 0xFFF00012F: ???
+              n1: 2105344 0xFFF000132: ???
+               n1: 2105344 0xFFF000146: ???
+                n1: 2105344 0xFFF000149: ???
+                 n1: 2105344 0xFFF00016F: ???
+                  n1: 2105344 0xFFF000172: ???
+                   n0: 2105344 0xFFF00018D: ???
+  n0: 364544 in 4 places, all below massif's threshold (01.00%)
+ n4: 6373376 0x5ADC149: mmap (syscall-template.S:81)
+  n3: 3756032 0x439A29: mmap_zeromap (spvw_mmap.d:339)
+   n1: 2154496 0x43BA16: loadmem_from_handle (spvw_memfile.d:1549)
+    n1: 2154496 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 2154496 0x43F949: main (spvw.d:3267)
+   n1: 1060864 0x43BA90: loadmem_from_handle (spvw_memfile.d:1559)
+    n1: 1060864 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 1060864 0x43F949: main (spvw.d:3267)
+   n0: 540672 in 2 places, all below massif's threshold (01.00%)
+  n1: 1609728 0x5A272FB: _nl_load_locale_from_archive (loadarchive.c:228)
+   n1: 1609728 0x5A262B0: _nl_find_locale (findlocale.c:154)
+    n1: 1609728 0x5A25BF1: setlocale (setlocale.c:417)
+     n0: 1609728 0x43F5B7: main (spvw_ctype.d:30)
+  n1: 790528 0x5A74E0B: _int_malloc (malloc.c:2305)
+   n1: 790528 0x5A7606E: malloc (malloc.c:2891)
+    n0: 790528 0x43F6B8: main (spvw_allocate.d:150)
+  n0: 217088 in 3 places, all below massif's threshold (01.00%)
+ n0: 2539520 0xFFFFFFFFFFFFFFFF: ???
+ n0: 135168 in 1 place, below massif's threshold (01.00%)
+#-----------
+snapshot=82
+#-----------
+time=32358400
+mem_heap_B=31973376
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=83
+#-----------
+time=32362496
+mem_heap_B=31977472
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=84
+#-----------
+time=32366592
+mem_heap_B=31981568
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=85
+#-----------
+time=32370688
+mem_heap_B=31985664
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=86
+#-----------
+time=32374784
+mem_heap_B=31989760
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=87
+#-----------
+time=32378880
+mem_heap_B=31993856
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=88
+#-----------
+time=32382976
+mem_heap_B=31997952
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=89
+#-----------
+time=32387072
+mem_heap_B=32002048
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=90
+#-----------
+time=32391168
+mem_heap_B=32006144
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=91
+#-----------
+time=32395264
+mem_heap_B=32010240
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=detailed
+n4: 32010240 (page allocation syscalls) mmap/mremap/brk, --alloc-fns, etc.
+ n2: 22921216 0x4017319: mmap (syscall-template.S:81)
+  n1: 22556672 0x4006220: _dl_map_object_from_fd (dl-load.c:1293)
+   n3: 22556672 0x400809D: _dl_map_object (dl-load.c:2605)
+    n1: 18341888 0x400C3A0: openaux (dl-deps.c:63)
+     n1: 18341888 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 18341888 0x400C5F3: _dl_map_object_deps (dl-deps.c:254)
+       n1: 18341888 0x4002DB2: dl_main (rtld.c:1743)
+        n1: 18341888 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 18341888 0x4004A14: _dl_start (rtld.c:331)
+          n1: 18341888 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 18341888 0x6: ???
+            n1: 18341888 0xFFF00010D: ???
+             n1: 18341888 0xFFF00012F: ???
+              n1: 18341888 0xFFF000132: ???
+               n1: 18341888 0xFFF000146: ???
+                n1: 18341888 0xFFF000149: ???
+                 n1: 18341888 0xFFF00016F: ???
+                  n1: 18341888 0xFFF000172: ???
+                   n0: 18341888 0xFFF00018D: ???
+    n1: 2109440 0x4012A23: dl_open_worker (dl-open.c:235)
+     n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2109440 0x4012439: _dl_open (dl-open.c:661)
+       n1: 2109440 0x5B15780: do_dlopen (dl-libc.c:87)
+        n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+         n1: 2109440 0x5B1581D: dlerror_run (dl-libc.c:46)
+          n1: 2109440 0x5B1588F: __libc_dlopen_mode (dl-libc.c:163)
+           n1: 2109440 0x5A2572E: __gconv_find_shlib (gconv_dl.c:116)
+            n1: 2109440 0x5A24E7C: find_module (gconv_cache.c:195)
+             n1: 2109440 0x5A25353: __gconv_lookup_cache (gconv_cache.c:392)
+              n1: 2109440 0x5A1DD18: __gconv_find_transform (gconv_db.c:730)
+               n1: 2109440 0x5A1C69D: __gconv_open (gconv_open.c:172)
+                n1: 2109440 0x5A2985E: _nl_find_msg (dcigettext.c:982)
+                 n1: 2109440 0x5A2A072: __dcigettext (dcigettext.c:638)
+                  n1: 2109440 0x434B7C: clgettext (spvw_language.d:249)
+                   n1: 2109440 0x43C4BB: CLSTEXT (spvw_language.d:274)
+                    n1: 2109440 0x528C76: C_text (i18n.d:53)
+                     n1: 2109440 0x444F9D: funcall_subr (eval.d:5227)
+                      n1: 2109440 0x447431: funcall (eval.d:4867)
+                       n1: 2109440 0x44BFF3: interpret_bytecode_ (eval.d:6796)
+                        n1: 2109440 0x459169: funcall_closure (eval.d:5611)
+                         n1: 2109440 0x447445: funcall (eval.d:4869)
+                          n1: 2109440 0x43DCB5: main_actions (spvw.d:3576)
+                           n0: 2109440 0x441BF3: main (spvw.d:3885)
+    n1: 2105344 0x400137C: map_doit (rtld.c:626)
+     n1: 2105344 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2105344 0x4000B2D: do_preload (rtld.c:815)
+       n1: 2105344 0x4004126: dl_main (rtld.c:1634)
+        n1: 2105344 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 2105344 0x4004A14: _dl_start (rtld.c:331)
+          n1: 2105344 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 2105344 0x6: ???
+            n1: 2105344 0xFFF00010D: ???
+             n1: 2105344 0xFFF00012F: ???
+              n1: 2105344 0xFFF000132: ???
+               n1: 2105344 0xFFF000146: ???
+                n1: 2105344 0xFFF000149: ???
+                 n1: 2105344 0xFFF00016F: ???
+                  n1: 2105344 0xFFF000172: ???
+                   n0: 2105344 0xFFF00018D: ???
+  n0: 364544 in 4 places, all below massif's threshold (01.00%)
+ n4: 6414336 0x5ADC149: mmap (syscall-template.S:81)
+  n4: 3796992 0x439A29: mmap_zeromap (spvw_mmap.d:339)
+   n1: 2154496 0x43BA16: loadmem_from_handle (spvw_memfile.d:1549)
+    n1: 2154496 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 2154496 0x43F949: main (spvw.d:3267)
+   n1: 1060864 0x43BA90: loadmem_from_handle (spvw_memfile.d:1559)
+    n1: 1060864 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 1060864 0x43F949: main (spvw.d:3267)
+   n1: 335872 0x439CDE: make_space_gc_true (spvw_allocate.d:310)
+    n0: 335872 in 7 places, all below massif's threshold (01.00%)
+   n0: 245760 in 1 place, below massif's threshold (01.00%)
+  n1: 1609728 0x5A272FB: _nl_load_locale_from_archive (loadarchive.c:228)
+   n1: 1609728 0x5A262B0: _nl_find_locale (findlocale.c:154)
+    n1: 1609728 0x5A25BF1: setlocale (setlocale.c:417)
+     n0: 1609728 0x43F5B7: main (spvw_ctype.d:30)
+  n1: 790528 0x5A74E0B: _int_malloc (malloc.c:2305)
+   n1: 790528 0x5A7606E: malloc (malloc.c:2891)
+    n0: 790528 0x43F6B8: main (spvw_allocate.d:150)
+  n0: 217088 in 3 places, all below massif's threshold (01.00%)
+ n0: 2539520 0xFFFFFFFFFFFFFFFF: ???
+ n0: 135168 in 1 place, below massif's threshold (01.00%)
+#-----------
+snapshot=92
+#-----------
+time=32399360
+mem_heap_B=32014336
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=93
+#-----------
+time=32403456
+mem_heap_B=32018432
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=94
+#-----------
+time=34009088
+mem_heap_B=30412800
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=peak
+n4: 30412800 (page allocation syscalls) mmap/mremap/brk, --alloc-fns, etc.
+ n2: 22921216 0x4017319: mmap (syscall-template.S:81)
+  n1: 22556672 0x4006220: _dl_map_object_from_fd (dl-load.c:1293)
+   n3: 22556672 0x400809D: _dl_map_object (dl-load.c:2605)
+    n1: 18341888 0x400C3A0: openaux (dl-deps.c:63)
+     n1: 18341888 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 18341888 0x400C5F3: _dl_map_object_deps (dl-deps.c:254)
+       n1: 18341888 0x4002DB2: dl_main (rtld.c:1743)
+        n1: 18341888 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 18341888 0x4004A14: _dl_start (rtld.c:331)
+          n1: 18341888 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 18341888 0x6: ???
+            n1: 18341888 0xFFF00010D: ???
+             n1: 18341888 0xFFF00012F: ???
+              n1: 18341888 0xFFF000132: ???
+               n1: 18341888 0xFFF000146: ???
+                n1: 18341888 0xFFF000149: ???
+                 n1: 18341888 0xFFF00016F: ???
+                  n1: 18341888 0xFFF000172: ???
+                   n0: 18341888 0xFFF00018D: ???
+    n1: 2109440 0x4012A23: dl_open_worker (dl-open.c:235)
+     n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2109440 0x4012439: _dl_open (dl-open.c:661)
+       n1: 2109440 0x5B15780: do_dlopen (dl-libc.c:87)
+        n1: 2109440 0x400E8B2: _dl_catch_error (dl-error.c:187)
+         n1: 2109440 0x5B1581D: dlerror_run (dl-libc.c:46)
+          n1: 2109440 0x5B1588F: __libc_dlopen_mode (dl-libc.c:163)
+           n1: 2109440 0x5A2572E: __gconv_find_shlib (gconv_dl.c:116)
+            n1: 2109440 0x5A24E7C: find_module (gconv_cache.c:195)
+             n1: 2109440 0x5A25353: __gconv_lookup_cache (gconv_cache.c:392)
+              n1: 2109440 0x5A1DD18: __gconv_find_transform (gconv_db.c:730)
+               n1: 2109440 0x5A1C69D: __gconv_open (gconv_open.c:172)
+                n1: 2109440 0x5A2985E: _nl_find_msg (dcigettext.c:982)
+                 n1: 2109440 0x5A2A072: __dcigettext (dcigettext.c:638)
+                  n1: 2109440 0x434B7C: clgettext (spvw_language.d:249)
+                   n1: 2109440 0x43C4BB: CLSTEXT (spvw_language.d:274)
+                    n1: 2109440 0x528C76: C_text (i18n.d:53)
+                     n1: 2109440 0x444F9D: funcall_subr (eval.d:5227)
+                      n1: 2109440 0x447431: funcall (eval.d:4867)
+                       n1: 2109440 0x44BFF3: interpret_bytecode_ (eval.d:6796)
+                        n1: 2109440 0x459169: funcall_closure (eval.d:5611)
+                         n1: 2109440 0x447445: funcall (eval.d:4869)
+                          n1: 2109440 0x43DCB5: main_actions (spvw.d:3576)
+                           n0: 2109440 0x441BF3: main (spvw.d:3885)
+    n1: 2105344 0x400137C: map_doit (rtld.c:626)
+     n1: 2105344 0x400E8B2: _dl_catch_error (dl-error.c:187)
+      n1: 2105344 0x4000B2D: do_preload (rtld.c:815)
+       n1: 2105344 0x4004126: dl_main (rtld.c:1634)
+        n1: 2105344 0x40152B3: _dl_sysdep_start (dl-sysdep.c:249)
+         n1: 2105344 0x4004A14: _dl_start (rtld.c:331)
+          n1: 2105344 0x4001196: ??? (in /lib/x86_64-linux-gnu/ld-2.19.so)
+           n1: 2105344 0x6: ???
+            n1: 2105344 0xFFF00010D: ???
+             n1: 2105344 0xFFF00012F: ???
+              n1: 2105344 0xFFF000132: ???
+               n1: 2105344 0xFFF000146: ???
+                n1: 2105344 0xFFF000149: ???
+                 n1: 2105344 0xFFF00016F: ???
+                  n1: 2105344 0xFFF000172: ???
+                   n0: 2105344 0xFFF00018D: ???
+  n0: 364544 in 4 places, all below massif's threshold (01.00%)
+ n3: 4816896 0x5ADC149: mmap (syscall-template.S:81)
+  n4: 3805184 0x439A29: mmap_zeromap (spvw_mmap.d:339)
+   n1: 2154496 0x43BA16: loadmem_from_handle (spvw_memfile.d:1549)
+    n1: 2154496 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 2154496 0x43F949: main (spvw.d:3267)
+   n1: 1060864 0x43BA90: loadmem_from_handle (spvw_memfile.d:1559)
+    n1: 1060864 0x43C0A6: loadmem (spvw_memfile.d:977)
+     n0: 1060864 0x43F949: main (spvw.d:3267)
+   n1: 339968 0x439CDE: make_space_gc_true (spvw_allocate.d:310)
+    n0: 339968 in 7 places, all below massif's threshold (01.00%)
+   n0: 249856 in 1 place, below massif's threshold (01.00%)
+  n1: 790528 0x5A74E0B: _int_malloc (malloc.c:2305)
+   n1: 790528 0x5A7606E: malloc (malloc.c:2891)
+    n0: 790528 0x43F6B8: main (spvw_allocate.d:150)
+  n0: 221184 in 4 places, all below massif's threshold (01.00%)
+ n0: 2539520 0xFFFFFFFFFFFFFFFF: ???
+ n0: 135168 in 1 place, below massif's threshold (01.00%)
+#-----------
+snapshot=95
+#-----------
+time=34013184
+mem_heap_B=30408704
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=96
+#-----------
+time=34201600
+mem_heap_B=30220288
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=97
+#-----------
+time=34230272
+mem_heap_B=30191616
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty
+#-----------
+snapshot=98
+#-----------
+time=36339712
+mem_heap_B=28082176
+mem_heap_extra_B=0
+mem_stacks_B=0
+heap_tree=empty

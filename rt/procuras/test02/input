@@ -1,0 +1,10 @@
+;;deve retornar IGNORE
+(progn (setf t1 (array->tabuleiro #2A((T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (T T T T T T T T NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL) (NIL NIL NIL NIL NIL NIL NIL NIL NIL NIL)))) 'IGNORE)
+;;deve retornar IGNORE
+'IGNORE
+;;deve retornar IGNORE
+(progn (setf e1 (make-estado :pontos 0 :tabuleiro t1  :pecas-por-colocar '(t i l l))) 'IGNORE)
+;;deve retornar IGNORE
+(progn (setf p1 (make-problema :estado-inicial e1 :solucao #'solucao :accoes #'accoes :resultado #'resultado :custo-caminho #'custo-oportunidade)) 'IGNORE)
+;;retorna tempo
+(progn (setf a1 (time (procura-RBFS p1 #'heuristicas))) 'RBFS)
